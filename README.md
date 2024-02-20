@@ -1,7 +1,4 @@
-[![Build Status](https://github.com/DependencyTrack/frontend/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/DependencyTrack/frontend/actions?workflow=Build+CI)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/364443f9f30c4b70b56e5be76c9e079c)](https://www.codacy.com/gh/DependencyTrack/frontend/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DependencyTrack/frontend&amp;utm_campaign=Badge_Grade)
-[![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)][License]
-[![Latest (including pre-releases)](https://img.shields.io/github/v/release/dependencytrack/frontend?include_prereleases)](https://github.com/DependencyTrack/frontend/releases)
+[![Build Status](https://github.com/DependencyTrack/hyades-frontend/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/DependencyTrack/hyades-frontend/actions?workflow=Build+CI)
 
 Dependency-Track Front-End
 =========
