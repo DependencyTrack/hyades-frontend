@@ -52,11 +52,11 @@ import { compareVersions, loadUserPreferencesForBootstrapTable } from "@/shared/
 import ProjectAddComponentModal from "@/views/portfolio/projects/ProjectAddComponentModal";
 import ProjectUploadBomModal from "@/views/portfolio/projects/ProjectUploadBomModal";
 import { Switch as cSwitch } from '@coreui/vue';
-  import $ from 'jquery';
-  import Vue from 'vue';
-  import xssFilters from "xss-filters";
-  import permissionsMixin from "../../../mixins/permissionsMixin";
-  import common from "../../../shared/common";
+import $ from 'jquery';
+import Vue from 'vue';
+import xssFilters from "xss-filters";
+import permissionsMixin from "../../../mixins/permissionsMixin";
+import common from "../../../shared/common";
 import SeverityProgressBar from "../../components/SeverityProgressBar";
   
   export default {
