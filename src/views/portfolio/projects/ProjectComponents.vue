@@ -52,13 +52,13 @@ import { compareVersions, loadUserPreferencesForBootstrapTable } from "@/shared/
 import ProjectAddComponentModal from "@/views/portfolio/projects/ProjectAddComponentModal";
 import ProjectUploadBomModal from "@/views/portfolio/projects/ProjectUploadBomModal";
 import { Switch as cSwitch } from '@coreui/vue';
-import $ from 'jquery';
-import Vue from 'vue';
-import xssFilters from "xss-filters";
-import permissionsMixin from "../../../mixins/permissionsMixin";
-import common from "../../../shared/common";
+  import $ from 'jquery';
+  import Vue from 'vue';
+  import xssFilters from "xss-filters";
+  import permissionsMixin from "../../../mixins/permissionsMixin";
+  import common from "../../../shared/common";
 import SeverityProgressBar from "../../components/SeverityProgressBar";
-
+  
   export default {
     components: {
       cSwitch,
@@ -76,7 +76,7 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
     },
     data() {
       return {
-        labelIcon: {
+labelIcon: {
           dataOn: '\u2713',
           dataOff: '\u2715'
         },
@@ -107,7 +107,7 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
                 row.latestVersion = row.repositoryMeta.latestVersion;
                 if (compareVersions(row.repositoryMeta.latestVersion, row.version) > 0) {
                   return '<span style="float:right" data-toggle="tooltip" data-placement="bottom" title="Risk: Outdated component. Current version is: '+ xssFilters.inHTMLData(row.repositoryMeta.latestVersion) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ' + xssFilters.inHTMLData(row.version);
-                } else if (compareVersions(row.repositoryMeta.latestVersion, row.version) < 0) {
+} else if (compareVersions(row.repositoryMeta.latestVersion, row.version) < 0) {
                   // should be unstable then
                   return '<span style="float:right" data-toggle="tooltip" data-placement="bottom" title="Risk: Unstable component. Current stable version is: '+ xssFilters.inHTMLData(row.repositoryMeta.latestVersion) + '"><i class="fa fa-exclamation-circle" aria-hidden="true"></i></span> ' + xssFilters.inHTMLData(row.version);
                 } else {
@@ -115,6 +115,16 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
                 }
               } else {
                 return xssFilters.inHTMLData(common.valueWithDefault(value, ""));
+              }
+            }
+          },
+          {
+            title: this.$t('message.published_at'),
+            field: "componentMetaInformation.publishedDate",
+            sortable: true,
+            formatter(value, row, index) {
+              if (value != null) {
+                return xssFilters.inHTMLData(common.formatTimestamp(value));
               }
             }
           },
@@ -144,6 +154,39 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
             formatter: function (value, row, index) {
               return value === true ? '<i class="fa fa-check-square-o" />' : "";
             },
+          },
+          {
+            title: this.$t('message.integrity'),
+            field: "componentMetaInformation.integrityMatchStatus",
+            sortable: true,
+            visible: false,
+            formatter: (value, row, index) => {
+              if (Object.prototype.hasOwnProperty.call(row, "componentMetaInformation") 
+                  && Object.prototype.hasOwnProperty.call(row.componentMetaInformation, "integrityMatchStatus")
+                  && row.componentMetaInformation.integrityMatchStatus != null) {
+
+                var lastFetchMessage = "Last fetch unknown.";
+                if (typeof row.componentMetaInformation.lastFetched !== 'undefined' && row.componentMetaInformation.lastFetched != null) {
+                  lastFetchMessage = "Last fetched on " + common.formatTimestamp(row.componentMetaInformation.lastFetched) + ".";
+                }
+              
+                if (typeof row.componentMetaInformation.integrityRepoUrl != null) {
+                  lastFetchMessage += " Source:  " + row.componentMetaInformation.integrityRepoUrl;
+                }
+
+                if (row.componentMetaInformation.integrityMatchStatus == 'HASH_MATCH_PASSED') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes match. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-check status-passed" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'HASH_MATCH_FAILED') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes do not match. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'COMPONENT_MISSING_HASH') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component hashes are missing. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'HASH_MATCH_UNKNOWN') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Repository hashes are missing. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'COMPONENT_MISSING_HASH_AND_MATCH_UNKNOWN') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes are missing. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                }
+              }
+            }
           },
           {
             title: this.$t('message.license'),
@@ -313,7 +356,7 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
           pageNumber: 1,
           silent: true
         });
-      },
+},
     },
     watch: {
       onlyOutdated() {
