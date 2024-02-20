@@ -6,7 +6,7 @@
 Hyades-Frontend
 =========
 
-Hyades-Frontend is a fork of the [Dependency-Track Frontend]([https://github.com/DependencyTrack/dependency-track](https://github.com/DependencyTrack/frontend)). 
+Hyades-Frontend is a fork of the [Dependency-Track Frontend](https://github.com/DependencyTrack/frontend). 
 It includes various changes necessary to work with Hyades.
 
 It is a Single Page Application (SPA) used in Dependency-Track, an open source Component Analysis platform that allows organizations to identify and reduce risk in the software supply chain.
