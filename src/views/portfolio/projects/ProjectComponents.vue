@@ -58,7 +58,7 @@ import xssFilters from "xss-filters";
 import permissionsMixin from "../../../mixins/permissionsMixin";
 import common from "../../../shared/common";
 import SeverityProgressBar from "../../components/SeverityProgressBar";
-  
+
   export default {
     components: {
       cSwitch,
@@ -76,7 +76,7 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
     },
     data() {
       return {
-labelIcon: {
+      labelIcon: {
           dataOn: '\u2713',
           dataOff: '\u2715'
         },
@@ -107,7 +107,7 @@ labelIcon: {
                 row.latestVersion = row.repositoryMeta.latestVersion;
                 if (compareVersions(row.repositoryMeta.latestVersion, row.version) > 0) {
                   return '<span style="float:right" data-toggle="tooltip" data-placement="bottom" title="Risk: Outdated component. Current version is: '+ xssFilters.inHTMLData(row.repositoryMeta.latestVersion) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ' + xssFilters.inHTMLData(row.version);
-} else if (compareVersions(row.repositoryMeta.latestVersion, row.version) < 0) {
+                } else if (compareVersions(row.repositoryMeta.latestVersion, row.version) < 0) {
                   // should be unstable then
                   return '<span style="float:right" data-toggle="tooltip" data-placement="bottom" title="Risk: Unstable component. Current stable version is: '+ xssFilters.inHTMLData(row.repositoryMeta.latestVersion) + '"><i class="fa fa-exclamation-circle" aria-hidden="true"></i></span> ' + xssFilters.inHTMLData(row.version);
                 } else {
@@ -356,7 +356,7 @@ labelIcon: {
           pageNumber: 1,
           silent: true
         });
-},
+      },
     },
     watch: {
       onlyOutdated() {
