@@ -6,6 +6,8 @@ on:
       - released
   workflow_dispatch:
 
+permissions: { }
+
 jobs:
   read-version:
     runs-on: ubuntu-latest
@@ -35,9 +37,12 @@ jobs:
     with:
       app-version: ${{ needs.read-version.outputs.version }}
       publish-container: true
+    permissions:
+      packages: write # Required to push images to ghcr.io
+      security-events: write # Required to upload trivy's SARIF output
     secrets:
-      registry-0-usr: ${{ secrets.HUB_USERNAME }}
-      registry-0-psw: ${{ secrets.HUB_ACCESS_TOKEN }}
+      registry-0-usr: ${{ github.repository_owner }}
+      registry-0-psw: ${{ secrets.GITHUB_TOKEN }}
 
   update-github-release:
     runs-on: ubuntu-latest
