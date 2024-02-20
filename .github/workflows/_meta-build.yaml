@@ -84,7 +84,7 @@ jobs:
         with:
           install: true
 
-      - name: Login to Docker.io
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3.0.0
         if: ${{ inputs.publish-container }}
         with:
