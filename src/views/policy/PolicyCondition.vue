@@ -13,7 +13,7 @@
         <b-input-group-form-select v-if="subject !== 'COORDINATES' && subject !== 'VERSION_DISTANCE' && isSubjectSelectable" id="input-value" required="true"
                                    v-on:change="saveCondition" v-model="value" :options="possibleValues" />
 
-        <b-input-group-form-input v-else-if="subject !== 'COORDINATES' && subject !== 'VERSION_DISTANCE' && subject !== 'EXPRESSION' && !isSubjectSelectable" id="input-value" required="true" type="text" v-model="value" lazy="true"
+        <b-input-group-form-input v-else-if="subject !== 'COORDINATES' && subject !== 'VERSION_DISTANCE' && !isSubjectSelectable" id="input-value" required="true" type="text" v-model="value" lazy="true"
                                   v-debounce:750ms="saveCondition" :tooltip="valueInputTooltip()" :debounce-events="'keyup'" />
 
         <b-input-group v-else-if="subject === 'COORDINATES'">
