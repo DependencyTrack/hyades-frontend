@@ -76,7 +76,7 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
     },
     data() {
       return {
-        labelIcon: {
+      labelIcon: {
           dataOn: '\u2713',
           dataOff: '\u2715'
         },
@@ -119,6 +119,16 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
             }
           },
           {
+            title: this.$t('message.published_at'),
+            field: "componentMetaInformation.publishedDate",
+            sortable: true,
+            formatter(value, row, index) {
+              if (value != null) {
+                return xssFilters.inHTMLData(common.formatTimestamp(value));
+              }
+            }
+          },
+          {
             title: this.$t('message.latest_version'),
             field: "latestVersion",
             sortable: false,
@@ -144,6 +154,39 @@ import SeverityProgressBar from "../../components/SeverityProgressBar";
             formatter: function (value, row, index) {
               return value === true ? '<i class="fa fa-check-square-o" />' : "";
             },
+          },
+          {
+            title: this.$t('message.integrity'),
+            field: "componentMetaInformation.integrityMatchStatus",
+            sortable: true,
+            visible: false,
+            formatter: (value, row, index) => {
+              if (Object.prototype.hasOwnProperty.call(row, "componentMetaInformation") 
+                  && Object.prototype.hasOwnProperty.call(row.componentMetaInformation, "integrityMatchStatus")
+                  && row.componentMetaInformation.integrityMatchStatus != null) {
+
+                var lastFetchMessage = "Last fetch unknown.";
+                if (typeof row.componentMetaInformation.lastFetched !== 'undefined' && row.componentMetaInformation.lastFetched != null) {
+                  lastFetchMessage = "Last fetched on " + common.formatTimestamp(row.componentMetaInformation.lastFetched) + ".";
+                }
+              
+                if (typeof row.componentMetaInformation.integrityRepoUrl != null) {
+                  lastFetchMessage += " Source:  " + row.componentMetaInformation.integrityRepoUrl;
+                }
+
+                if (row.componentMetaInformation.integrityMatchStatus == 'HASH_MATCH_PASSED') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes match. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-check status-passed" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'HASH_MATCH_FAILED') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes do not match. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'COMPONENT_MISSING_HASH') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component hashes are missing. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'HASH_MATCH_UNKNOWN') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Repository hashes are missing. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                } else if (row.componentMetaInformation.integrityMatchStatus == 'COMPONENT_MISSING_HASH_AND_MATCH_UNKNOWN') {
+                  return '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes are missing. '+ xssFilters.inHTMLData(lastFetchMessage) + '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> ';
+                }
+              }
+            }
           },
           {
             title: this.$t('message.license'),

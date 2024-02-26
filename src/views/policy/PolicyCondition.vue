@@ -5,11 +5,11 @@
         <b-input-group-form-select id="input-subject" required="true"
                                    v-on:change="subjectChanged" v-model="subject" :options="subjects" />
       </b-col>
-      <b-col md="3" lg="2">
+      <b-col md="3"  v-if="subject !== 'EXPRESSION'" lg="2">
         <b-input-group-form-select id="input-operator" required="true"
                                    v-model="operator" :options="operators" />
       </b-col>
-      <b-col md="5" lg="5">
+      <b-col md="5" lg="5" v-if="subject !== 'EXPRESSION'">
         <b-input-group-form-select v-if="subject !== 'COORDINATES' && subject !== 'VERSION_DISTANCE' && isSubjectSelectable" id="input-value" required="true"
                                    v-on:change="saveCondition" v-model="value" :options="possibleValues" />
 
@@ -35,6 +35,12 @@
         </b-input-group>
 
       </b-col>
+      <b-col v-if="subject === 'EXPRESSION'" lg="6">
+        <MonacoEditor id="input-value" v-if="subject === 'EXPRESSION'" v-model="value" :markers="this.editorMarkers" v-debounce:1s="saveCondition" :debounce-events="'keyup'"></MonacoEditor>
+      </b-col>
+      <b-col v-if="subject === 'EXPRESSION'" lg="2">
+        <b-form-select id="input-value-violationtype" v-if="subject === 'EXPRESSION'" v-on:change="saveCondition" v-model="violationType" :options="violationTypes"></b-form-select>
+      </b-col>
       <b-col md="0" lg="2">
       </b-col>
     </b-row>
@@ -42,10 +48,11 @@
 </template>
 
 <script>
-  import BInputGroupFormInput from "../../forms/BInputGroupFormInput";
+import BInputGroupFormInput from "../../forms/BInputGroupFormInput";
 import BInputGroupFormSelect from "../../forms/BInputGroupFormSelect";
 import common from "../../shared/common";
 import ActionableListGroupItem from "../components/ActionableListGroupItem";
+import MonacoEditor from "@/views/components/MonacoEditor.vue";
 
   export default {
     props: {
@@ -55,7 +62,8 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
     components: {
       ActionableListGroupItem,
       BInputGroupFormSelect,
-      BInputGroupFormInput
+      BInputGroupFormInput,
+      MonacoEditor,
     },
     created() {
       if (this.condition) {
@@ -64,6 +72,7 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
         this.subjectChanged();
         this.operator = this.condition.operator;
         this.value = this.condition.value;
+        this.violationType = this.condition.violationType;
       }
     },
     data() {
@@ -72,6 +81,7 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
         subject: null,
         operator: null,
         value: null,
+        violationType: null,
         coordinatesGroup: null,
         coordinatesName: null,
         coordinatesVersion: null,
@@ -96,7 +106,8 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
           {value: 'COMPONENT_HASH', text: this.$t('message.component_hash')},
           {value: 'CWE', text: this.$t('message.cwe_full')},
           {value: 'VULNERABILITY_ID', text: this.$t('message.vulnerability_vuln_id')},
-          {value: 'VERSION_DISTANCE', text: this.$t('message.version_distance')}
+          {value: 'VERSION_DISTANCE', text: this.$t('message.version_distance')},
+          {value: 'EXPRESSION', text: 'Expression'}
         ],
         objectOperators: [
           {value: 'IS', text: this.$t('operator.is')},
@@ -132,8 +143,14 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
           {value: 'CONTAINS_ANY', text: this.$t('operator.contains_any')},
           {value: 'CONTAINS_ALL', text: this.$t('operator.contains_all')}
         ],
+        violationTypes: [
+          {value: 'LICENSE', text: 'License'},
+          {value: 'OPERATIONAL', text: 'Operational'},
+          {value: 'SECURITY', text: 'Security'}
+        ],
         operators: [],
-        possibleValues: []
+        possibleValues: [],
+        editorMarkers: [],
       }
     },
     computed: {
@@ -168,6 +185,8 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
           case 'VULNERABILITY_ID':
             return false;
           case 'VERSION_DISTANCE':
+            return false;
+          case 'EXPRESSION':
             return false;
           default:
             return false;
@@ -240,6 +259,9 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
           case 'VERSION_DISTANCE':
             this.operators = this.numericOperators;
             break;
+          case 'EXPRESSION':
+            this.operators = this.regexOperators;
+            break;
           default:
             this.operators = [];
         }
@@ -288,7 +310,13 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
       },
       saveCondition: function() {
         let dynamicValue = this.createDynamicValue();
-        if (!this.subject || !this.operator || !dynamicValue) {
+        if (!this.subject) {
+          return;
+        }
+        if (this.subject == 'EXPRESSION' && (!this.violationType || !dynamicValue)) {
+          return;
+        }
+        if (this.subject != 'EXPRESSION' && (!this.operator || !dynamicValue)) {
           return;
         }
         if (this.uuid) {
@@ -297,27 +325,44 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
             uuid: this.uuid,
             subject: this.subject,
             operator: this.subject === 'COMPONENT_HASH' ? 'IS' : this.operator,
+            violationType: this.subject === 'EXPRESSION' ? this.violationType : null,
             value: dynamicValue
           }).then((response) => {
             this.uuid = response.data.uuid;
             this.subject = response.data.subject;
             this.operator = response.data.operator;
             this.value = response.data.value;
+            this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.updated'));
           }).catch((error) => {
-            this.$toastr.w(this.$t('condition.unsuccessful_action'));
+            if (this.subject === 'EXPRESSION' && error.response && error.response.data && error.response.data.celErrors) {
+              this.editorMarkers = error.response.data.celErrors.map(celErr => {
+                return {
+                  startLineNumber: celErr.line,
+                  startColumn: celErr.column,
+                  endLineNumber: celErr.line,
+                  endColumn: celErr.column + 3, // Add a few columns to make it more visible
+                  message: celErr.message,
+                  severity: 8
+                }
+              });
+            } else {
+              this.$toastr.w(this.$t('condition.unsuccessful_action'));
+            }
           });
         } else {
           let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}/condition`;
           this.axios.put(url, {
             subject: this.subject,
             operator: this.subject === 'COMPONENT_HASH' ? 'IS' : this.operator,
-            value: dynamicValue
+            value: dynamicValue,
+            violationType: this.subject === 'EXPRESSION' ? this.violationType : null
           }).then((response) => {
             this.uuid = response.data.uuid;
             this.subject = response.data.subject;
             this.operator = response.data.operator;
             this.value = response.data.value;
+            this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.updated'));
           }).catch((error) => {
             this.$toastr.w(this.$t('condition.unsuccessful_action'));
@@ -332,6 +377,7 @@ import ActionableListGroupItem from "../components/ActionableListGroupItem";
             this.subject = response.data.subject;
             this.operator = response.data.operator;
             this.value = response.data.value;
+            this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.condition_deleted'));
             this.$emit('conditionRemoved');
           }).catch((error) => {
