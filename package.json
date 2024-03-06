@@ -72,7 +72,7 @@
     "@vue/cli-plugin-babel": "5.0.8",
     "@vue/cli-plugin-eslint": "3.12.1",
     "@vue/cli-service": "3.12.1",
-    "copy-webpack-plugin": "5.1.2",
+    "copy-webpack-plugin": "6.4.0",
     "cross-env": "^7.0.3",
     "growl": "1.10.5",
     "https-proxy-agent": "2.2.4",
@@ -82,6 +82,7 @@
     "vue-template-compiler": "2.6.14"
   },
   "overrides": {
+    "glob-parent": "5.1.2",
     "vue-bootstrap-toggle": {
       "merge": "2.1.1"
     }
