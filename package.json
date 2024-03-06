@@ -82,6 +82,7 @@
     "vue-template-compiler": "2.6.14"
   },
   "overrides": {
+    "glob-parent": "5.1.2",
     "vue-bootstrap-toggle": {
       "merge": "2.1.1"
     }
