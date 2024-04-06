@@ -29,14 +29,11 @@
     "analyzer_snyk_multiple_tokens_info": "Можно указать несколько токенов, разделив их точкой с запятой, например.",
     "analyzer_snyk_org_id": "Идентификатор организации",
     "analyzer_snyk_why_multiple_cvss": "Почему для одной и той же уязвимости имеется несколько оценок CVSS?",
-
     "analyzer_vulndb_desc": "VulnDB — это коммерческий сервис от Risk Based Security, который выявляет уязвимости в сторонних компонентах. Dependency-Track изначально интегрируется со службой VulnDB, обеспечивая очень точные результаты. Для использования этого анализатора требуется действительный CPE для анализируемых компонентов.",
     "analyzer_vulndb_enable": "Включить анализатор VulnDB",
     "analyzers": "Анализаторы",
-
     "api_keys": "API-ключи",
     "api_token": "API-токен",
-
     "base_url": "Базовый URL",
     "bearer_token_auth_enable": "Аутентификация с помощью токена личного доступа",
     "bom_formats": "Форматы спецификаций",
@@ -72,7 +69,6 @@
     "delete_user": "Удалить пользователя",
     "destination": "Место назначения",
     "distinguished_name": "Отличительное имя",
-
     "email": "Электронная почта",
     "email_address": "Адрес электронной почты",
     "email_enable_ssltls": "Включить шифрование SSL/TLS",
@@ -188,7 +184,6 @@
     "reindex_submitted": "Запрос на переиндексацию отправлен",
     "reindex_vulnerabilities": "Уязвимости",
     "reindex_vulnerable_software": "Уязвимое программное обеспечение",
-
     "repositories": "Репозитории",
     "repository_authentication": "Необходима аутентификация",
     "repository_created": "Репозиторий создан",
@@ -242,7 +237,6 @@
     "templates": "Шаблоны",
     "test_notification_queued": "Тестовое уведомление поставлено в очередь",
     "token": "Токен",
-
     "url": "URL-адрес",
     "user_created": "Пользователь создан",
     "user_deleted": "Пользователь удален",
@@ -301,7 +295,6 @@
     "aliases": "Псевдонимы",
     "analysis": "Анализ",
     "analysis_details_tooltip": "Подробности (объяснения, сведения об обходном пути и другая информация о влиянии)",
-
     "analysis_tooltip": "Текущее состояние возникновения уязвимости",
     "analyzer": "Анализатор",
     "apply_vex": "Применить VEX",
@@ -312,6 +305,7 @@
     "audit_vulnerabilities": "Аудит уязвимостей",
     "auditing_progress": "Аудит прогресса",
     "authenticated": "Аутентифицированный",
+    "author": "Автор",
     "authors": "Авторы",
     "bom": "спецификация",
     "bom_format": "Формат спецификации",
@@ -322,7 +316,6 @@
     "change_password": "Изменить пароль",
     "classification": "Классификация",
     "classifier": "Классификатор",
-
     "close": "Закрывать",
     "code_not_present": "Код отсутствует",
     "code_not_reachable": "Код недоступен",
@@ -332,7 +325,6 @@
     "component_application": "Приложение",
     "component_author": "Автор",
     "component_author_desc": "Автор компонента",
-
     "component_classifier_desc": "Указывает тип компонента: активы (приложения, операционные системы и оборудование) и неактивы (библиотеки, платформы и файлы).",
     "component_container": "Контейнер",
     "component_cpe_desc": "URI CPE v2.2 или v2.3, предоставленный MITRE или NIST. Для всех активов (приложений, операционных систем и оборудования) должно быть указано CPE.",
@@ -453,19 +445,15 @@
     "external_references": "Внешние ссылки",
     "false_positive": "Ложно положительный",
     "filename": "Имя файла",
-
     "findings": "Выводы",
     "findings_audited": "Результаты проверены",
     "findings_unaudited": "Результаты неаудированы",
     "first_seen": "Впервые увиден в",
-
     "fsf_libre": "ФСФ Либре",
     "fullname": "Полное имя",
     "general": "Общий",
-
     "group": "Группа",
     "group_name": "Имя группы",
-
     "hashes": "Хэши",
     "hashes_short_desc": "Хэш (MD5, SHA, SHA3, Blake2b, Blake3)",
     "home": "Дом",
@@ -483,6 +471,7 @@
     "include_services": "Включить услуги",
     "include_tags": "Включить теги",
     "inherited_risk_score": "Унаследованный показатель риска",
+    "integrity": "Честность",
     "internal": "Внутренний",
     "inventory": "Инвентарь",
     "inventory_with_vulnerabilities": "Инвентаризация с уязвимостями",
@@ -518,6 +507,7 @@
     "manufacturer_name": "Название производителя",
     "manufacturer_name_desc": "Организация, изготовившая компонент, описанный в проекте.",
     "matrix": "Матрица",
+    "method": "Метод",
     "metric_refresh_requested": "Запрошено обновление. Метрики будут обновлены после завершения задачи обновления.",
     "name": "Имя",
     "no_file_chosen": "Файл не выбран",
@@ -529,7 +519,6 @@
     "object_identifier": "Идентификатор объекта",
     "object_identifier_desc": "Уникальный идентификатор (UUID), который Dependency-Track автоматически присваивает каждому объекту.",
     "occurred_on": "Произошло",
-
     "oidc_availability_check_failed": "Не удалось определить доступность OpenID Connect.",
     "oidc_redirect_failed": "Произошла ошибка при перенаправлении к поставщику удостоверений OpenID Connect.",
     "only_direct_tooltip": "Показывать только прямые зависимости, скрывая транзитивные зависимости",
@@ -646,8 +635,15 @@
     "password_unauthorized": "Проверьте текущие учетные данные для входа и повторите попытку.",
     "phone": "Телефон",
     "policies": "Политика",
+    "policy_bundle_hash": "Пакетный хэш",
+    "policy_bundle_info": "Информация о пакете",
+    "policy_bundle_sync": "Пакет синхронизации",
+    "policy_bundle_sync_requested": "Запрошена синхронизация пакета политик. Данные политики уязвимостей будут обновлены после завершения синхронизации.",
+    "policy_bundle_sync_timestamp": "Последняя синхронизация включена",
+    "policy_bundle_url": "URL-адрес пакета",
     "policy_created": "Политика создана",
     "policy_deleted": "Политика удалена.",
+    "policy_last_bundle_sync_failed": "Ошибка синхронизации последнего пакета",
     "policy_management": "Управление политиками",
     "policy_name": "Имя политики",
     "policy_violations": "Нарушения политики",
@@ -687,8 +683,10 @@
     "provider": "Поставщик",
     "provider_name": "Имя провайдера",
     "published": "Опубликовано",
+    "published_at": "Опубликовано в",
     "purl": "purl",
     "range": "Диапазон",
+    "ratings": "Рейтинги",
     "recommendation": "Рекомендация",
     "references": "Рекомендации",
     "reindex": "Перестроить индекс(ы)",
@@ -713,6 +711,7 @@
     "risk_score": "Оценка риска",
     "risk_type": "Тип риска",
     "rollback": "Откат",
+    "score": "Счет",
     "search": "Поиск",
     "search_parent": "Введите для поиска родителя",
     "security_risk": "Риск безопасности",
@@ -754,12 +753,9 @@
     "tag_name": "Название тэга",
     "tags": "Теги",
     "template": "Шаблон",
-
     "title": "Заголовок",
-
     "total": "Общий",
     "total_findings": "Общие выводы",
-
     "type": "Тип",
     "update": "Обновлять",
     "update_details": "Обновить детали",
@@ -771,7 +767,10 @@
     "url": "URL-адрес",
     "urls": "URL-адреса",
     "username": "Имя пользователя",
+    "validFrom": "Действителен с",
+    "validUntil": "Годен до",
     "value": "Ценить",
+    "vector": "Вектор",
     "vendor_response": "Ответ поставщика",
     "version": "Версия",
     "version_distance": "Версия Расстояние",
@@ -787,13 +786,12 @@
     "violations_audited": "Нарушения проверены",
     "violations_unaudited": "Нарушения не проверены",
     "vulnerabilities": "Уязвимости",
-
     "vulnerability": "Уязвимость",
-
     "vulnerability_created": "Уязвимость создана",
     "vulnerability_created_desc": "Дата первоначального создания записи об уязвимости.",
     "vulnerability_deleted": "Уязвимость удалена",
     "vulnerability_details": "Подробности об уязвимости",
+    "vulnerability_policies": "Политики уязвимостей",
     "vulnerability_published_desc": "Дата первоначальной публикации записи об уязвимости.",
     "vulnerability_title": "Заголовок",
     "vulnerability_title_desc": "Необязательное название уязвимости",

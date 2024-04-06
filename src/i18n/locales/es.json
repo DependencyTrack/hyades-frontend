@@ -29,14 +29,11 @@
     "analyzer_snyk_multiple_tokens_info": "Se pueden proporcionar varios tokens separándolos con punto y coma, p.",
     "analyzer_snyk_org_id": "ID de organización",
     "analyzer_snyk_why_multiple_cvss": "¿Por qué existen múltiples puntuaciones CVSS para la misma vulnerabilidad?",
-
     "analyzer_vulndb_desc": "VulnDB es un servicio comercial de Risk Based Security que identifica vulnerabilidades en componentes de terceros. Dependency-Track se integra de forma nativa con el servicio VulnDB para proporcionar resultados altamente precisos. El uso de este analizador requiere un CPE válido para los componentes que se analizan.",
     "analyzer_vulndb_enable": "Habilitar el analizador VulnDB",
     "analyzers": "Analizadores",
-
     "api_keys": "Claves API",
     "api_token": "token API",
-
     "base_url": "URL base",
     "bearer_token_auth_enable": "Autenticarse con un token de acceso personal",
     "bom_formats": "Formatos de lista de materiales",
@@ -72,7 +69,6 @@
     "delete_user": "Borrar usuario",
     "destination": "Destino",
     "distinguished_name": "Nombre distinguido",
-
     "email": "Correo electrónico",
     "email_address": "Dirección de correo electrónico",
     "email_enable_ssltls": "Habilitar el cifrado SSL/TLS",
@@ -188,7 +184,6 @@
     "reindex_submitted": "Solicitud de reindexación enviada",
     "reindex_vulnerabilities": "Vulnerabilidades",
     "reindex_vulnerable_software": "software vulnerable",
-
     "repositories": "Repositorios",
     "repository_authentication": "Autenticacion requerida",
     "repository_created": "Repositorio creado",
@@ -242,7 +237,6 @@
     "templates": "Plantillas",
     "test_notification_queued": "Se ha puesto en cola una notificación de prueba",
     "token": "Simbólico",
-
     "url": "URL",
     "user_created": "Usuario creado",
     "user_deleted": "Usuario eliminado",
@@ -301,7 +295,6 @@
     "aliases": "Alias",
     "analysis": "Análisis",
     "analysis_details_tooltip": "Detalles (explicación, detalles de la solución alternativa y otra información sobre el impacto)",
-
     "analysis_tooltip": "El estado actual de una ocurrencia de una vulnerabilidad.",
     "analyzer": "Analizador",
     "apply_vex": "Aplicar VEX",
@@ -312,6 +305,7 @@
     "audit_vulnerabilities": "Vulnerabilidades de auditoría",
     "auditing_progress": "Progreso de la auditoría",
     "authenticated": "Autenticado",
+    "author": "Autor",
     "authors": "Autores",
     "bom": "lista de materiales",
     "bom_format": "Formato de lista de materiales",
@@ -322,7 +316,6 @@
     "change_password": "Cambiar la contraseña",
     "classification": "Clasificación",
     "classifier": "Clasificador",
-
     "close": "Cerca",
     "code_not_present": "Código no presente",
     "code_not_reachable": "Código no accesible",
@@ -332,7 +325,6 @@
     "component_application": "Aplicación",
     "component_author": "Autor",
     "component_author_desc": "El autor del componente.",
-
     "component_classifier_desc": "Especifica el tipo de componente: Activos (aplicaciones, sistemas operativos y hardware) y no activos (bibliotecas, marcos y archivos)",
     "component_container": "Contenedor",
     "component_cpe_desc": "El URI de CPE v2.2 o v2.3 proporcionado por MITRE o NIST. Todos los activos (aplicaciones, sistemas operativos y hardware) deben tener un CPE especificado.",
@@ -453,19 +445,15 @@
     "external_references": "Referencias externas",
     "false_positive": "Falso positivo",
     "filename": "Nombre del archivo",
-
     "findings": "Recomendaciones",
     "findings_audited": "Hallazgos auditados",
     "findings_unaudited": "Hallazgos no auditados",
     "first_seen": "Visto por primera vez en",
-
     "fsf_libre": "FSF Libre",
     "fullname": "Nombre completo",
     "general": "General",
-
     "group": "Grupo",
     "group_name": "Nombre del grupo",
-
     "hashes": "hashes",
     "hashes_short_desc": "Hash (MD5, SHA, SHA3, Blake2b, Blake3)",
     "home": "Hogar",
@@ -483,6 +471,7 @@
     "include_services": "Incluir servicios",
     "include_tags": "Incluir etiquetas",
     "inherited_risk_score": "Puntuación de riesgo heredada",
+    "integrity": "Integridad",
     "internal": "Interno",
     "inventory": "Inventario",
     "inventory_with_vulnerabilities": "Inventario con vulnerabilidades",
@@ -518,6 +507,7 @@
     "manufacturer_name": "Nombre del Fabricante",
     "manufacturer_name_desc": "La organización que fabricó el componente que describe el proyecto.",
     "matrix": "Matriz",
+    "method": "Método",
     "metric_refresh_requested": "Se ha solicitado una actualización. Las métricas se actualizarán cuando se complete la tarea de actualización.",
     "name": "Nombre",
     "no_file_chosen": "Ningún archivo elegido",
@@ -529,7 +519,6 @@
     "object_identifier": "Identificador de objeto",
     "object_identifier_desc": "Un identificador único (UUID) que Dependency-Track asigna automáticamente a cada objeto",
     "occurred_on": "Ocurrió el",
-
     "oidc_availability_check_failed": "No se pudo determinar la disponibilidad de OpenID Connect",
     "oidc_redirect_failed": "Se produjo un error al redirigir al proveedor de identidad de OpenID Connect",
     "only_direct_tooltip": "Mostrar solo dependencias directas, ocultando dependencias transitivas",
@@ -646,8 +635,15 @@
     "password_unauthorized": "Verifique las credenciales de inicio de sesión actuales e inténtelo nuevamente",
     "phone": "Teléfono",
     "policies": "Políticas",
+    "policy_bundle_hash": "Paquete de hash",
+    "policy_bundle_info": "Información del paquete",
+    "policy_bundle_sync": "Paquete de sincronización",
+    "policy_bundle_sync_requested": "Se solicitó la sincronización del paquete de políticas. Los datos de la política de vulnerabilidad se actualizarán cuando se complete la sincronización.",
+    "policy_bundle_sync_timestamp": "Última sincronización el",
+    "policy_bundle_url": "URL del paquete",
     "policy_created": "Política creada",
     "policy_deleted": "Política eliminada",
+    "policy_last_bundle_sync_failed": "Error en la sincronización del último paquete",
     "policy_management": "Gestión de políticas",
     "policy_name": "Nombre de directiva",
     "policy_violations": "Violaciones de políticas",
@@ -687,8 +683,10 @@
     "provider": "Proveedor",
     "provider_name": "Nombre del proveedor",
     "published": "Publicado",
+    "published_at": "Publicado en",
     "purl": "purl",
     "range": "Rango",
+    "ratings": "Calificaciones",
     "recommendation": "Recomendación",
     "references": "Referencias",
     "reindex": "Índice(s) de reconstrucción",
@@ -713,6 +711,7 @@
     "risk_score": "Puntuación de riesgo",
     "risk_type": "Tipo de riesgo",
     "rollback": "Retroceder",
+    "score": "Puntaje",
     "search": "Buscar",
     "search_parent": "Escriba para buscar padre",
     "security_risk": "Riesgo de seguridad",
@@ -754,12 +753,9 @@
     "tag_name": "Nombre de etiqueta",
     "tags": "Etiquetas",
     "template": "Plantilla",
-
     "title": "Título",
-
     "total": "Total",
     "total_findings": "Hallazgos totales",
-
     "type": "Tipo",
     "update": "Actualizar",
     "update_details": "Detalles de actualización",
@@ -771,7 +767,10 @@
     "url": "URL",
     "urls": "URL",
     "username": "Nombre de usuario",
+    "validFrom": "Válida desde",
+    "validUntil": "Válido hasta",
     "value": "Valor",
+    "vector": "Vector",
     "vendor_response": "Respuesta del proveedor",
     "version": "Versión",
     "version_distance": "Versión Distancia",
@@ -787,13 +786,12 @@
     "violations_audited": "Violaciones auditadas",
     "violations_unaudited": "Violaciones no auditadas",
     "vulnerabilities": "Vulnerabilidades",
-
     "vulnerability": "Vulnerabilidad",
-
     "vulnerability_created": "Vulnerabilidad creada",
     "vulnerability_created_desc": "La fecha en que se creó originalmente el registro de vulnerabilidad",
     "vulnerability_deleted": "Vulnerabilidad eliminada",
     "vulnerability_details": "Detalles de vulnerabilidad",
+    "vulnerability_policies": "Políticas de vulnerabilidad",
     "vulnerability_published_desc": "La fecha en que se publicó originalmente el registro de vulnerabilidad",
     "vulnerability_title": "Título",
     "vulnerability_title_desc": "El título opcional de la vulnerabilidad.",

@@ -29,14 +29,11 @@
     "analyzer_snyk_multiple_tokens_info": "Można podać wiele tokenów oddzielając je średnikami, np.",
     "analyzer_snyk_org_id": "Identyfikator organizacji",
     "analyzer_snyk_why_multiple_cvss": "Dlaczego dla tej samej luki istnieje wiele wyników CVSS?",
-
     "analyzer_vulndb_desc": "VulnDB to komercyjna usługa firmy Risk Based Security, która identyfikuje luki w komponentach innych firm. Zależność-Track integruje się natywnie z usługą VulnDB, aby zapewnić bardzo dokładne wyniki. Korzystanie z tego analizatora wymaga ważnego CPE dla analizowanych składników.",
     "analyzer_vulndb_enable": "Włącz analizator VulnDB",
     "analyzers": "Analizatory",
-
     "api_keys": "Klucze API",
     "api_token": "Token API",
-
     "base_url": "Bazowy adres URL",
     "bearer_token_auth_enable": "Uwierzytelnij się za pomocą osobistego tokena dostępu",
     "bom_formats": "Formaty BOM-ów",
@@ -72,7 +69,6 @@
     "delete_user": "Usuń użytkownika",
     "destination": "Miejsce docelowe",
     "distinguished_name": "Wytworne imię",
-
     "email": "E-mail",
     "email_address": "Adres e-mail",
     "email_enable_ssltls": "Włącz szyfrowanie SSL/TLS",
@@ -188,7 +184,6 @@
     "reindex_submitted": "Przesłano prośbę o ponowne indeksowanie",
     "reindex_vulnerabilities": "Luki",
     "reindex_vulnerable_software": "Wrażliwe oprogramowanie",
-
     "repositories": "Repozytoria",
     "repository_authentication": "Wymagane uwierzytelnienie",
     "repository_created": "Repozytorium zostało utworzone",
@@ -242,7 +237,6 @@
     "templates": "Szablony",
     "test_notification_queued": "Powiadomienie testowe zostało umieszczone w kolejce",
     "token": "Znak",
-
     "url": "Adres URL",
     "user_created": "Utworzono użytkownika",
     "user_deleted": "Użytkownik usunięty",
@@ -301,7 +295,6 @@
     "aliases": "Skróty",
     "analysis": "Analiza",
     "analysis_details_tooltip": "Szczegóły (wyjaśnienie, szczegóły obejścia i inne informacje o wpływie)",
-
     "analysis_tooltip": "Bieżący stan wystąpienia luki",
     "analyzer": "Analizator",
     "apply_vex": "Zastosuj VEX",
@@ -312,6 +305,7 @@
     "audit_vulnerabilities": "Audyt luk w zabezpieczeniach",
     "auditing_progress": "Postęp audytu",
     "authenticated": "Zalegalizowany",
+    "author": "Autor",
     "authors": "Autorski",
     "bom": "BOM",
     "bom_format": "Format zestawienia komponentów",
@@ -322,7 +316,6 @@
     "change_password": "Zmień hasło",
     "classification": "Klasyfikacja",
     "classifier": "Klasyfikator",
-
     "close": "Zamknąć",
     "code_not_present": "Brak kodu",
     "code_not_reachable": "Kod nieosiągalny",
@@ -332,7 +325,6 @@
     "component_application": "Aplikacja",
     "component_author": "Autor",
     "component_author_desc": "Autor komponentu",
-
     "component_classifier_desc": "Określa typ komponentu: zasoby (aplikacje, systemy operacyjne i sprzęt) i inne niż zasoby (biblioteki, struktury i pliki)",
     "component_container": "Kontener",
     "component_cpe_desc": "Identyfikator URI CPE v2.2 lub v2.3 dostarczony przez MITRE lub NIST. Wszystkie zasoby (aplikacje, systemy operacyjne i sprzęt) powinny mieć określony CPE",
@@ -453,19 +445,15 @@
     "external_references": "Referencje zewnętrzne",
     "false_positive": "Fałszywie pozytywny",
     "filename": "Nazwa pliku",
-
     "findings": "Wyniki",
     "findings_audited": "Wyniki audytu",
     "findings_unaudited": "Ustalenia niezbadane",
     "first_seen": "Po raz pierwszy widziany o godz",
-
     "fsf_libre": "Darmowa wersja FSF",
     "fullname": "Pełne imię i nazwisko",
     "general": "Ogólny",
-
     "group": "Grupa",
     "group_name": "Nazwa grupy",
-
     "hashes": "Hasze",
     "hashes_short_desc": "Hash (MD5, SHA, SHA3, Blake2b, Blake3)",
     "home": "Dom",
@@ -483,6 +471,7 @@
     "include_services": "Uwzględnij usługi",
     "include_tags": "Dołącz tagi",
     "inherited_risk_score": "Odziedziczona ocena ryzyka",
+    "integrity": "Uczciwość",
     "internal": "Wewnętrzny",
     "inventory": "Spis",
     "inventory_with_vulnerabilities": "Inwentarz z lukami w zabezpieczeniach",
@@ -518,6 +507,7 @@
     "manufacturer_name": "Nazwa producenta",
     "manufacturer_name_desc": "Organizacja, która wyprodukowała komponent opisany w projekcie",
     "matrix": "Matryca",
+    "method": "Metoda",
     "metric_refresh_requested": "Zażądano odświeżenia. Metryki zostaną zaktualizowane po zakończeniu zadania odświeżania.",
     "name": "Nazwa",
     "no_file_chosen": "Nie wybrano żadnego pliku",
@@ -529,7 +519,6 @@
     "object_identifier": "Identyfikator obiektu",
     "object_identifier_desc": "Unikalny identyfikator (UUID), który zależność Track automatycznie przypisuje do każdego obiektu",
     "occurred_on": "Wystąpiło dnia",
-
     "oidc_availability_check_failed": "Nie udało się określić dostępności OpenID Connect",
     "oidc_redirect_failed": "Wystąpił błąd podczas przekierowania do dostawcy tożsamości OpenID Connect",
     "only_direct_tooltip": "Pokazuj tylko zależności bezpośrednie, ukrywając zależności przechodnie",
@@ -646,8 +635,15 @@
     "password_unauthorized": "Sprawdź aktualne dane logowania i spróbuj ponownie",
     "phone": "Telefon",
     "policies": "Zasady",
+    "policy_bundle_hash": "Skrót pakietu",
+    "policy_bundle_info": "Informacje o pakiecie",
+    "policy_bundle_sync": "Synchronizuj pakiet",
+    "policy_bundle_sync_requested": "Zażądano synchronizacji pakietu zasad. Dane zasad dotyczących luk w zabezpieczeniach zostaną zaktualizowane po zakończeniu synchronizacji.",
+    "policy_bundle_sync_timestamp": "Ostatnia synchronizacja włączona",
+    "policy_bundle_url": "URL pakietu",
     "policy_created": "Utworzono politykę",
     "policy_deleted": "Polityka została usunięta",
+    "policy_last_bundle_sync_failed": "Ostatnia synchronizacja pakietu nie powiodła się",
     "policy_management": "Zarządzanie polityką",
     "policy_name": "Nazwa zasady",
     "policy_violations": "Naruszenia zasad",
@@ -687,8 +683,10 @@
     "provider": "Dostawca",
     "provider_name": "Nazwa dostawcy",
     "published": "Opublikowany",
+    "published_at": "Opublikowano w",
     "purl": "purl",
     "range": "Zakres",
+    "ratings": "Oceny",
     "recommendation": "Rekomendacje",
     "references": "Bibliografia",
     "reindex": "Odbuduj indeksy",
@@ -713,6 +711,7 @@
     "risk_score": "Ocena ryzyka",
     "risk_type": "Rodzaj ryzyka",
     "rollback": "Wycofanie",
+    "score": "Wynik",
     "search": "Szukaj",
     "search_parent": "Wpisz, aby wyszukać element nadrzędny",
     "security_risk": "Zagrożenie dla bezpieczeństwa",
@@ -754,12 +753,9 @@
     "tag_name": "Nazwa znacznika",
     "tags": "Tagi",
     "template": "Szablon",
-
     "title": "Tytuł",
-
     "total": "Całkowity",
     "total_findings": "Łączne ustalenia",
-
     "type": "Typ",
     "update": "Aktualizacja",
     "update_details": "Aktualizuj szczegóły",
@@ -771,7 +767,10 @@
     "url": "Adres URL",
     "urls": "Adresy URL",
     "username": "Nazwa użytkownika",
+    "validFrom": "Ważne od",
+    "validUntil": "Ważne do",
     "value": "Wartość",
+    "vector": "Wektor",
     "vendor_response": "Odpowiedź dostawcy",
     "version": "Wersja",
     "version_distance": "Wersja Odległość",
@@ -787,13 +786,12 @@
     "violations_audited": "Naruszenia skontrolowane",
     "violations_unaudited": "Naruszenia nieskontrolowane",
     "vulnerabilities": "Luki",
-
     "vulnerability": "Słaby punkt",
-
     "vulnerability_created": "Utworzono lukę",
     "vulnerability_created_desc": "Data pierwotnego utworzenia rekordu luki w zabezpieczeniach",
     "vulnerability_deleted": "Luka została usunięta",
     "vulnerability_details": "Szczegóły luki",
+    "vulnerability_policies": "Zasady dotyczące luk w zabezpieczeniach",
     "vulnerability_published_desc": "Data pierwotnej publikacji rejestru luk w zabezpieczeniach",
     "vulnerability_title": "Tytuł",
     "vulnerability_title_desc": "Opcjonalny tytuł luki",

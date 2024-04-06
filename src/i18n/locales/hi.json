@@ -29,14 +29,11 @@
     "analyzer_snyk_multiple_tokens_info": "अर्धविराम से अलग करके कई टोकन प्रदान किए जा सकते हैं, जैसे",
     "analyzer_snyk_org_id": "संगठन आईडी",
     "analyzer_snyk_why_multiple_cvss": "एक ही भेद्यता के लिए अनेक CVSS स्कोर क्यों होते हैं?",
-
     "analyzer_vulndb_desc": "VulnDB जोखिम आधारित सुरक्षा से एक वाणिज्यिक सेवा है जो तीसरे पक्ष के घटकों में कमजोरियों की पहचान करती है। निर्भरता-ट्रैक अत्यधिक सटीक परिणाम प्रदान करने के लिए VulnDB सेवा के साथ मूल रूप से एकीकृत होता है। इस विश्लेषक के उपयोग के लिए विश्लेषण किए जा रहे घटकों के लिए एक वैध CPE की आवश्यकता होती है।",
     "analyzer_vulndb_enable": "VulnDB विश्लेषक सक्षम करें",
     "analyzers": "विश्लेषक",
-
     "api_keys": "एपीआई कुंजियाँ",
     "api_token": "एपीआई टोकन",
-
     "base_url": "आधार यूआरएल",
     "bearer_token_auth_enable": "व्यक्तिगत एक्सेस टोकन से प्रमाणीकरण करें",
     "bom_formats": "बीओएम प्रारूप",
@@ -72,7 +69,6 @@
     "delete_user": "उपभोक्ता मिटायें",
     "destination": "गंतव्य",
     "distinguished_name": "विशिष्ट नाम",
-
     "email": "ईमेल",
     "email_address": "मेल पता",
     "email_enable_ssltls": "SSL/TLS एन्क्रिप्शन सक्षम करें",
@@ -188,7 +184,6 @@
     "reindex_submitted": "पुनः अनुक्रमणिका अनुरोध प्रस्तुत किया गया",
     "reindex_vulnerabilities": "कमजोरियों",
     "reindex_vulnerable_software": "कमजोर सॉफ्टवेयर",
-
     "repositories": "डेटा संग्रह स्थान",
     "repository_authentication": "प्रमाणित करना",
     "repository_created": "रिपोजिटरी बनाई गई",
@@ -242,7 +237,6 @@
     "templates": "टेम्पलेट्स",
     "test_notification_queued": "एक परीक्षण अधिसूचना कतारबद्ध कर दी गई है",
     "token": "टोकन",
-
     "url": "यूआरएल",
     "user_created": "उपयोगकर्ता द्वारा बनाया गया",
     "user_deleted": "उपयोगकर्ता हटा दिया गया",
@@ -301,7 +295,6 @@
     "aliases": "उपनाम",
     "analysis": "विश्लेषण",
     "analysis_details_tooltip": "विवरण (स्पष्टीकरण, समाधान विवरण, और अन्य प्रभाव जानकारी)",
-
     "analysis_tooltip": "किसी भेद्यता की घटना की वर्तमान स्थिति",
     "analyzer": "विश्लेषक",
     "apply_vex": "VEX लागू करें",
@@ -312,6 +305,7 @@
     "audit_vulnerabilities": "ऑडिट कमजोरियाँ",
     "auditing_progress": "लेखापरीक्षा प्रगति",
     "authenticated": "प्रमाणीकृत",
+    "author": "लेखक",
     "authors": "लेखक",
     "bom": "बीओएम",
     "bom_format": "बीओएम प्रारूप",
@@ -322,7 +316,6 @@
     "change_password": "पासवर्ड बदलें",
     "classification": "वर्गीकरण",
     "classifier": "वर्गीकरणकर्ता",
-
     "close": "बंद करना",
     "code_not_present": "कोड मौजूद नहीं है",
     "code_not_reachable": "कोड उपलब्ध नहीं है",
@@ -332,7 +325,6 @@
     "component_application": "आवेदन",
     "component_author": "लेखक",
     "component_author_desc": "घटक का लेखक",
-
     "component_classifier_desc": "घटक के प्रकार को निर्दिष्ट करता है: परिसंपत्तियाँ (अनुप्रयोग, ऑपरेटिंग सिस्टम और हार्डवेयर) और गैर-परिसंपत्तियाँ (लाइब्रेरी, फ़्रेमवर्क और फ़ाइलें)",
     "component_container": "कंटेनर",
     "component_cpe_desc": "MITRE या NIST द्वारा प्रदान किया गया CPE v2.2 या v2.3 URI। सभी संपत्तियों (अनुप्रयोग, ऑपरेटिंग सिस्टम और हार्डवेयर) में CPE निर्दिष्ट होना चाहिए",
@@ -453,19 +445,15 @@
     "external_references": "बाह्य संदर्भ",
     "false_positive": "सकारात्मक झूठी",
     "filename": "फ़ाइल का नाम",
-
     "findings": "जाँच - परिणाम",
     "findings_audited": "निष्कर्ष लेखापरीक्षित",
     "findings_unaudited": "निष्कर्ष असंपादित",
     "first_seen": "सबसे पहले यहां देखा गया",
-
     "fsf_libre": "एफएसएफ मुक्त",
     "fullname": "पूरा नाम",
     "general": "सामान्य",
-
     "group": "समूह",
     "group_name": "समूह नाम",
-
     "hashes": "हैश",
     "hashes_short_desc": "हैश (MD5, SHA, SHA3, ब्लेक2b, ब्लेक3)",
     "home": "घर",
@@ -483,6 +471,7 @@
     "include_services": "सेवाएँ शामिल करें",
     "include_tags": "टैग शामिल करें",
     "inherited_risk_score": "वंशानुगत जोखिम स्कोर",
+    "integrity": "अखंडता",
     "internal": "आंतरिक",
     "inventory": "भंडार",
     "inventory_with_vulnerabilities": "कमज़ोरियों वाली सूची",
@@ -518,6 +507,7 @@
     "manufacturer_name": "निर्माता नाम",
     "manufacturer_name_desc": "वह संगठन जिसने परियोजना में वर्णित घटक का निर्माण किया",
     "matrix": "आव्यूह",
+    "method": "तरीका",
     "metric_refresh_requested": "रिफ्रेश का अनुरोध किया गया है। रिफ्रेश कार्य पूरा होने पर मेट्रिक्स अपडेट हो जाएंगे।",
     "name": "नाम",
     "no_file_chosen": "कोई फ़ाइल चुना नही",
@@ -529,7 +519,6 @@
     "object_identifier": "ऑब्जेक्ट पहचानकर्ता",
     "object_identifier_desc": "एक अद्वितीय पहचानकर्ता (UUID) जिसे Dependency-Track स्वचालित रूप से प्रत्येक ऑब्जेक्ट को असाइन करता है",
     "occurred_on": "घटित हुआ",
-
     "oidc_availability_check_failed": "OpenID कनेक्ट की उपलब्धता निर्धारित करने में विफल",
     "oidc_redirect_failed": "OpenID Connect पहचान प्रदाता पर रीडायरेक्ट करते समय एक त्रुटि हुई",
     "only_direct_tooltip": "केवल प्रत्यक्ष निर्भरताएँ दिखाएँ, सकर्मक निर्भरताएँ छिपाएँ",
@@ -646,8 +635,15 @@
     "password_unauthorized": "वर्तमान लॉगिन क्रेडेंशियल जांचें और पुनः प्रयास करें",
     "phone": "फ़ोन",
     "policies": "नीतियों",
+    "policy_bundle_hash": "बंडल हैश",
+    "policy_bundle_info": "बंडल जानकारी",
+    "policy_bundle_sync": "सिंक बंडल",
+    "policy_bundle_sync_requested": "पॉलिसी बंडल सिंक्रोनाइज़ेशन का अनुरोध किया गया है। सिंक पूरा होने पर भेद्यता नीति डेटा अपडेट किया जाएगा।",
+    "policy_bundle_sync_timestamp": "अंतिम समन्वयन चालू",
+    "policy_bundle_url": "बंडल यूआरएल",
     "policy_created": "नीति बनाई गई",
     "policy_deleted": "नीति हटा दी गई",
+    "policy_last_bundle_sync_failed": "अंतिम बंडल सिंक विफल",
     "policy_management": "नीति प्रबंधन",
     "policy_name": "पालिसी का नाम",
     "policy_violations": "नीति उल्लंघन",
@@ -687,8 +683,10 @@
     "provider": "प्रदाता",
     "provider_name": "प्रदाता का नाम",
     "published": "प्रकाशित",
+    "published_at": "पर प्रकाशित",
     "purl": "purl",
     "range": "श्रेणी",
+    "ratings": "रेटिंग",
     "recommendation": "सिफारिश",
     "references": "संदर्भ",
     "reindex": "सूचकांक का पुनर्निर्माण करें",
@@ -713,6 +711,7 @@
     "risk_score": "जोखिम स्कोर",
     "risk_type": "जोखिम का प्रकार",
     "rollback": "रोलबैक",
+    "score": "अंक",
     "search": "खोज",
     "search_parent": "माता-पिता को खोजने के लिए टाइप करें",
     "security_risk": "सुरक्षा मे जोखिम",
@@ -754,12 +753,9 @@
     "tag_name": "टैग नाम",
     "tags": "टैग",
     "template": "खाका",
-
     "title": "शीर्षक",
-
     "total": "कुल",
     "total_findings": "कुल निष्कर्ष",
-
     "type": "प्रकार",
     "update": "अद्यतन",
     "update_details": "अद्यतन विवरण",
@@ -771,7 +767,10 @@
     "url": "यूआरएल",
     "urls": "यूआरएल",
     "username": "उपयोगकर्ता नाम",
+    "validFrom": "से मान्य",
+    "validUntil": "तब तक वैध",
     "value": "कीमत",
+    "vector": "वेक्टर",
     "vendor_response": "विक्रेता प्रतिक्रिया",
     "version": "संस्करण",
     "version_distance": "संस्करण दूरी",
@@ -787,13 +786,12 @@
     "violations_audited": "उल्लंघनों का लेखापरीक्षण किया गया",
     "violations_unaudited": "उल्लंघन असंपरीक्षित",
     "vulnerabilities": "कमजोरियों",
-
     "vulnerability": "भेद्यता",
-
     "vulnerability_created": "भेद्यता निर्मित हुई",
     "vulnerability_created_desc": "वह तिथि जब भेद्यता रिकॉर्ड मूल रूप से बनाया गया था",
     "vulnerability_deleted": "भेद्यता हटा दी गई",
     "vulnerability_details": "भेद्यता विवरण",
+    "vulnerability_policies": "असुरक्षितता नीतियाँ",
     "vulnerability_published_desc": "वह तिथि जब भेद्यता रिकॉर्ड मूल रूप से प्रकाशित किया गया था",
     "vulnerability_title": "शीर्षक",
     "vulnerability_title_desc": "भेद्यता का वैकल्पिक शीर्षक",

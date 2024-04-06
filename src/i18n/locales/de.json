@@ -29,14 +29,11 @@
     "analyzer_snyk_multiple_tokens_info": "Mehrere Token können durch Semikolons getrennt angegeben werden, z. B.",
     "analyzer_snyk_org_id": "Organisations-ID",
     "analyzer_snyk_why_multiple_cvss": "Warum gibt es mehrere CVSS-Scores für dieselbe Schwachstelle?",
-
     "analyzer_vulndb_desc": "VulnDB ist ein kommerzieller Dienst von Risk Based Security, der Schwachstellen in Komponenten von Drittanbietern identifiziert. Dependency-Track lässt sich nativ in den VulnDB-Dienst integrieren, um hochpräzise Ergebnisse zu liefern. Die Verwendung dieses Analysators erfordert eine gültige CPE für die zu analysierenden Komponenten.",
     "analyzer_vulndb_enable": "VulnDB-Analyzer aktivieren",
     "analyzers": "Analysatoren",
-
     "api_keys": "API-Schlüssel",
     "api_token": "API-Token",
-
     "base_url": "Basis-URL",
     "bearer_token_auth_enable": "Authentifizieren mit einem persönlichen Zugriffstoken",
     "bom_formats": "Stücklistenformate",
@@ -72,7 +69,6 @@
     "delete_user": "Benutzer löschen",
     "destination": "Ziel",
     "distinguished_name": "Distinguished Name",
-
     "email": "Email",
     "email_address": "E-Mail-Adresse",
     "email_enable_ssltls": "SSL/TLS-Verschlüsselung aktivieren",
@@ -188,7 +184,6 @@
     "reindex_submitted": "Neuindizierungsanforderung übermittelt",
     "reindex_vulnerabilities": "Sicherheitslücken",
     "reindex_vulnerable_software": "Anfällige Software",
-
     "repositories": "Depots",
     "repository_authentication": "Authentifizierung erforderlich",
     "repository_created": "Repository erstellt",
@@ -242,7 +237,6 @@
     "templates": "Vorlagen",
     "test_notification_queued": "Eine Testbenachrichtigung wurde in die Warteschlange gestellt",
     "token": "Zeichen",
-
     "url": "URL",
     "user_created": "Vom Benutzer erstellt",
     "user_deleted": "Benutzer gelöscht",
@@ -301,7 +295,6 @@
     "aliases": "Aliase",
     "analysis": "Analyse",
     "analysis_details_tooltip": "Details (Erklärung, Details zur Problemumgehung und andere Informationen zu den Auswirkungen)",
-
     "analysis_tooltip": "Der aktuelle Stand des Auftretens einer Sicherheitslücke",
     "analyzer": "Analysator",
     "apply_vex": "VEX anwenden",
@@ -312,6 +305,7 @@
     "audit_vulnerabilities": "Schwachstellen prüfen",
     "auditing_progress": "Prüfungsfortschritt",
     "authenticated": "Authentifiziert",
+    "author": "Autor",
     "authors": "Autoren",
     "bom": "Stückliste",
     "bom_format": "BOM-Format",
@@ -322,7 +316,6 @@
     "change_password": "Kennwort ändern",
     "classification": "Einstufung",
     "classifier": "Klassifikator",
-
     "close": "Schließen",
     "code_not_present": "Code nicht vorhanden",
     "code_not_reachable": "Code nicht erreichbar",
@@ -332,7 +325,6 @@
     "component_application": "Anwendung",
     "component_author": "Autor",
     "component_author_desc": "Der Autor der Komponente",
-
     "component_classifier_desc": "Gibt den Typ der Komponente an: Assets (Anwendungen, Betriebssysteme und Hardware) und Nicht-Assets (Bibliotheken, Frameworks und Dateien)",
     "component_container": "Container",
     "component_cpe_desc": "Die CPE v2.2- oder v2.3-URI, wie von MITRE oder NIST bereitgestellt. Für alle Assets (Anwendungen, Betriebssysteme und Hardware) sollte ein CPE angegeben werden",
@@ -453,19 +445,15 @@
     "external_references": "Externe Referenzen",
     "false_positive": "Falsch-Positiv",
     "filename": "Dateiname",
-
     "findings": "Ergebnisse",
     "findings_audited": "Geprüfte Ergebnisse",
     "findings_unaudited": "Ungeprüfte Ergebnisse",
     "first_seen": "Erstmals gesehen bei",
-
     "fsf_libre": "FSF Libre",
     "fullname": "Vollständiger Name",
     "general": "Allgemein",
-
     "group": "Gruppe",
     "group_name": "Gruppenname",
-
     "hashes": "Hashwerte",
     "hashes_short_desc": "Hash (MD5, SHA, SHA3, Blake2b, Blake3)",
     "home": "Heim",
@@ -483,6 +471,7 @@
     "include_services": "Leistungen einschließen",
     "include_tags": "Tags einschließen",
     "inherited_risk_score": "Vererbter Risiko-Score",
+    "integrity": "Integrität",
     "internal": "Intern",
     "inventory": "Inventar",
     "inventory_with_vulnerabilities": "Inventarisierung mit Schwachstellen",
@@ -518,6 +507,7 @@
     "manufacturer_name": "Herstellername",
     "manufacturer_name_desc": "Die Organisation, die die im Projekt beschriebene Komponente hergestellt hat",
     "matrix": "Matrix",
+    "method": "Methode",
     "metric_refresh_requested": "Eine Aktualisierung wurde angefordert. Die Metriken werden aktualisiert, wenn die Aktualisierungsaufgabe abgeschlossen ist.",
     "name": "Name",
     "no_file_chosen": "Keine Datei ausgewählt",
@@ -529,7 +519,6 @@
     "object_identifier": "Objektkennung",
     "object_identifier_desc": "Eine eindeutige Kennung (UUID), die Dependency-Track jedem Objekt automatisch zuweist",
     "occurred_on": "Aufgetreten am",
-
     "oidc_availability_check_failed": "Verfügbarkeit von OpenID Connect konnte nicht ermittelt werden",
     "oidc_redirect_failed": "Beim Umleiten zum OpenID Connect-Identitätsanbieter ist ein Fehler aufgetreten",
     "only_direct_tooltip": "Nur direkte Abhängigkeiten anzeigen, transitive Abhängigkeiten ausblenden",
@@ -646,8 +635,15 @@
     "password_unauthorized": "Überprüfen Sie die aktuellen Anmeldeinformationen und versuchen Sie es erneut",
     "phone": "Telefon",
     "policies": "Richtlinien",
+    "policy_bundle_hash": "Bundle-Hash",
+    "policy_bundle_info": "Bundle-Info",
+    "policy_bundle_sync": "Sync-Bundle",
+    "policy_bundle_sync_requested": "Synchronisierung des Richtlinienpakets angefordert. Die Daten der Schwachstellenrichtlinie werden aktualisiert, wenn die Synchronisierung abgeschlossen ist.",
+    "policy_bundle_sync_timestamp": "Zuletzt synchronisiert am",
+    "policy_bundle_url": "Bundle-URL",
     "policy_created": "Richtlinie erstellt",
     "policy_deleted": "Richtlinie gelöscht",
+    "policy_last_bundle_sync_failed": "Letzte Bundle-Synchronisierung fehlgeschlagen",
     "policy_management": "Richtlinienverwaltung",
     "policy_name": "Versicherungsname",
     "policy_violations": "Richtlinienverstöße",
@@ -687,8 +683,10 @@
     "provider": "Anbieter",
     "provider_name": "Anbietername",
     "published": "Veröffentlicht",
+    "published_at": "Veröffentlicht unter",
     "purl": "purl",
     "range": "Reichweite",
+    "ratings": "Bewertungen",
     "recommendation": "Empfehlung",
     "references": "Verweise",
     "reindex": "Index(e) neu erstellen",
@@ -713,6 +711,7 @@
     "risk_score": "Risiko-Score",
     "risk_type": "Risikoart",
     "rollback": "Rollback",
+    "score": "Punktzahl",
     "search": "Suchen",
     "search_parent": "Geben Sie zum Suchen nach übergeordnetem Element etwas ein",
     "security_risk": "Sicherheitsrisiko",
@@ -754,12 +753,9 @@
     "tag_name": "Verlinke den Namen",
     "tags": "Stichworte",
     "template": "Vorlage",
-
     "title": "Titel",
-
     "total": "Gesamt",
     "total_findings": "Gesamtergebnisse",
-
     "type": "Typ",
     "update": "Aktualisieren",
     "update_details": "Details zum Update",
@@ -771,7 +767,10 @@
     "url": "URL",
     "urls": "URLs",
     "username": "Nutzername",
+    "validFrom": "Gültig ab",
+    "validUntil": "Gültig bis",
     "value": "Wert",
+    "vector": "Vektor",
     "vendor_response": "Antwort des Anbieters",
     "version": "Ausführung",
     "version_distance": "Ausführung Distanz",
@@ -787,13 +786,12 @@
     "violations_audited": "Überprüfte Verstöße",
     "violations_unaudited": "Verstöße ungeprüft",
     "vulnerabilities": "Sicherheitslücken",
-
     "vulnerability": "Verletzlichkeit",
-
     "vulnerability_created": "Schwachstelle geschaffen",
     "vulnerability_created_desc": "Das Datum, an dem der Schwachstellendatensatz ursprünglich erstellt wurde",
     "vulnerability_deleted": "Schwachstelle gelöscht",
     "vulnerability_details": "Details zur Sicherheitsanfälligkeit",
+    "vulnerability_policies": "Richtlinien zur Sicherheitslücke",
     "vulnerability_published_desc": "Das Datum, an dem der Schwachstellendatensatz ursprünglich veröffentlicht wurde",
     "vulnerability_title": "Titel",
     "vulnerability_title_desc": "Der optionale Titel der Sicherheitslücke",

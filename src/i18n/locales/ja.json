@@ -29,14 +29,11 @@
     "analyzer_snyk_multiple_tokens_info": "複数のトークンはセミコロンで区切って提供できます。例:",
     "analyzer_snyk_org_id": "組織ID",
     "analyzer_snyk_why_multiple_cvss": "同じ脆弱性に対して複数の CVSS スコアがあるのはなぜですか?",
-
     "analyzer_vulndb_desc": "VulnDB は、サードパーティ コンポーネントの脆弱性を特定する Risk Based Security の商用サービスです。Dependency-Track は VulnDB サービスとネイティブに統合され、非常に正確な結果を提供します。このアナライザーを使用するには、分析対象のコンポーネントの有効な CPE が必要です。",
     "analyzer_vulndb_enable": "VulnDBアナライザーを有効にする",
     "analyzers": "アナライザー",
-
     "api_keys": "APIキー",
     "api_token": "APIトークン",
-
     "base_url": "ベースURL",
     "bearer_token_auth_enable": "個人アクセストークンで認証する",
     "bom_formats": "BOM 形式",
@@ -72,7 +69,6 @@
     "delete_user": "ユーザーを削除",
     "destination": "行き先",
     "distinguished_name": "識別名",
-
     "email": "Eメール",
     "email_address": "電子メールアドレス",
     "email_enable_ssltls": "SSL/TLS暗号化を有効にする",
@@ -188,7 +184,6 @@
     "reindex_submitted": "再インデックスリクエストが送信されました",
     "reindex_vulnerabilities": "脆弱性",
     "reindex_vulnerable_software": "脆弱なソフトウェア",
-
     "repositories": "リポジトリ",
     "repository_authentication": "認証が必要です",
     "repository_created": "リポジトリが作成されました",
@@ -242,7 +237,6 @@
     "templates": "テンプレート",
     "test_notification_queued": "テスト通知がキューに追加されました",
     "token": "トークン",
-
     "url": "メールアドレス",
     "user_created": "ユーザーが作成した",
     "user_deleted": "ユーザーを削除しました",
@@ -301,7 +295,6 @@
     "aliases": "エイリアス",
     "analysis": "分析",
     "analysis_details_tooltip": "詳細（説明、回避策の詳細、その他の影響情報）",
-
     "analysis_tooltip": "脆弱性発生の現状",
     "analyzer": "アナライザ",
     "apply_vex": "VEXを適用する",
@@ -312,6 +305,7 @@
     "audit_vulnerabilities": "監査の脆弱性",
     "auditing_progress": "監査の進捗",
     "authenticated": "認証済み",
+    "author": "著者",
     "authors": "著者",
     "bom": "ボム",
     "bom_format": "BOM形式",
@@ -322,7 +316,6 @@
     "change_password": "パスワードを変更する",
     "classification": "分類",
     "classifier": "分類器",
-
     "close": "近い",
     "code_not_present": "コードが存在しません",
     "code_not_reachable": "コードにアクセスできません",
@@ -332,7 +325,6 @@
     "component_application": "アプリケーション",
     "component_author": "著者",
     "component_author_desc": "コンポーネントの作成者",
-
     "component_classifier_desc": "コンポーネントの種類を指定します: アセット (アプリケーション、オペレーティング システム、ハードウェア) と非アセット (ライブラリ、フレームワーク、ファイル)",
     "component_container": "コンテナ",
     "component_cpe_desc": "MITREまたはNISTによって提供されるCPE v2.2またはv2.3 URI。すべての資産（アプリケーション、オペレーティングシステム、ハードウェア）にはCPEを指定する必要があります。",
@@ -453,19 +445,15 @@
     "external_references": "外部参照",
     "false_positive": "偽陽性",
     "filename": "ファイル名",
-
     "findings": "調査結果",
     "findings_audited": "監査結果",
     "findings_unaudited": "調査結果 監査なし",
     "first_seen": "初登場",
-
     "fsf_libre": "FSFリブレ",
     "fullname": "フルネーム",
     "general": "一般的な",
-
     "group": "グループ",
     "group_name": "グループ名",
-
     "hashes": "ハッシュ",
     "hashes_short_desc": "ハッシュ (MD5、SHA、SHA3、Blake2b、Blake3)",
     "home": "家",
@@ -483,6 +471,7 @@
     "include_services": "サービスを含める",
     "include_tags": "タグを含める",
     "inherited_risk_score": "継承リスクスコア",
+    "integrity": "誠実さ",
     "internal": "内部",
     "inventory": "在庫",
     "inventory_with_vulnerabilities": "脆弱性のあるインベントリ",
@@ -518,6 +507,7 @@
     "manufacturer_name": "メーカー名",
     "manufacturer_name_desc": "プロジェクトで説明されているコンポーネントを製造した組織",
     "matrix": "マトリックス",
+    "method": "方法",
     "metric_refresh_requested": "更新が要求されました。更新タスクが完了すると、メトリックが更新されます。",
     "name": "名前",
     "no_file_chosen": "ファイルが選択されていません",
@@ -529,7 +519,6 @@
     "object_identifier": "オブジェクト識別子",
     "object_identifier_desc": "Dependency-Trackがすべてのオブジェクトに自動的に割り当てる一意の識別子（UUID）",
     "occurred_on": "発生日時",
-
     "oidc_availability_check_failed": "OpenID Connect の可用性を判断できませんでした",
     "oidc_redirect_failed": "OpenID Connect ID プロバイダーへのリダイレクト中にエラーが発生しました",
     "only_direct_tooltip": "直接的な依存関係のみを表示し、推移的な依存関係を非表示にする",
@@ -646,8 +635,15 @@
     "password_unauthorized": "現在のログイン資格情報を確認して、もう一度お試しください",
     "phone": "電話",
     "policies": "ポリシー",
+    "policy_bundle_hash": "バンドルハッシュ",
+    "policy_bundle_info": "バンドル情報",
+    "policy_bundle_sync": "同期バンドル",
+    "policy_bundle_sync_requested": "ポリシー バンドルの同期が要求されました。同期が完了すると,脆弱性ポリシー データが更新されます。",
+    "policy_bundle_sync_timestamp": "最終同期日",
+    "policy_bundle_url": "バンドル URL",
     "policy_created": "ポリシーが作成されました",
     "policy_deleted": "ポリシーを削除しました",
+    "policy_last_bundle_sync_failed": "最後のバンドル同期に失敗しました",
     "policy_management": "ポリシー管理",
     "policy_name": "ポリシー名",
     "policy_violations": "ポリシー違反",
@@ -687,8 +683,10 @@
     "provider": "プロバイダー",
     "provider_name": "プロバイダー名",
     "published": "公開済み",
+    "published_at": "公開日",
     "purl": "purl",
     "range": "範囲",
+    "ratings": "評価",
     "recommendation": "おすすめ",
     "references": "参考文献",
     "reindex": "インデックスを再構築する",
@@ -713,6 +711,7 @@
     "risk_score": "リスクスコア",
     "risk_type": "リスクの種類",
     "rollback": "ロールバック",
+    "score": "スコア",
     "search": "検索",
     "search_parent": "親を検索するには入力してください",
     "security_risk": "セキュリティリスク",
@@ -754,12 +753,9 @@
     "tag_name": "タグ名",
     "tags": "タグ",
     "template": "テンプレート",
-
     "title": "タイトル",
-
     "total": "合計",
     "total_findings": "合計調査結果",
-
     "type": "タイプ",
     "update": "アップデート",
     "update_details": "アップデートの詳細",
@@ -771,7 +767,10 @@
     "url": "メールアドレス",
     "urls": "URL",
     "username": "ユーザー名",
+    "validFrom": "から有効",
+    "validUntil": "まで有効",
     "value": "価値",
+    "vector": "ベクトル",
     "vendor_response": "ベンダーの回答",
     "version": "バージョン",
     "version_distance": "バージョン距離",
@@ -787,13 +786,12 @@
     "violations_audited": "監査された違反",
     "violations_unaudited": "監査されていない違反",
     "vulnerabilities": "脆弱性",
-
     "vulnerability": "脆弱性",
-
     "vulnerability_created": "脆弱性が発生",
     "vulnerability_created_desc": "脆弱性レコードが最初に作成された日付",
     "vulnerability_deleted": "脆弱性が削除されました",
     "vulnerability_details": "脆弱性の詳細",
+    "vulnerability_policies": "脆弱性ポリシー",
     "vulnerability_published_desc": "脆弱性記録が最初に公開された日付",
     "vulnerability_title": "タイトル",
     "vulnerability_title_desc": "脆弱性のオプションタイトル",
