@@ -142,6 +142,10 @@
                     <b-input-group-form-input id="input-destination" :label="$t('admin.destination')" input-group-size="mb-3"
                                               :required="(!(this.alert.hasOwnProperty('teams') && this.alert.teams != null && this.alert.teams.length > 0)).toString()"
                                               type="text" v-model="destination" lazy="true" />
+                    <b-input-group-form-input v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.WebhookPublisher'" id="input-token-header" :label="$t('admin.api_token_header')" input-group-size="mb-3"
+                                              type="password" v-model="tokenHeader" lazy="true" />
+                    <b-input-group-form-input v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.WebhookPublisher'" id="input-token" :label="$t('admin.api_token')" input-group-size="mb-3"
+                                              type="password" v-model="token" lazy="true" />
                     <b-input-group-form-input v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.JiraPublisher'" id="input-jira-ticket-type"
                                               :label="$t('admin.jira_ticket_type')" :required="true" type="text" v-model="jiraTicketType" lazy="true" />
                      <b-form-group v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.SendMailPublisher'"
@@ -192,6 +196,8 @@
                           <div class="list-group-item"><b-form-checkbox value="FILE_SYSTEM">FILE_SYSTEM</b-form-checkbox></div>
                           <div class="list-group-item"><b-form-checkbox value="INDEXING_SERVICE">INDEXING_SERVICE</b-form-checkbox></div>
                           <div class="list-group-item"><b-form-checkbox value="REPOSITORY">REPOSITORY</b-form-checkbox></div>
+                          <div class="list-group-item"><b-form-checkbox value="USER_CREATED">USER_CREATED</b-form-checkbox></div>
+                          <div class="list-group-item"><b-form-checkbox value="USER_DELETED">USER_DELETED</b-form-checkbox></div>
                         </b-form-checkbox-group>
                       </div>
                     </b-form-group>
@@ -228,7 +234,9 @@
                   publisherClass: row.publisher.publisherClass,
                   notificationLevel: row.notificationLevel,
                   destination: this.parseDestination(row),
+                  tokenHeader: this.parseTokenHeader(row),
                   jiraTicketType: this.parseJiraTicketType(row),
+                  token: this.parseToken(row),
                   scope: row.scope,
                   notifyOn: row.notifyOn,
                   projects: row.projects,
@@ -248,6 +256,8 @@
               created() {
                 this.parseDestination(this.alert);
                 this.parseJiraTicketType(this.alert);
+                this.parseToken(this.alert);
+                this.parseTokenHeader(this.alert);
               },
               watch: {
                 enabled() {
@@ -292,6 +302,24 @@
                     return null;
                   }
                 },
+                parseToken: function (alert) {
+                  if (alert.publisherConfig) {
+                    let value = JSON.parse(alert.publisherConfig);
+                    if (value) {
+                      return value.token;
+                    }
+                    return null;
+                  }
+                },
+                parseTokenHeader: function (alert) {
+                  if (alert.publisherConfig) {
+                    let value = JSON.parse(alert.publisherConfig);
+                    if (value) {
+                      return value.tokenHeader;
+                    }
+                    return null;
+                  }
+                },
                 updateNotificationRule: function () {
                   let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}`;
                   this.axios.post(url, {
@@ -301,12 +329,16 @@
                     logSuccessfulPublish: this.logSuccessfulPublish,
                     notifyChildren: this.notifyChildren,
                     notificationLevel: this.notificationLevel,
+                    token: this.token,
+                    tokenHeader: this.tokenHeader,
                     publisherConfig: JSON.stringify({ destination: this.destination, jiraTicketType: this.jiraTicketType }),
                     notifyOn: this.notifyOn
                   }).then((response) => {
                     this.alert = response.data;
                     this.destination = this.parseDestination(this.alert);
                     this.jiraTicketType = this.parseJiraTicketType(this.alert);
+                    this.token = this.parseToken(this.alert);
+                    this.tokenHeader = this.parseTokenHeader(this.alert);
                     EventBus.$emit('admin:alerts:rowUpdate', index, this.alert);
                     this.$toastr.s(this.$t('message.updated'));
                   }).catch((error) => {
