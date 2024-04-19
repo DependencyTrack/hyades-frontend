@@ -366,6 +366,7 @@
     "vulnerability_subtitle_desc": "The optional sub-title of the vulnerability",
     "vulnerability_updated": "Vulnerability updated",
     "vulnerability_deleted": "Vulnerability deleted",
+    "vulnerability_tags_updated": "Vulnerability tags updated",
     "created": "Created",
     "validFrom": "Valid From",
     "validUntil": "Valid Until",
