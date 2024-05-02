@@ -384,6 +384,7 @@
     "policy_created": "Policy created",
     "delete_policy": "Delete Policy",
     "policy_deleted": "Policy deleted",
+    "policy_operation_mode": "Operation Mode",
     "operator": "Operator",
     "violation_state": "Violation State",
     "select_license": "Select License",
