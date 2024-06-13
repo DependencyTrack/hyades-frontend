@@ -35,5 +35,5 @@
     just leave it empty for now. The maintainers are happy to assist you in figuring it out!
 -->
 
-- [ ] I have read and understand the [contributing guidelines](https://github.com/DependencyTrack/dependency-track/blob/master/CONTRIBUTING.md#pull-requests)
-- [ ] This PR introduces new or alters existing behavior, and I have updated the [documentation](https://github.com/DependencyTrack/dependency-track/tree/master/docs/_docs) accordingly
+- [ ] I have read and understand the [contributing guidelines](https://github.com/DependencyTrack/hyades/blob/main/CONTRIBUTING.md#pull-requests)
+- [ ] This PR introduces new or alters existing behavior, and I have updated the [documentation](https://dependencytrack.github.io/hyades/latest/development/documentation/) accordingly

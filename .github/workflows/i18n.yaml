@@ -2,11 +2,11 @@ name: i18n
 on:
   push:
     branches:
-      - 'master' # Default branch
+      - 'main' # Default branch
       - 'feature-**' # Feature branches
   pull_request:
     branches:
-      - 'master' # Default branch
+      - 'main' # Default branch
       - 'feature-**' # Feature branches
 
 permissions:

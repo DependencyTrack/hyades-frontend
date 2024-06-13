@@ -3,11 +3,11 @@ name: 'CodeQL'
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
       - 'feature-**'
   pull_request:
     branches:
-      - 'master'
+      - 'main'
       - 'feature-**'
   schedule:
     - cron: '0 7 * * 2'
@@ -16,7 +16,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'DependencyTrack/frontend' }}
+    if: ${{ github.repository == 'DependencyTrack/hyades-frontend' }}
 
     strategy:
       fail-fast: false
