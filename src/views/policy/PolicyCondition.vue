@@ -13,7 +13,7 @@
           :options="subjects"
         />
       </b-col>
-      <b-col md="3" lg="2">
+      <b-col md="3" lg="2" v-if="subject !== 'EXPRESSION'">
         <b-input-group-form-select
           id="input-operator"
           required="true"
@@ -21,7 +21,7 @@
           :options="operators"
         />
       </b-col>
-      <b-col md="5" lg="5">
+      <b-col md="5" lg="5" v-if="subject !== 'EXPRESSION'">
         <b-input-group-form-select
           v-if="
             subject !== 'COORDINATES' &&
@@ -146,6 +146,27 @@
           >
         </b-input-group>
       </b-col>
+
+      <b-col v-if="subject === 'EXPRESSION'" lg="6">
+        <MonacoEditor
+          id="input-value"
+          v-if="subject === 'EXPRESSION'"
+          v-model="value"
+          :markers="this.editorMarkers"
+          v-debounce:1s="saveCondition"
+          :debounce-events="'keyup'"
+        ></MonacoEditor>
+      </b-col>
+      <b-col v-if="subject === 'EXPRESSION'" lg="2">
+        <b-form-select
+          id="input-value-violationtype"
+          v-if="subject === 'EXPRESSION'"
+          v-on:change="saveCondition"
+          v-model="violationType"
+          :options="violationTypes"
+        ></b-form-select>
+      </b-col>
+
       <b-col md="0" lg="2"> </b-col>
     </b-row>
   </actionable-list-group-item>
@@ -156,6 +177,7 @@ import BInputGroupFormInput from '../../forms/BInputGroupFormInput';
 import BInputGroupFormSelect from '../../forms/BInputGroupFormSelect';
 import common from '../../shared/common';
 import ActionableListGroupItem from '../components/ActionableListGroupItem';
+import MonacoEditor from '@/views/components/MonacoEditor.vue';
 
 export default {
   props: {
@@ -166,6 +188,7 @@ export default {
     ActionableListGroupItem,
     BInputGroupFormSelect,
     BInputGroupFormInput,
+    MonacoEditor,
   },
   created() {
     if (this.condition) {
@@ -174,6 +197,7 @@ export default {
       this.subjectChanged();
       this.operator = this.condition.operator;
       this.value = this.condition.value;
+      this.violationType = this.condition.violationType;
     }
   },
   data() {
@@ -182,6 +206,7 @@ export default {
       subject: null,
       operator: null,
       value: null,
+      violationType: null,
       coordinatesGroup: null,
       coordinatesName: null,
       coordinatesVersion: null,
@@ -213,6 +238,7 @@ export default {
           value: 'VERSION_DISTANCE',
           text: this.$t('message.version_distance'),
         },
+        { value: 'EXPRESSION', text: 'Expression' },
       ],
       objectOperators: [
         { value: 'IS', text: this.$t('operator.is') },
@@ -248,8 +274,14 @@ export default {
         { value: 'CONTAINS_ANY', text: this.$t('operator.contains_any') },
         { value: 'CONTAINS_ALL', text: this.$t('operator.contains_all') },
       ],
+      violationTypes: [
+        { value: 'LICENSE', text: 'License' },
+        { value: 'OPERATIONAL', text: 'Operational' },
+        { value: 'SECURITY', text: 'Security' },
+      ],
       operators: [],
       possibleValues: [],
+      editorMarkers: [],
     };
   },
   computed: {
@@ -284,6 +316,8 @@ export default {
         case 'VULNERABILITY_ID':
           return false;
         case 'VERSION_DISTANCE':
+          return false;
+        case 'EXPRESSION':
           return false;
         default:
           return false;
@@ -356,6 +390,9 @@ export default {
         case 'VERSION_DISTANCE':
           this.operators = this.numericOperators;
           break;
+        case 'EXPRESSION':
+          this.operators = this.regexOperators;
+          break;
         default:
           this.operators = [];
       }
@@ -412,7 +449,16 @@ export default {
     },
     saveCondition: function () {
       let dynamicValue = this.createDynamicValue();
-      if (!this.subject || !this.operator || !dynamicValue) {
+      if (!this.subject) {
+        return;
+      }
+      if (
+        this.subject === 'EXPRESSION' &&
+        (!this.violationType || !dynamicValue)
+      ) {
+        return;
+      }
+      if (this.subject !== 'EXPRESSION' && (!this.operator || !dynamicValue)) {
         return;
       }
       if (this.uuid) {
@@ -422,6 +468,8 @@ export default {
             uuid: this.uuid,
             subject: this.subject,
             operator: this.subject === 'COMPONENT_HASH' ? 'IS' : this.operator,
+            violationType:
+              this.subject === 'EXPRESSION' ? this.violationType : null,
             value: dynamicValue,
           })
           .then((response) => {
@@ -429,10 +477,31 @@ export default {
             this.subject = response.data.subject;
             this.operator = response.data.operator;
             this.value = response.data.value;
+            this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.updated'));
           })
           .catch((error) => {
-            this.$toastr.w(this.$t('condition.unsuccessful_action'));
+            if (
+              this.subject === 'EXPRESSION' &&
+              error.response &&
+              error.response.data &&
+              error.response.data.celErrors
+            ) {
+              this.editorMarkers = error.response.data.celErrors.map(
+                (celErr) => {
+                  return {
+                    startLineNumber: celErr.line,
+                    startColumn: celErr.column,
+                    endLineNumber: celErr.line,
+                    endColumn: celErr.column + 3, // Add a few columns to make it more visible
+                    message: celErr.message,
+                    severity: 8,
+                  };
+                },
+              );
+            } else {
+              this.$toastr.w(this.$t('condition.unsuccessful_action'));
+            }
           });
       } else {
         let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}/condition`;
@@ -441,12 +510,15 @@ export default {
             subject: this.subject,
             operator: this.subject === 'COMPONENT_HASH' ? 'IS' : this.operator,
             value: dynamicValue,
+            violationType:
+              this.subject === 'EXPRESSION' ? this.violationType : null,
           })
           .then((response) => {
             this.uuid = response.data.uuid;
             this.subject = response.data.subject;
             this.operator = response.data.operator;
             this.value = response.data.value;
+            this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.updated'));
           })
           .catch((error) => {
@@ -464,6 +536,7 @@ export default {
             this.subject = response.data.subject;
             this.operator = response.data.operator;
             this.value = response.data.value;
+            this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.condition_deleted'));
             this.$emit('conditionRemoved');
           })

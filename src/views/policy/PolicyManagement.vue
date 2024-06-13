@@ -27,6 +27,23 @@
         >
         <license-group-list v-on:total="totalLicenseGroups = $event" />
       </b-tab>
+      <b-tab
+        ref="vulnerability"
+        class="body-bg-color overview-chart"
+        style="border-left: 0; border-right: 0; border-top: 0"
+        @click="routeTo('vulnerability')"
+      >
+        <template v-slot:title
+          ><i class="fa fa-list-alt"></i>
+          {{ $t('message.vulnerability_policies') }}
+          <b-badge variant="tab-total">{{
+            totalVulnerabilityPolicies
+          }}</b-badge></template
+        >
+        <vulnerability-policy-list
+          v-on:total="totalVulnerabilityPolicies = $event"
+        />
+      </b-tab>
     </b-tabs>
   </div>
 </template>
@@ -35,17 +52,20 @@
 import permissionsMixin from '../../mixins/permissionsMixin';
 import PolicyList from './PolicyList';
 import LicenseGroupList from './LicenseGroupList';
+import VulnerabilityPolicyList from './VulnerabilityPolicyList';
 
 export default {
   mixins: [permissionsMixin],
   components: {
     LicenseGroupList,
     PolicyList,
+    VulnerabilityPolicyList,
   },
   data() {
     return {
       totalPolicies: 0,
       totalLicenseGroups: 0,
+      totalVulnerabilityPolicies: 0,
     };
   },
   methods: {
@@ -70,11 +90,17 @@ export default {
     },
   },
   mounted() {
-    this.getTabFromRoute().active = true;
+    const tab = this.getTabFromRoute();
+    if (tab) {
+      tab.active = true;
+    }
   },
   watch: {
     $route() {
-      this.getTabFromRoute().activate();
+      const tab = this.getTabFromRoute();
+      if (tab) {
+        tab.activate();
+      }
     },
   },
 };

@@ -11,7 +11,7 @@ on:
       - 'feature-**' # Feature branches
   workflow_dispatch:
 
-permissions: { }
+permissions: {}
 
 jobs:
   call-build:

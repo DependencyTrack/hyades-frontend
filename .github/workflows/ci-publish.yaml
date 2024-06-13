@@ -6,7 +6,7 @@ on:
       - released
   workflow_dispatch:
 
-permissions: { }
+permissions: {}
 
 jobs:
   read-version:
