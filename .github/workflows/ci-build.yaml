@@ -3,13 +3,15 @@ name: Build CI
 on:
   push:
     branches:
-      - 'master' # Default branch
+      - 'main' # Default branch
       - 'feature-**' # Feature branches
   pull_request:
     branches:
-      - 'master' # Default branch
+      - 'main' # Default branch
       - 'feature-**' # Feature branches
   workflow_dispatch:
+
+permissions: { }
 
 jobs:
   call-build:
@@ -18,8 +20,11 @@ jobs:
       node-versions: '["18", "20"]'
       node-version-package: '18'
       app-version: 'snapshot'
-      publish-container: ${{ github.ref_name == 'master' || startsWith(github.ref_name, 'feature-') }}
+      publish-container: ${{ github.ref_name == 'main' || startsWith(github.ref_name, 'feature-') }}
       ref-name: ${{ github.ref_name }}
+    permissions:
+      packages: write # Required to push images to ghcr.io
+      security-events: write # Required to upload trivy's SARIF output
     secrets:
-      registry-0-usr: ${{ secrets.HUB_USERNAME }}
-      registry-0-psw: ${{ secrets.HUB_ACCESS_TOKEN }}
+      registry-0-usr: ${{ github.repository_owner }}
+      registry-0-psw: ${{ secrets.GITHUB_TOKEN }}
