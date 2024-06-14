@@ -6,7 +6,7 @@
       <b-card no-body :header="headers.customRiskScore">
         <b-card-body>
           <p>{{ $t('admin.index_risk_score_weighting_description') }}</p>
-          <c-switch id="riskscore.history.enabled" color="primary" v-model="customRiskScore.enabled" label v-bind="labelIcon" />{{$t('admin.enable_risk_score_history_check')}}
+          <c-switch id="weight.history.enabled" color="primary" v-model="customRiskScore.enabled" label v-bind="labelIcon" />{{$t('admin.enable_risk_score_history_check')}}
           <b-validated-input-group-form-input
             id="custom-risk-score-critical"
             :label="$t('admin.risk_score_weight_critical')"
@@ -109,21 +109,21 @@
           for (let i=0; i<configItems.length; i++) {
             let item = configItems[i];
             switch (item.propertyName) {
-              case "riskscore.history.enabled":
+              case "weight.history.enabled":
                 this.customRiskScore.enabled = common.toBoolean(item.propertyValue); break;
-              case "riskscore.critical":
+              case "weight.critical":
                 this.customRiskScore.critical = item.propertyValue;
                 this.customRiskScore.criticalTooltip = item.description; break;
-                case "riskscore.high":
+                case "weight.high":
                 this.customRiskScore.high = item.propertyValue;
                 this.customRiskScore.highTooltip = item.description; break;
-                case "riskscore.medium":
+                case "weight.medium":
                 this.customRiskScore.medium = item.propertyValue;
                 this.customRiskScore.mediumTooltip = item.description; break;
-                case "riskscore.low":
+                case "weight.low":
                 this.customRiskScore.low = item.propertyValue;
                 this.customRiskScore.lowTooltip = item.description; break;
-                case "riskscore.unassigned":
+                case "weight.unassigned":
                 this.customRiskScore.unassigned = item.propertyValue;
                 this.customRiskScore.unassignedTooltip = item.description; break;
             }
@@ -133,12 +133,12 @@
       methods: {
         saveCustomRiskScoreSettings: function() {
           this.updateConfigProperties([
-            {groupName: 'risk-score', propertyName: 'riskscore.history.enabled', propertyValue: this.customRiskScore.enabled},
-            {groupName: 'risk-score', propertyName: 'riskscore.critical', propertyValue: this.customRiskScore.critical},
-            {groupName: 'risk-score', propertyName: 'riskscore.high', propertyValue: this.customRiskScore.high},
-            {groupName: 'risk-score', propertyName: 'riskscore.medium', propertyValue: this.customRiskScore.medium},
-            {groupName: 'risk-score', propertyName: 'riskscore.low', propertyValue: this.customRiskScore.low},
-            {groupName: 'risk-score', propertyName: 'riskscore.unassigned', propertyValue: this.customRiskScore.unassigned}
+            {groupName: 'risk-score', propertyName: 'weight.history.enabled', propertyValue: this.customRiskScore.enabled},
+            {groupName: 'risk-score', propertyName: 'weight.critical', propertyValue: this.customRiskScore.critical},
+            {groupName: 'risk-score', propertyName: 'weight.high', propertyValue: this.customRiskScore.high},
+            {groupName: 'risk-score', propertyName: 'weight.medium', propertyValue: this.customRiskScore.medium},
+            {groupName: 'risk-score', propertyName: 'weight.low', propertyValue: this.customRiskScore.low},
+            {groupName: 'risk-score', propertyName: 'weight.unassigned', propertyValue: this.customRiskScore.unassigned}
           ]);
         },
         reindex: function() {
