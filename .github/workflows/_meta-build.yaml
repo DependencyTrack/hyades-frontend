@@ -129,7 +129,7 @@ jobs:
         if: ${{ inputs.publish-container }}
         uses: aquasecurity/trivy-action@0.19.0
         with:
-          image-ref: docker.io/dependencytrack/frontend:${{ inputs.app-version }}
+          image-ref: ghcr.io/dependencytrack/hyades-frontend:${{ inputs.app-version }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           ignore-unfixed: true
