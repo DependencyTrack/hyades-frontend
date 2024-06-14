@@ -844,6 +844,7 @@
     "vulnerability_details": "脆弱性の詳細",
     "vulnerability_policies": "脆弱性ポリシー",
     "vulnerability_published_desc": "脆弱性記録が最初に公開された日付",
+    "vulnerability_tags_updated": "脆弱性タグが更新されました",
     "vulnerability_title": "タイトル",
     "vulnerability_title_desc": "脆弱性のオプションタイトル",
     "vulnerability_updated": "脆弱性が更新されました",

@@ -844,6 +844,7 @@
     "vulnerability_details": "Деталі вразливості",
     "vulnerability_policies": "Політика вразливості",
     "vulnerability_published_desc": "Дата первинної публікації запису про вразливість",
+    "vulnerability_tags_updated": "Оновлено теги вразливості",
     "vulnerability_title": "Назва",
     "vulnerability_title_desc": "Необов’язкова назва вразливості",
     "vulnerability_updated": "Уразливість оновлено",
