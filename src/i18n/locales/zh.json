@@ -844,6 +844,7 @@
     "vulnerability_details": "漏洞详细信息",
     "vulnerability_policies": "漏洞策略",
     "vulnerability_published_desc": "漏洞记录最初发布的日期",
+    "vulnerability_tags_updated": "漏洞标签已更新",
     "vulnerability_title": "标题",
     "vulnerability_title_desc": "漏洞的可选标题",
     "vulnerability_updated": "漏洞更新",

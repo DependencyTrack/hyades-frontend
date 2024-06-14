@@ -844,6 +844,7 @@
     "vulnerability_details": "Detalles de vulnerabilidad",
     "vulnerability_policies": "Políticas de vulnerabilidad",
     "vulnerability_published_desc": "La fecha en que se publicó originalmente el registro de vulnerabilidad",
+    "vulnerability_tags_updated": "Etiquetas de vulnerabilidad actualizadas",
     "vulnerability_title": "Título",
     "vulnerability_title_desc": "El título opcional de la vulnerabilidad.",
     "vulnerability_updated": "Vulnerabilidad actualizada",

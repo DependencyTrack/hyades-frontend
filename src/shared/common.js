@@ -49,6 +49,19 @@ $common.formatProjectTagLabel = function formatProjectTagLabel(router, tag) {
 };
 
 /**
+ * Formats and returns a specialized label for a vulnerability tag.
+ */
+$common.formatVulnerabilityTagLabel = function formatVulnerabilityTagLabel(
+  router,
+  tag,
+) {
+  if (!tag) {
+    return '';
+  }
+  return `<a href="${router.resolve({ name: 'Vulnerabilities', query: { tag: tag.name } }).href}" class="badge badge-tag text-lowercase mr-1">${xssFilters.inHTMLData(tag.name)}</a>`;
+};
+
+/**
  * Changes the first letter to uppercase and the remaining letters to lowercase.
  *
  * @param {string} string the String to capitalize
@@ -590,6 +603,7 @@ export default {
   formatSourceLabel: $common.formatSourceLabel,
   formatNotificationLabel: $common.formatNotificationLabel,
   formatProjectTagLabel: $common.formatProjectTagLabel,
+  formatVulnerabilityTagLabel: $common.formatVulnerabilityTagLabel,
   capitalize: $common.capitalize,
   formatSeverityLabel: $common.formatSeverityLabel,
   formatViolationStateLabel: $common.formatViolationStateLabel,
