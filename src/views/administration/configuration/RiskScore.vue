@@ -1,11 +1,11 @@
 <template>
     <div>
-      <p>{{ $t('admin.index_risk_score_description') }}</p>
-      <p>{{ $t('admin.index_risk_score_calc') }}</p>
+      <p>{{ $t('admin.risk_score_description') }}</p>
+      <p>{{ $t('admin.risk_score_calc') }}</p>
       <br/>
       <b-card no-body :header="headers.customRiskScore">
         <b-card-body>
-          <p>{{ $t('admin.index_risk_score_weighting_description') }}</p>
+          <p>{{ $t('admin.risk_score_weighting_description') }}</p>
           <c-switch id="weight.history.enabled" color="primary" v-model="customRiskScore.enabled" label v-bind="labelIcon" />{{$t('admin.enable_risk_score_history_check')}}
           <b-validated-input-group-form-input
             id="custom-risk-score-critical"
@@ -140,20 +140,6 @@
             {groupName: 'risk-score', propertyName: 'weight.low', propertyValue: this.customRiskScore.low},
             {groupName: 'risk-score', propertyName: 'weight.unassigned', propertyValue: this.customRiskScore.unassigned}
           ]);
-        },
-        reindex: function() {
-          let url = `${this.$api.BASE_URL}/${this.$api.URL_SEARCH}/reindex`;
-          let params = new URLSearchParams();
-          Object.entries(this.type).forEach(([key, value]) => {
-            if(value) {
-              params.append('type', key.toUpperCase());
-            }
-          });
-          this.axios.post(url, null, { params: params }).then((response) => {
-            this.$toastr.s(this.$t('admin.reindex_submitted'));
-          }).catch((error) => {
-            this.$toastr.s(this.$t('admin.reindex_error'));
-          });
         }
       }
     }
