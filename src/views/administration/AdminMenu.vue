@@ -111,6 +111,11 @@ export default {
               route: 'configuration/search',
             },
             {
+              component: 'RiskScore',
+              name: this.$t('message.risk_score'),
+              route: 'configuration/RiskScore',
+            },
+            {
               component: 'Experimental',
               name: this.$t('admin.experimental'),
               route: 'configuration/experimental',
