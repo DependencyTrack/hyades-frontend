@@ -32,6 +32,8 @@ const InternalComponents = () =>
 const TaskScheduler = () =>
   import('@/views/administration/configuration/TaskScheduler');
 const Search = () => import('@/views/administration/configuration/Search');
+const RiskScore = () =>
+  import('@/views/administration/configuration/RiskScore');
 const Experimental = () =>
   import('@/views/administration/configuration/Experimental');
 
@@ -383,6 +385,16 @@ function configRoutes() {
             {
               path: 'configuration/search',
               component: Search,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                permission: 'SYSTEM_CONFIGURATION',
+              },
+            },
+            {
+              path: 'configuration/riskscore',
+              component: RiskScore,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
