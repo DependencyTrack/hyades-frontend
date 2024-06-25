@@ -91,6 +91,12 @@ export default {
           permission: permissions.VIEW_PORTFOLIO,
         },
         {
+          name: 'Tags',
+          url: '/tags',
+          icon: 'fa fa-cubes',
+          permission: permissions.VIEW_PORTFOLIO,
+        },
+        {
           name: this.$t('message.vulnerabilities'),
           url: '/vulnerabilities',
           icon: 'fa fa-shield',
