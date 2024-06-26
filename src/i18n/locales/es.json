@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "Falló la sincronización del último paquete",
     "policy_management": "Gestión de políticas",
     "policy_name": "Nombre de directiva",
+    "policy_operation_mode": "Modo de operación",
     "policy_violations": "Violaciones de políticas",
     "policy_violations_by_classification": "Violaciones de políticas por clasificación",
     "policy_violations_by_state": "Violaciones de políticas por estado",
