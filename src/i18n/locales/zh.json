@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "上次捆绑包同步失败",
     "policy_management": "策略管理",
     "policy_name": "策略名称",
+    "policy_operation_mode": "操作模式",
     "policy_violations": "违反策略",
     "policy_violations_by_classification": "违反策略的分类",
     "policy_violations_by_state": "违反策略的情况",

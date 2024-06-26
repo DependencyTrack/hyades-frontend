@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "Ostatnia synchronizacja pakietu nie powiodła się",
     "policy_management": "Zarządzanie polityką",
     "policy_name": "Nazwa zasady",
+    "policy_operation_mode": "Tryb działania",
     "policy_violations": "Naruszenia zasad",
     "policy_violations_by_classification": "Naruszenia zasad według klasyfikacji",
     "policy_violations_by_state": "Naruszenia zasad według stanu",
