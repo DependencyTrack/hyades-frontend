@@ -83,34 +83,41 @@ export default {
     initializeProjectCreateProjectModal: function () {
       this.$root.$emit('initializeProjectCreateProjectModal');
     },
-    apiUrl: function (uuid) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}`;
-      if (uuid) {
-        url += `/${uuid}/children`;
+    apiUrl: function (parentUuid) {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/concise`;
+      if (parentUuid) {
+        url += `/${parentUuid}/children`;
+      }
+      let queryParams = {
+        includeMetrics: true,
+      };
+      if (this.showInactiveProjects === false) {
+        queryParams['active'] = true;
       }
       let tag = this.$route.query.tag;
       if (tag) {
-        url += '/tag/' + encodeURIComponent(tag);
+        queryParams['tag'] = tag;
       }
       let classifier = this.$route.query.classifier;
       if (classifier) {
-        url += '/classifier/' + encodeURIComponent(classifier);
+        queryParams['classifier'] = classifier;
       }
-      if (this.showInactiveProjects === undefined) {
-        url += '?excludeInactive=true';
-      } else {
-        url += '?excludeInactive=' + !this.showInactiveProjects;
-      }
-      if (this.isSearching) {
-        url += '&onlyRoot=false';
+      if (this.isSearching || parentUuid) {
+        queryParams['onlyRoot'] = false;
       } else {
         if (this.showFlatView === undefined) {
-          url += '&onlyRoot=true';
+          queryParams['onlyRoot'] = true;
         } else {
-          url += '&onlyRoot=' + !this.showFlatView;
+          queryParams['onlyRoot'] = !this.showFlatView;
         }
       }
-      return url;
+      let queryString = Object.keys(queryParams)
+        .map(
+          (key) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`,
+        )
+        .join('&');
+      return `${url}?${queryString}`;
     },
     refreshTable: function () {
       this.$refs.table.refresh({
@@ -142,29 +149,22 @@ export default {
           });
         }
         this.$refs.table.getData().forEach((project) => {
-          if (
-            project.children &&
-            !project.fetchedChildren &&
-            (this.showInactiveProjects ||
-              project.children.some((child) => child.active)) &&
-            (!this.$route.query.classifier ||
-              project.children.some(
-                (child) => child.classifier === this.$route.query.classifier,
-              )) &&
-            (!this.$route.query.tag ||
-              project.children.some(
-                (child) => child.tag === this.$route.query.tag,
-              ))
-          ) {
-            this.$refs.table.$table
-              .find('tbody')
-              .find('tr.treegrid-' + project.id.toString())
-              .addClass('treegrid-collapsed');
-            this.$refs.table.$table
-              .find('tbody')
-              .find('tr.treegrid-' + project.id.toString())
-              .treegrid('renderExpander');
+          if (project.fetchedChildren) {
+            return;
           }
+
+          this.hasMatchingChildren(project).then((doesHaveMatchingChildren) => {
+            if (doesHaveMatchingChildren) {
+              this.$refs.table.$table
+                .find('tbody')
+                .find('tr.treegrid-' + project.id.toString())
+                .addClass('treegrid-collapsed');
+              this.$refs.table.$table
+                .find('tbody')
+                .find('tr.treegrid-' + project.id.toString())
+                .treegrid('renderExpander');
+            }
+          });
         });
         this.$refs.table.getData().forEach((row) => {
           if (row.expanded) {
@@ -182,16 +182,31 @@ export default {
       }
       this.$refs.table.hideLoading();
     },
-    getChildren: async function (project) {
-      let url = this.apiUrl(project.uuid);
+    getChildren: async function (parentProject) {
+      let url = this.apiUrl(parentProject.uuid);
       await this.axios.get(url).then((response) => {
         for (let project of response.data) {
-          if (project.parent) {
-            project.pid = MurmurHash2(project.parent.uuid).result();
-          }
+          project.pid = MurmurHash2(parentProject.uuid).result();
         }
         this.$refs.table.append(response.data);
       });
+    },
+    hasMatchingChildren: function (project) {
+      if (!project.hasChildren) {
+        return new Promise(() => false);
+      }
+
+      // Perform a pre-flight search if there is at least one
+      // child project that matches the current search criteria,
+      // and is accessible to the user.
+      //
+      // While this *does* result in an additional request per project
+      // with hasChildren=true, it's still better than returning child
+      // data in the project list response.
+      let url = this.apiUrl(project.uuid);
+      return this.axios
+        .get(`${url}&pageNumber=1&pageSize=1`)
+        .then((response) => Number(response.headers['x-total-count']) > 0);
     },
     saveViewState: function () {
       this.savedViewState = this.showFlatView;
@@ -305,7 +320,7 @@ export default {
         },
         {
           title: this.$t('message.risk_score'),
-          field: 'lastInheritedRiskScore',
+          field: 'metrics.inheritedRiskScore',
           sortable: true,
         },
         {
@@ -320,7 +335,7 @@ export default {
         {
           title: this.$t('message.components'),
           field: 'metrics.components',
-          sortable: false,
+          sortable: true,
           visible: false,
         },
         {
@@ -414,18 +429,8 @@ export default {
             if (
               event.target.tagName.toLowerCase() !== 'a' &&
               $element.treegrid('isLeaf') &&
-              row.children &&
-              !row.fetchedChildren &&
-              (this.showInactiveProjects ||
-                row.children.some((child) => child.active)) &&
-              (!this.$route.query.classifier ||
-                row.children.some(
-                  (child) => child.classifier === this.$route.query.classifier,
-                )) &&
-              (!this.$route.query.tag ||
-                row.children.some(
-                  (child) => child.tag === this.$route.query.tag,
-                ))
+              row.hasChildren &&
+              !row.fetchedChildren
             ) {
               row.fetchedChildren = true;
               this.getChildren(row);
