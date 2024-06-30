@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "Last bundle sync failed",
     "policy_management": "Policy Management",
     "policy_name": "Policy Name",
+    "policy_operation_mode": "Operation Mode",
     "policy_violations": "Policy Violations",
     "policy_violations_by_classification": "Policy Violations by Classification",
     "policy_violations_by_state": "Policy Violations by State",

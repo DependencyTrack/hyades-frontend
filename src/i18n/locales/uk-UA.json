@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "Не вдалося синхронізувати останній пакет",
     "policy_management": "Управління політикою",
     "policy_name": "Назва політики",
+    "policy_operation_mode": "Режим роботи",
     "policy_violations": "Порушення політики",
     "policy_violations_by_classification": "Порушення політики за класифікацією",
     "policy_violations_by_state": "Порушення політики державою",

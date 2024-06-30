@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "Die letzte Paket-Synchronisierung ist fehlgeschlagen",
     "policy_management": "Richtlinienverwaltung",
     "policy_name": "Versicherungsname",
+    "policy_operation_mode": "Betriebsmodus",
     "policy_violations": "Richtlinienverstöße",
     "policy_violations_by_classification": "Richtlinienverletzungen nach Klassifizierung",
     "policy_violations_by_state": "Richtlinienverstöße nach Status",
