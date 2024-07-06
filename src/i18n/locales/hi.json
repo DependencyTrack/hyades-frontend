@@ -701,6 +701,7 @@
     "policy_last_bundle_sync_failed": "अंतिम बंडल सिंक विफल रहा",
     "policy_management": "नीति प्रबंधन",
     "policy_name": "पालिसी का नाम",
+    "policy_operation_mode": "ऑपरेशन मोड",
     "policy_violations": "नीति उल्लंघन",
     "policy_violations_by_classification": "वर्गीकरण के अनुसार नीति उल्लंघन",
     "policy_violations_by_state": "राज्यवार नीति उल्लंघन",
