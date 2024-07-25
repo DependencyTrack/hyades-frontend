@@ -179,12 +179,7 @@ export default {
           field: 'component.version',
           sortable: true,
           formatter(value, row, index) {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                row.component,
-                'latestVersion',
-              )
-            ) {
+            if (row.component.latestVersion) {
               if (
                 compareVersions(
                   row.component.latestVersion,
