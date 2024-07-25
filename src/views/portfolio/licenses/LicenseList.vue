@@ -6,7 +6,7 @@
         size="md"
         variant="outline-primary"
         v-b-modal.licenseAddLicenseModal
-        v-permission="PERMISSIONS.SYSTEM_CONFIGURATION"
+        v-permission:or="[PERMISSIONS.SYSTEM_CONFIGURATION, PERMISSIONS.SYSTEM_CONFIGURATION_CREATE]"
       >
         <span class="fa fa-plus"></span> {{ $t('message.add_license') }}
       </b-button>

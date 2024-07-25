@@ -1,5 +1,6 @@
 <template>
   <actionable-list-group-item
+    v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_UPDATE']"
     :delete-icon="true"
     v-on:actionClicked="removeCondition()"
   >

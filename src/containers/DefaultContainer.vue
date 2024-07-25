@@ -126,19 +126,37 @@ export default {
             element: '',
             attributes: {},
           },
-          permission: permissions.SYSTEM_CONFIGURATION,
+          permission: [
+            permissions.SYSTEM_CONFIGURATION,
+            permissions.SYSTEM_CONFIGURATION_CREATE,
+            permissions.SYSTEM_CONFIGURATION_READ, 
+            permissions.SYSTEM_CONFIGURATION_UPDATE,
+            permissions.SYSTEM_CONFIGURATION_DELETE
+          ],
         },
         {
           name: this.$t('message.policy_management'),
           url: '/policy',
           icon: 'fa fa-list-alt',
-          permission: permissions.POLICY_MANAGEMENT,
+          permission: [
+            permissions.POLICY_MANAGEMENT,
+            permissions.POLICY_MANAGEMENT_CREATE,
+            permissions.POLICY_MANAGEMENT_READ,
+            permissions.POLICY_MANAGEMENT_UPDATE,
+            permissions.POLICY_MANAGEMENT_DELETE
+          ],
         },
         {
           name: this.$t('message.administration'),
           url: '/admin',
           icon: 'fa fa-cogs',
-          permission: permissions.SYSTEM_CONFIGURATION,
+          permission: [
+            permissions.SYSTEM_CONFIGURATION,
+            permissions.SYSTEM_CONFIGURATION_CREATE,
+            permissions.SYSTEM_CONFIGURATION_READ, 
+            permissions.SYSTEM_CONFIGURATION_UPDATE,
+            permissions.SYSTEM_CONFIGURATION_DELETE
+          ],
         },
       ],
     };

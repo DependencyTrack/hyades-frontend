@@ -24,7 +24,7 @@
             :label="$t('message.service_name')"
             :tooltip="this.$t('message.service_name_desc')"
             :feedback-text="$t('message.required_service_name')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
           />
           <b-input-group-form-input
             id="service-version-input"
@@ -34,7 +34,7 @@
             required="false"
             :label="$t('message.version')"
             :tooltip="this.$t('message.service_version_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
           />
           <b-input-group-form-input
             id="service-group-input"
@@ -44,7 +44,7 @@
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
           />
           <b-form-group
             id="service-notes-form-group"
@@ -55,7 +55,7 @@
               id="service-notes-description"
               v-model="service.description"
               rows="3"
-              :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+              :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
             />
           </b-form-group>
           <b-input-group-form-input
@@ -168,7 +168,7 @@
         size="md"
         variant="outline-danger"
         @click="deleteService()"
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE]"
         >{{ $t('message.delete') }}</b-button
       >
       <b-button size="md" variant="secondary" @click="cancel()">{{
@@ -178,7 +178,7 @@
         size="md"
         variant="primary"
         @click="updateService()"
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE]"
         >{{ $t('message.update') }}</b-button
       >
     </template>

@@ -45,7 +45,15 @@ import permissionsMixin from '../../mixins/permissionsMixin';
 import EventBus from '../../shared/eventbus';
 import {
   ACCESS_MANAGEMENT,
+  ACCESS_MANAGEMENT_CREATE,
+  ACCESS_MANAGEMENT_READ,
+  ACCESS_MANAGEMENT_UPDATE,
+  ACCESS_MANAGEMENT_DELETE,
   SYSTEM_CONFIGURATION,
+  SYSTEM_CONFIGURATION_CREATE,
+  SYSTEM_CONFIGURATION_READ,
+  SYSTEM_CONFIGURATION_UPDATE,
+  SYSTEM_CONFIGURATION_DELETE,
 } from '../../shared/permissions';
 
 export default {
@@ -78,7 +86,7 @@ export default {
         {
           name: this.$t('admin.configuration'),
           id: 'configuration',
-          permission: SYSTEM_CONFIGURATION,
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_CREATE, SYSTEM_CONFIGURATION_READ, SYSTEM_CONFIGURATION_UPDATE, SYSTEM_CONFIGURATION_DELETE],
           children: [
             {
               component: 'General',
@@ -125,7 +133,7 @@ export default {
         {
           name: this.$t('admin.analyzers'),
           id: 'analyzers',
-          permission: SYSTEM_CONFIGURATION,
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_CREATE, SYSTEM_CONFIGURATION_READ, SYSTEM_CONFIGURATION_UPDATE, SYSTEM_CONFIGURATION_DELETE],
           children: [
             {
               component: 'InternalAnalyzer',
@@ -157,7 +165,7 @@ export default {
         {
           name: this.$t('admin.vuln_sources'),
           id: 'vulnerabilitysources',
-          permission: SYSTEM_CONFIGURATION,
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_CREATE, SYSTEM_CONFIGURATION_READ, SYSTEM_CONFIGURATION_UPDATE, SYSTEM_CONFIGURATION_DELETE],
           children: [
             {
               component: 'VulnSourceNvd',
@@ -179,7 +187,7 @@ export default {
         {
           name: this.$t('admin.repositories'),
           id: 'repositories',
-          permission: SYSTEM_CONFIGURATION,
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_CREATE, SYSTEM_CONFIGURATION_READ, SYSTEM_CONFIGURATION_UPDATE, SYSTEM_CONFIGURATION_DELETE],
           children: [
             {
               component: 'Cargo',
@@ -251,7 +259,7 @@ export default {
         {
           name: this.$t('admin.notifications'),
           id: 'notifications',
-          permission: SYSTEM_CONFIGURATION,
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_CREATE, SYSTEM_CONFIGURATION_READ, SYSTEM_CONFIGURATION_UPDATE, SYSTEM_CONFIGURATION_DELETE],
           children: [
             {
               component: 'Alerts',
@@ -268,7 +276,7 @@ export default {
         {
           name: this.$t('admin.integrations'),
           id: 'integrations',
-          permission: SYSTEM_CONFIGURATION,
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_CREATE, SYSTEM_CONFIGURATION_READ, SYSTEM_CONFIGURATION_UPDATE, SYSTEM_CONFIGURATION_DELETE],
           children: [
             {
               component: 'DefectDojo',
@@ -295,7 +303,7 @@ export default {
         {
           name: this.$t('admin.access_management'),
           id: 'accessmanagement',
-          permission: ACCESS_MANAGEMENT,
+          permission: [ACCESS_MANAGEMENT, ACCESS_MANAGEMENT_CREATE, ACCESS_MANAGEMENT_READ, ACCESS_MANAGEMENT_UPDATE, ACCESS_MANAGEMENT_DELETE],
           children: [
             {
               component: 'LdapUsers',

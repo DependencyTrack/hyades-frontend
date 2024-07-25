@@ -6,7 +6,7 @@
           size="md"
           variant="outline-primary"
           v-b-modal.projectAddComponentModal
-          v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+          v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE]"
         >
           <span class="fa fa-plus"></span> {{ $t('message.add_component') }}
         </b-button>
@@ -14,7 +14,7 @@
           size="md"
           variant="outline-primary"
           @click="removeDependencies"
-          v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+          v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE]"
         >
           <span class="fa fa-minus"></span> {{ $t('message.remove_component') }}
         </b-button>
@@ -23,10 +23,7 @@
           size="md"
           variant="outline-primary"
           v-b-modal.projectUploadBomModal
-          v-permission:or="[
-            PERMISSIONS.PORTFOLIO_MANAGEMENT,
-            PERMISSIONS.BOM_UPLOAD,
-          ]"
+          v-permission="PERMISSIONS.BOM_UPLOAD"
         >
           <span class="fa fa-upload"></span> {{ $t('message.upload_bom') }}
         </b-button>

@@ -16,7 +16,7 @@
               <td>
                 {{ lastMeasurement }}
                 <b-link
-                  v-permission="'PORTFOLIO_MANAGEMENT'"
+                  v-permission:or="['PORTFOLIO_MANAGEMENT', 'PORTFOLIO_MANAGEMENT_READ']"
                   class="font-weight-bold"
                   style="margin-left: 6px"
                   v-on:click="refreshMetrics"
