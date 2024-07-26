@@ -172,13 +172,7 @@ export default {
           field: 'version',
           sortable: true,
           formatter: (value, row, index) => {
-            if (
-              Object.prototype.hasOwnProperty.call(row, 'repositoryMeta') &&
-              Object.prototype.hasOwnProperty.call(
-                row.repositoryMeta,
-                'latestVersion',
-              )
-            ) {
+            if (row.repositoryMeta && row.repositoryMeta.latestVersion) {
               row.latestVersion = row.repositoryMeta.latestVersion;
               if (
                 compareVersions(row.repositoryMeta.latestVersion, row.version) >
