@@ -312,7 +312,7 @@ function configRoutes() {
               'POLICY_MANAGEMENT_CREATE',
               'POLICY_MANAGEMENT_READ',
               'POLICY_MANAGEMENT_UPDATE',
-              'POLICY_MANAGEMENT_DELETE'
+              'POLICY_MANAGEMENT_DELETE',
             ],
           },
         },
@@ -328,7 +328,7 @@ function configRoutes() {
               'SYSTEM_CONFIGURATION_CREATE',
               'SYSTEM_CONFIGURATION_READ',
               'SYSTEM_CONFIGURATION_UPDATE',
-              'SYSTEM_CONFIGURATION_DELETE'
+              'SYSTEM_CONFIGURATION_DELETE',
             ],
           },
           children: [
@@ -346,7 +346,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -362,7 +362,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -378,7 +378,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -394,7 +394,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -410,7 +410,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -426,7 +426,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -442,7 +442,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -458,7 +458,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -474,7 +474,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -491,7 +491,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -507,7 +507,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -523,7 +523,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -539,7 +539,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -555,7 +555,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -572,7 +572,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -588,7 +588,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -604,7 +604,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -621,7 +621,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -637,7 +637,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -653,7 +653,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -669,7 +669,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -685,7 +685,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -701,7 +701,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -717,7 +717,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -733,7 +733,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -749,7 +749,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -765,7 +765,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -781,7 +781,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -797,7 +797,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -813,7 +813,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -830,7 +830,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -846,7 +846,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -863,7 +863,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -879,7 +879,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },
@@ -895,7 +895,7 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_CREATE',
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE'
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },

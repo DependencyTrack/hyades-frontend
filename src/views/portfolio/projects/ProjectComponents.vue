@@ -6,7 +6,10 @@
           size="md"
           variant="outline-primary"
           v-b-modal.projectAddComponentModal
-          v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE]"
+          v-permission:or="[
+            PERMISSIONS.PORTFOLIO_MANAGEMENT,
+            PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+          ]"
         >
           <span class="fa fa-plus"></span> {{ $t('message.add_component') }}
         </b-button>
@@ -14,7 +17,10 @@
           size="md"
           variant="outline-primary"
           @click="removeDependencies"
-          v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE]"
+          v-permission:or="[
+            PERMISSIONS.PORTFOLIO_MANAGEMENT,
+            PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
+          ]"
         >
           <span class="fa fa-minus"></span> {{ $t('message.remove_component') }}
         </b-button>

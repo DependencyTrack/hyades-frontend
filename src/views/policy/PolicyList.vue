@@ -1,11 +1,23 @@
 <template>
-  <div class="animated fadeIn" v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_CREATE', 'POLICY_MANAGEMENT_READ', 'POLICY_MANAGEMENT_UPDATE', 'POLICY_MANAGEMENT_DELETE']">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      'POLICY_MANAGEMENT',
+      'POLICY_MANAGEMENT_CREATE',
+      'POLICY_MANAGEMENT_READ',
+      'POLICY_MANAGEMENT_UPDATE',
+      'POLICY_MANAGEMENT_DELETE',
+    ]"
+  >
     <div id="policiesToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.createPolicyModal
-        v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_CREATE]"
+        v-permission:or="[
+          PERMISSIONS.POLICY_MANAGEMENT,
+          PERMISSIONS.POLICY_MANAGEMENT_CREATE,
+        ]"
       >
         <span class="fa fa-plus"></span> {{ $t('message.create_policy') }}
       </b-button>

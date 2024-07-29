@@ -97,7 +97,10 @@
       v-if="license.isCustomLicense"
       variant="outline-danger"
       @click="removeCustomLicense"
-      v-permission:or="[PERMISSIONS.SYSTEM_CONFIGURATION, PERMISSIONS.SYSTEM_CONFIGURATION_DELETE]"
+      v-permission:or="[
+        PERMISSIONS.SYSTEM_CONFIGURATION,
+        PERMISSIONS.SYSTEM_CONFIGURATION_DELETE,
+      ]"
       >{{ $t('message.delete') }}</b-button
     >
   </div>

@@ -6,7 +6,10 @@
         size="md"
         variant="outline-primary"
         @click="initializeProjectCreateProjectModal"
-        v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_CREATE]"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_CREATE,
+        ]"
       >
         <span class="fa fa-plus"></span> {{ $t('message.create_project') }}
       </b-button>

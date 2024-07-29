@@ -25,7 +25,12 @@
             :label="$t('message.component_name')"
             :tooltip="this.$t('message.component_name_desc')"
             :feedback-text="$t('message.required_component_name')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-version-input"
@@ -39,7 +44,12 @@
             :label="$t('message.version')"
             :tooltip="this.$t('message.component_version_desc')"
             :feedback-text="$t('message.required_component_version')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-group-input"
@@ -49,7 +59,12 @@
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           {{ $t('message.component_classification') }}
           <b-badge
@@ -67,7 +82,12 @@
             required="false"
             :label="$t('message.component_author')"
             :tooltip="this.$t('message.component_author_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-purl-input"
@@ -77,7 +97,12 @@
             required="false"
             :label="$t('message.package_url_full')"
             :tooltip="this.$t('message.component_package_url_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-cpe-input"
@@ -87,7 +112,12 @@
             required="false"
             :label="$t('message.cpe_full')"
             :tooltip="$t('message.component_cpe_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-swidTagId-input"
@@ -97,7 +127,12 @@
             required="false"
             :label="$t('message.swid_tagid')"
             :tooltip="$t('message.component_swid_tagid_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-uuid"
@@ -128,7 +163,12 @@
             :options="availableClassifiers"
             :label="$t('message.classifier')"
             :tooltip="$t('message.component_classifier_desc')"
-            :disabled="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :disabled="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-filename-input"
@@ -138,7 +178,12 @@
             required="false"
             :label="$t('message.filename')"
             :tooltip="$t('message.component_filename_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-form-group
             id="component-description-form-group"
@@ -149,7 +194,12 @@
               id="component-description-description"
               v-model="component.description"
               rows="3"
-              :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+              :readonly="
+                this.isNotPermitted([
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+                ])
+              "
             />
           </b-form-group>
         </b-card>
@@ -167,7 +217,12 @@
             :options="selectableLicenses"
             :label="$t('message.license')"
             :tooltip="$t('message.component_spdx_license_desc')"
-            :disabled="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :disabled="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-license-expression"
@@ -177,7 +232,12 @@
             required="false"
             :label="$t('message.license_expression')"
             :tooltip="$t('message.component_license_expression_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-license-url-input"
@@ -187,7 +247,12 @@
             required="false"
             :label="$t('message.license_url')"
             :tooltip="$t('message.component_license_url_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-form-group
             id="component-copyright-form-group"
@@ -198,7 +263,12 @@
               id="component-description-description"
               v-model="component.copyright"
               rows="3"
-              :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+              :readonly="
+                this.isNotPermitted([
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+                ])
+              "
             />
           </b-form-group>
         </b-card>
@@ -216,7 +286,12 @@
             required="false"
             :label="$t('hashes.md5')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-sha1-input"
@@ -226,7 +301,12 @@
             required="false"
             :label="$t('hashes.sha_1')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-sha256-input"
@@ -236,7 +316,12 @@
             required="false"
             :label="$t('hashes.sha_256')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-sha512-input"
@@ -246,7 +331,12 @@
             required="false"
             :label="$t('hashes.sha_512')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-sha3256-input"
@@ -256,7 +346,12 @@
             required="false"
             :label="$t('hashes.sha3_256')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="component-sha3512-input"
@@ -266,7 +361,12 @@
             required="false"
             :label="$t('hashes.sha3_512')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
         </b-card>
       </b-tab>
@@ -349,7 +449,12 @@
               id="component-notes-description"
               v-model="component.notes"
               rows="3"
-              :readonly="this.isNotPermitted([PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE])"
+              :readonly="
+                this.isNotPermitted([
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+                ])
+              "
             />
           </b-form-group>
         </b-card>
@@ -360,14 +465,20 @@
         size="md"
         variant="outline-danger"
         @click="deleteComponent()"
-        v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE]"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
+        ]"
         >{{ $t('message.delete') }}</b-button
       >
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.componentPropertiesModal
-        v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE]"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+        ]"
         >{{ $t('message.properties') }}</b-button
       >
       <b-button size="md" variant="secondary" @click="cancel()">{{
@@ -377,7 +488,10 @@
         size="md"
         variant="primary"
         @click="updateComponent()"
-        v-permission:or="[PERMISSIONS.PORTFOLIO_MANAGEMENT, PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE]"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+        ]"
         >{{ $t('message.update') }}</b-button
       >
     </template>

@@ -1,5 +1,14 @@
 <template>
-  <div class="animated fadeIn" v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_CREATE', 'POLICY_MANAGEMENT_READ', 'POLICY_MANAGEMENT_UPDATE', 'POLICY_MANAGEMENT_DELETE']">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      'POLICY_MANAGEMENT',
+      'POLICY_MANAGEMENT_CREATE',
+      'POLICY_MANAGEMENT_READ',
+      'POLICY_MANAGEMENT_UPDATE',
+      'POLICY_MANAGEMENT_DELETE',
+    ]"
+  >
     <div id="licenseGroupsToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
@@ -7,8 +16,8 @@
         v-b-modal.createLicenseGroupModal
         v-permission:or="[
           PERMISSIONS.POLICY_MANAGEMENT,
-          PERMISSIONS.POLICY_MANAGEMENT_CREATE
-          ]"
+          PERMISSIONS.POLICY_MANAGEMENT_CREATE,
+        ]"
       >
         <span class="fa fa-plus"></span>
         {{ $t('message.create_license_group') }}

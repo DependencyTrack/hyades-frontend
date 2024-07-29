@@ -129,9 +129,9 @@ export default {
           permission: [
             permissions.SYSTEM_CONFIGURATION,
             permissions.SYSTEM_CONFIGURATION_CREATE,
-            permissions.SYSTEM_CONFIGURATION_READ, 
+            permissions.SYSTEM_CONFIGURATION_READ,
             permissions.SYSTEM_CONFIGURATION_UPDATE,
-            permissions.SYSTEM_CONFIGURATION_DELETE
+            permissions.SYSTEM_CONFIGURATION_DELETE,
           ],
         },
         {
@@ -143,7 +143,7 @@ export default {
             permissions.POLICY_MANAGEMENT_CREATE,
             permissions.POLICY_MANAGEMENT_READ,
             permissions.POLICY_MANAGEMENT_UPDATE,
-            permissions.POLICY_MANAGEMENT_DELETE
+            permissions.POLICY_MANAGEMENT_DELETE,
           ],
         },
         {
@@ -153,9 +153,9 @@ export default {
           permission: [
             permissions.SYSTEM_CONFIGURATION,
             permissions.SYSTEM_CONFIGURATION_CREATE,
-            permissions.SYSTEM_CONFIGURATION_READ, 
+            permissions.SYSTEM_CONFIGURATION_READ,
             permissions.SYSTEM_CONFIGURATION_UPDATE,
-            permissions.SYSTEM_CONFIGURATION_DELETE
+            permissions.SYSTEM_CONFIGURATION_DELETE,
           ],
         },
       ],
