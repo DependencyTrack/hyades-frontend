@@ -330,7 +330,7 @@ export default {
             return value === true ? '<i class="fa fa-check-square-o" />' : '';
           },
           align: 'center',
-          sortable: true,
+          sortable: false,
         },
         {
           title: this.$t('message.components'),
