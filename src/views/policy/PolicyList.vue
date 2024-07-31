@@ -1,11 +1,23 @@
 <template>
-  <div class="animated fadeIn" v-permission="'POLICY_MANAGEMENT'">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      'POLICY_MANAGEMENT',
+      'POLICY_MANAGEMENT_CREATE',
+      'POLICY_MANAGEMENT_READ',
+      'POLICY_MANAGEMENT_UPDATE',
+      'POLICY_MANAGEMENT_DELETE',
+    ]"
+  >
     <div id="policiesToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.createPolicyModal
-        v-permission="PERMISSIONS.POLICY_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.POLICY_MANAGEMENT,
+          PERMISSIONS.POLICY_MANAGEMENT_CREATE,
+        ]"
       >
         <span class="fa fa-plus"></span> {{ $t('message.create_policy') }}
       </b-button>
@@ -140,7 +152,7 @@ export default {
                         <span v-for="(condition, conditionIndex) in conditions">
                           <policy-condition :policy="policy" :condition="condition" v-on:conditionRemoved="removeCondition(condition, conditionIndex, index)" />
                         </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="addCondition" />
+                        <actionable-list-group-item v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :add-icon="true" v-on:actionClicked="addCondition" />
                       </div>
                     </b-form-group>
                     <b-form-group v-if="limitToVisible === true" id="projectLimitsList" :label="this.$t('admin.limit_to_projects')">
@@ -148,7 +160,7 @@ export default {
                         <span v-for="project in projects">
                           <actionable-list-group-item :value="formatLabel(project.name, project.version)" :delete-icon="true" v-on:actionClicked="deleteProjectLimiter(project.uuid)"/>
                         </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectProjectModal')"/>
+                        <actionable-list-group-item v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectProjectModal')"/>
                       </div>
                     </b-form-group>
                     <div v-if="limitToVisible === true" style="margin-bottom: 1.5rem">
@@ -160,13 +172,13 @@ export default {
                         <span v-for="tag in tags">
                           <actionable-list-group-item :value="formatLabel(tag.name, tag.id)" :delete-icon="true" v-on:actionClicked="deleteTagLimiter(tag.name)"/>
                         </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTagModal')"/>
+                        <actionable-list-group-item v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTagModal')"/>
                       </div>
                     </b-form-group>
                     <div style="text-align:right">
                       <b-toggleable-display-button variant="outline-primary" :label="$t('admin.limit_to')"
                           v-permission="PERMISSIONS.VIEW_PORTFOLIO" v-on:toggle="limitToVisible = !limitToVisible" />
-                       <b-button variant="outline-danger" @click="deletePolicy">{{ $t('message.delete_policy') }}</b-button>
+                       <b-button v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_DELETE']" variant="outline-danger" @click="deletePolicy">{{ $t('message.delete_policy') }}</b-button>
                     </div>
                   </b-col>
                 </b-row>

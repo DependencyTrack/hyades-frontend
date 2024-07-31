@@ -11,8 +11,8 @@
         variant="outline-primary"
         v-b-modal.projectUploadVexModal
         v-permission:or="[
-          PERMISSIONS.VIEW_VULNERABILITY,
           PERMISSIONS.VULNERABILITY_ANALYSIS,
+          PERMISSIONS.VULNERABILITY_ANALYSIS_CREATE,
         ]"
       >
         <span class="fa fa-upload"></span> {{ $t('message.apply_vex') }}
@@ -29,6 +29,7 @@
         v-permission:or="[
           PERMISSIONS.VIEW_VULNERABILITY,
           PERMISSIONS.VULNERABILITY_ANALYSIS,
+          PERMISSIONS.VULNERABILITY_ANALYSIS_READ,
         ]"
       >
         <span class="fa fa-download"></span> {{ $t('message.export_vex') }}
@@ -45,6 +46,7 @@
         v-permission:or="[
           PERMISSIONS.VIEW_VULNERABILITY,
           PERMISSIONS.VULNERABILITY_ANALYSIS,
+          PERMISSIONS.VULNERABILITY_ANALYSIS_READ,
         ]"
       >
         <span class="fa fa-download"></span> {{ $t('message.export_vdr') }}

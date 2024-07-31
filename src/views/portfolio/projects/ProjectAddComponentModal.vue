@@ -245,7 +245,10 @@
         size="md"
         variant="primary"
         @click="createComponent()"
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+        ]"
         >{{ $t('message.create') }}</b-button
       >
     </template>

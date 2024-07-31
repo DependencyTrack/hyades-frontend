@@ -1,5 +1,14 @@
 <template>
-  <div class="animated fadeIn" v-permission="'SYSTEM_CONFIGURATION'">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      'SYSTEM_CONFIGURATION',
+      'SYSTEM_CONFIGURATION_CREATE',
+      'SYSTEM_CONFIGURATION_READ',
+      'SYSTEM_CONFIGURATION_UPDATE',
+      'SYSTEM_CONFIGURATION_DELETE',
+    ]"
+  >
     <b-row>
       <b-col xs="6" sm="4" md="4" lg="3" id="admin-menu-column">
         <admin-menu />
