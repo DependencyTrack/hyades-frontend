@@ -1,23 +1,12 @@
 <template>
   <b-modal
-    id="selectProjectModal"
+    :id="`taggedProjectListModal-${index}`"
     size="lg"
     hide-header-close
     no-stacking
-    :title="$t('admin.select_project')"
+    v-permission="'VIEW_PORTFOLIO'"
+    :title="$t('message.projects_tagged_with', { tag: this.tag })"
   >
-    <div id="projectsToolbar" class="bs-table-custom-toolbar">
-      <c-switch
-        style="margin-left: 1rem; margin-right: 0.5rem"
-        id="showInactiveProjects"
-        color="primary"
-        v-model="showInactiveProjects"
-        label
-        v-bind="labelIcon"
-      /><span class="text-muted">{{
-        $t('message.show_inactive_projects')
-      }}</span>
-    </div>
     <bootstrap-table
       ref="table"
       :columns="columns"
@@ -29,12 +18,6 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.cancel')
       }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="$emit('selection', $refs.table.getSelections())"
-        >{{ $t('message.select') }}</b-button
-      >
     </template>
   </b-modal>
 </template>
@@ -43,35 +26,38 @@
 import xssFilters from 'xss-filters';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import common from '../../../shared/common';
-import { Switch as cSwitch } from '@coreui/vue';
 import router from '@/router';
 
 export default {
-  mixins: [permissionsMixin],
-  components: {
-    cSwitch,
-  },
   props: {
-    teamUuid: String,
+    tag: String,
+    index: Number,
+  },
+  mixins: [permissionsMixin],
+  methods: {
+    apiUrl: function () {
+      return `${this.$api.BASE_URL}/${this.$api.URL_TAG}/${this.tag}/project`;
+    },
+    refreshTable: function () {
+      this.$refs.table.refresh({
+        url: this.apiUrl(),
+        pageNumber: 1,
+        silent: true,
+      });
+    },
   },
   data() {
     return {
-      showInactiveProjects: false,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
       },
       columns: [
         {
-          field: 'state',
-          checkbox: true,
-          align: 'center',
-        },
-        {
-          title: this.$t('message.project_name'),
+          title: this.$t('message.name'),
           field: 'name',
           sortable: true,
-          formatter(value, row) {
+          formatter: (value, row) => {
             // TODO: Close modal when link is clicked.
             const href = router.resolve({
               name: 'Project',
@@ -103,7 +89,7 @@ export default {
         icons: {
           refresh: 'fa-refresh',
         },
-        toolbar: '#projectsToolbar',
+        toolbar: '#tagsToolbar',
         responseHandler: function (res, xhr) {
           res.total = xhr.getResponseHeader('X-Total-Count');
           return res;
@@ -111,28 +97,6 @@ export default {
         url: this.apiUrl(),
       },
     };
-  },
-  methods: {
-    apiUrl: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}?notAssignedToTeamWithUuid=${this.teamUuid}`;
-      if (this.showInactiveProjects === undefined) {
-        url += '&excludeInactive=true';
-      } else {
-        url += '&excludeInactive=' + !this.showInactiveProjects;
-      }
-      return url;
-    },
-    refreshTable: function () {
-      this.$refs.table.refresh({
-        url: this.apiUrl(),
-        silent: true,
-      });
-    },
-  },
-  watch: {
-    showInactiveProjects() {
-      this.refreshTable();
-    },
   },
 };
 </script>
