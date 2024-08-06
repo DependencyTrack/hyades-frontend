@@ -93,6 +93,9 @@
     "vue-template-compiler": "2.7.16"
   },
   "overrides": {
+    "@cyclonedx/cyclonedx-npm": {
+      "@cyclonedx/cyclonedx-library": "6.11.0"
+    },
     "vue-bootstrap-toggle": {
       "merge": "2.1.1"
     }
