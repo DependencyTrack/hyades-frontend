@@ -42,7 +42,10 @@ export default {
   },
   mounted() {
     this.$refs.table.refreshOptions({
-      showBtnDeleteSelected: this.isPermitted(this.PERMISSIONS.TAG_MANAGEMENT),
+      showBtnDeleteSelected: this.isPermitted([ 
+        this.PERMISSIONS.TAG_MANAGEMENT, 
+        this.PERMISSIONS.TAG_MANAGEMENT_DELETE, 
+      ]),
     });
   },
   data() {

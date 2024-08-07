@@ -61,6 +61,7 @@ export default {
         this.$refs.table.refreshOptions({
           showBtnDeleteSelected: this.isPermitted(
             this.PERMISSIONS.PORTFOLIO_MANAGEMENT,
+            this.PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
           ),
         });
         clearInterval(interval);
