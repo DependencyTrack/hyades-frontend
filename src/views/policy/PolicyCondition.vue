@@ -231,6 +231,7 @@ export default {
         { value: 'VERSION', text: this.$t('message.version') },
         { value: 'COMPONENT_HASH', text: this.$t('message.component_hash') },
         { value: 'CWE', text: this.$t('message.cwe_full') },
+        { value: 'EPSS', text: this.$t('message.epss_score') },
         {
           value: 'VULNERABILITY_ID',
           text: this.$t('message.vulnerability_vuln_id'),
@@ -318,6 +319,8 @@ export default {
           return false;
         case 'VERSION_DISTANCE':
           return false;
+        case 'EPSS':
+          return false;
         case 'EXPRESSION':
           return false;
         default:
@@ -389,6 +392,9 @@ export default {
           this.operators = this.objectOperators;
           break;
         case 'VERSION_DISTANCE':
+          this.operators = this.numericOperators;
+          break;
+        case 'EPSS':
           this.operators = this.numericOperators;
           break;
         case 'EXPRESSION':
