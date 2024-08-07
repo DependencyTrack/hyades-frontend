@@ -59,10 +59,10 @@ export default {
     const interval = setInterval(() => {
       if (this.$refs.table) {
         this.$refs.table.refreshOptions({
-          showBtnDeleteSelected: this.isPermitted(
+          showBtnDeleteSelected: this.isPermitted([
             this.PERMISSIONS.PORTFOLIO_MANAGEMENT,
             this.PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-          ),
+          ]),
         });
         clearInterval(interval);
       }
