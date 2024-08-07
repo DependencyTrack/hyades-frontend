@@ -115,6 +115,7 @@
               :tags="tags"
               :add-on-key="addOnKeys"
               :placeholder="$t('message.add_tag')"
+              :autocomplete-items="tagsAutoCompleteItems"
               @tags-changed="(newTags) => (this.tags = newTags)"
               class="mw-100 bg-transparent text-lowercase"
               :readonly="
@@ -560,6 +561,8 @@ export default {
       availableParents: [],
       tag: '', // The contents of a tag as its being typed into the vue-tag-input
       tags: [], // An array of tags bound to the vue-tag-input
+      tagsAutoCompleteItems: [],
+      tagsAutoCompleteDebounce: null,
       addOnKeys: [9, 13, 32, ':', ';', ','], // Separators used when typing tags into the vue-tag-input
       labelIcon: {
         dataOn: '\u2713',
@@ -708,6 +711,9 @@ export default {
       this.$root.$emit('bv::show::modal', 'projectDetailsModal');
     });
   },
+  watch: {
+    tag: 'searchTags',
+  },
   methods: {
     initializeTags: function () {
       this.tags = (this.project.tags || []).map((tag) => ({ text: tag.name }));
@@ -809,6 +815,20 @@ export default {
           this.isLoading = false;
         });
       }
+    },
+    searchTags: function () {
+      if (!this.tag) {
+        return;
+      }
+      clearTimeout(this.tagsAutoCompleteDebounce);
+      this.tagsAutoCompleteDebounce = setTimeout(() => {
+        const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(this.tag)}&pageNumber=1&pageSize=6`;
+        this.axios.get(url).then((response) => {
+          this.tagsAutoCompleteItems = response.data.map((tag) => {
+            return { text: tag.name };
+          });
+        });
+      }, 250);
     },
     resetValues: function () {
       this.selectedParent = this.parent;
