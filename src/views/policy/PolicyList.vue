@@ -318,10 +318,10 @@ export default {
                   });
               },
               deleteTagLimiter: function (tagName) {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}/tag/${tagName}`;
+                let url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}/${encodeURIComponent(tagName)}/policy`;
                 this.axios
-                  .delete(url)
-                  .then((response) => {
+                  .delete(url, { data: [this.policy.uuid] })
+                  .then(() => {
                     let p = [];
                     for (let i = 0; i < this.tags.length; i++) {
                       if (this.tags[i].name !== tagName) {
@@ -330,9 +330,6 @@ export default {
                     }
                     this.tags = p;
                     this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
               updateProjectSelection: function (selections) {
@@ -359,19 +356,24 @@ export default {
               },
               updateTagSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectTagModal');
+                let promises = [];
                 for (let i = 0; i < selections.length; i++) {
                   let selection = selections[i];
-                  let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}/tag/${selection.name}`;
-                  this.axios
-                    .post(url)
-                    .then((response) => {
-                      this.tags.push(selection);
-                      this.$toastr.s(this.$t('message.updated'));
-                    })
-                    .catch((error) => {
-                      this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                    });
+                  let url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}/${encodeURIComponent(selection.name)}/policy`;
+                  promises.push(
+                    this.axios
+                      .post(url, [this.policy.uuid])
+                      .then(() => Promise.resolve(selection.name)),
+                  );
                 }
+                Promise.all(promises).then((addedTagNames) => {
+                  for (const tagName of addedTagNames) {
+                    if (!this.tags.some((tag) => tag.name === tagName)) {
+                      this.tags.push({ name: tagName });
+                    }
+                  }
+                  this.$toastr.s(this.$t('message.updated'));
+                });
               },
               updateIncludeChildren: function () {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}`;
