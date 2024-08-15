@@ -101,6 +101,10 @@ export default {
       if (tag) {
         queryParams['tag'] = tag;
       }
+      let team = this.$route.query.team;
+      if (team) {
+        queryParams['team'] = team;
+      }
       let classifier = this.$route.query.classifier;
       if (classifier) {
         queryParams['classifier'] = classifier;
@@ -290,6 +294,34 @@ export default {
               }
             }
             return tag_string;
+          },
+        },
+         {
+          title: this.$t('message.teams'),
+          field: 'teams',
+          sortable: false,
+          visible: false,
+          routerFunc: () => this.$router, // Injecting $router directly causes recursion errors in Vue...
+          formatter(value, row, index) {
+            const router = this.routerFunc();
+            let team_string = '';
+            if (row.teams) {
+              team_string =
+                row.teams
+                  ?.slice(0, 2)
+                  .map((teams) => common.formatProjectTeamLabel(router, teams))
+                  .join(' ') || '';
+              if (row.teams.length > 2) {
+                team_string += ` <span class="d-none">`;
+                team_string += row.teams
+                  .slice(2)
+                  ?.map((teams) => common.formatProjectTeamLabel(router, teams))
+                  .join(' ');
+                team_string += `</span>`;
+                team_string += `<a href="#" title="show all teams" class="badge badge-team" onclick="this.previousElementSibling.classList.toggle('d-none')">…</a>`;
+              }
+            }
+            return team_string;
           },
         },
         {
