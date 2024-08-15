@@ -296,7 +296,7 @@ export default {
             return tag_string;
           },
         },
-         {
+        {
           title: this.$t('message.teams'),
           field: 'teams',
           sortable: false,

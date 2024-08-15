@@ -617,6 +617,7 @@ export default {
   formatSourceLabel: $common.formatSourceLabel,
   formatNotificationLabel: $common.formatNotificationLabel,
   formatProjectTagLabel: $common.formatProjectTagLabel,
+  formatProjectTeamLabel: $common.formatProjectTeamLabel,
   formatVulnerabilityTagLabel: $common.formatVulnerabilityTagLabel,
   capitalize: $common.capitalize,
   formatSeverityLabel: $common.formatSeverityLabel,
