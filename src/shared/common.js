@@ -52,15 +52,15 @@ $common.formatProjectTagLabel = function formatProjectTagLabel(router, tag) {
  * Formats and returns a specialized label for a project team.
  */
 $common.formatProjectTeamLabel = function formatProjectTeamLabel(router, team) {
-    if (!team) {
-      return '';
-    }
-    return `<a href="${
-      router.resolve({ name: 'Projects', query: { team: team.name } }).href
-    }" class="badge badge-team text-lowercase mr-1">${xssFilters.inHTMLData(
-      team.name,
-    )}</a>`;
-  };
+  if (!team) {
+    return '';
+  }
+  return `<a href="${
+    router.resolve({ name: 'Projects', query: { team: team.name } }).href
+  }" class="badge badge-team text-lowercase mr-1">${xssFilters.inHTMLData(
+    team.name,
+  )}</a>`;
+};
 
 /**
  * Formats and returns a specialized label for a vulnerability tag.
