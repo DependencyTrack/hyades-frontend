@@ -237,6 +237,7 @@ export default {
         { value: 'DEVICE', text: this.$i18n.t('message.component_device') },
         { value: 'FIRMWARE', text: this.$i18n.t('message.component_firmware') },
         { value: 'FILE', text: this.$i18n.t('message.component_file') },
+        { value: 'CRYPTOGRAPHIC_ASSET', text: this.$i18n.t('message.component_cryptographic_asset') },
       ],
       selectableLicenses: [],
       selectedLicense: '',
@@ -330,8 +331,7 @@ export default {
         this.axios
           .get(url)
           .then((response) => {
-            for (let i = 0; i < response.data.length; i++) {
-              let license = response.data[i];
+            for (const license of response.data) {
               this.selectableLicenses.push({
                 value: license.licenseId,
                 text: license.name,

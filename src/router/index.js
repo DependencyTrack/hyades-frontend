@@ -4,6 +4,8 @@ import i18n from '../i18n';
 import EventBus from '../shared/eventbus';
 import { getToken, hasPermission } from '../shared/permissions';
 import { getContextPath } from '../shared/utils';
+import CryptoAsset from "../views/portfolio/projects/CryptoAsset";
+import CryptoAssets from "../views/portfolio/cryptoassets/CryptoAssets";
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer');
@@ -240,6 +242,26 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             permissions: ['VIEW_PORTFOLIO'],
+          },
+        },
+        {
+          path: 'cryptoassets',
+          name: 'CryptoAssets',
+          component: CryptoAssets,
+          meta: {
+            title: i18n.t('message.component_search'),
+            i18n: 'message.crypto_assets',
+            sectionPath: '/cryptoassets',
+          },
+        },
+        {
+          path: '/cryptoassets/:uuid',
+          name: 'CryptoAsset',
+          props: (route) => ( { uuid: route.params.uuid } ),
+          component: CryptoAsset,
+          meta: {
+            i18n: 'message.projects',
+            sectionPath: '/projects',
           },
         },
         {

@@ -418,6 +418,7 @@ $common.componentClassifierLabelFormatter = (i18n) => {
       case 'DEVICE':
       case 'FIRMWARE':
       case 'FILE':
+      case 'CRYPTOGRAPHIC_ASSET':
         return i18n.$t(`message.component_${value.toLowerCase()}`);
       default:
         return null;
@@ -444,6 +445,7 @@ $common.componentClassifierLabelProjectUrlFormatter = (i18n) => {
       case 'DEVICE':
       case 'FIRMWARE':
       case 'FILE':
+      case 'CRYPTOGRAPHIC_ASSET':
         return `<a href="${url}">${i18n.$t(
           `message.component_${value.toLowerCase()}`,
         )}</a>`;
