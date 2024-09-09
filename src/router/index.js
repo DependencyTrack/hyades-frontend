@@ -30,6 +30,8 @@ const Email = () => import('@/views/administration/configuration/Email');
 const Jira = () => import('@/views/administration/configuration/JiraConfig');
 const InternalComponents = () =>
   import('@/views/administration/configuration/InternalComponents');
+const Maintenance = () =>
+  import('@/views/administration/configuration/Maintenance');
 const TaskScheduler = () =>
   import('@/views/administration/configuration/TaskScheduler');
 const Search = () => import('@/views/administration/configuration/Search');
@@ -413,6 +415,22 @@ function configRoutes() {
             {
               path: 'configuration/internalComponents',
               component: InternalComponents,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'configuration/maintenance',
+              component: Maintenance,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',

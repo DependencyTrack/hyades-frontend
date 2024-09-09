@@ -115,6 +115,11 @@ export default {
               route: 'configuration/internalComponents',
             },
             {
+              component: 'Maintenance',
+              name: this.$t('admin.maintenance'),
+              route: 'configuration/maintenance',
+            },
+            {
               component: 'TaskScheduler',
               name: this.$t('admin.task_scheduler'),
               route: 'configuration/taskScheduler',
