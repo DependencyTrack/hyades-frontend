@@ -192,6 +192,7 @@
     "permissions": "अनुमतियां",
     "personal_access_token": "व्यक्तिगत एक्सेस टोकन",
     "portfolio_access_control": "पोर्टफोलियो एक्सेस नियंत्रण",
+    "preview": "पूर्व दर्शन",
     "project_access": "परियोजना तक पहुंच",
     "publisher": "प्रकाशक",
     "publisher_class": "प्रकाशक वर्ग",
@@ -291,6 +292,9 @@
     "vulnsource_osv_advisories_enable": "Google OSV एडवाइजरी मिररिंग सक्षम करने के लिए पारिस्थितिकी तंत्र का चयन करें",
     "vulnsource_osv_alias_sync_warning": "OSV गैर-समान कमज़ोरियों को उपनाम के रूप में रिपोर्ट कर सकता है। सावधानी से आगे बढ़ें।",
     "vulnsource_osv_base_url": "OSV बेस यूआरएल",
+    "welcome_message": "स्वागत संदेश",
+    "welcome_message_desc": "उपयोगकर्ताओं के साइन इन करने से पहले डिपेंडेंसी-ट्रैक के आरंभ पृष्ठ पर दिखाई देने वाले स्वागत संदेश को अनुकूलित करें।",
+    "welcome_message_enable": "स्वागत संदेश सक्षम करें",
     "workflow_step_timeout": "चरण समयबाह्य",
     "workflows": "वर्कफ़्लो"
   },

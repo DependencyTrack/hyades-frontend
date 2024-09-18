@@ -26,6 +26,8 @@ const Administration = () => import('@/views/administration/Administration');
 const General = () => import('@/views/administration/configuration/General');
 const BomFormats = () =>
   import('@/views/administration/configuration/BomFormats');
+const WelcomeMessage = () =>
+  import('@/views/administration/configuration/WelcomeMessage');
 const Email = () => import('@/views/administration/configuration/Email');
 const Jira = () => import('@/views/administration/configuration/JiraConfig');
 const InternalComponents = () =>
@@ -378,6 +380,16 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_UPDATE',
                   'SYSTEM_CONFIGURATION_DELETE',
                 ],
+              },
+            },
+            {
+              path: 'configuration/welcomeMessage',
+              component: WelcomeMessage,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                permission: 'SYSTEM_CONFIGURATION',
               },
             },
             {
