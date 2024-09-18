@@ -192,6 +192,7 @@
     "permissions": "権限",
     "personal_access_token": "パーソナルアクセストークン",
     "portfolio_access_control": "ポートフォリオアクセス制御",
+    "preview": "プレビュー",
     "project_access": "プロジェクトへのアクセス",
     "publisher": "パブリッシャー",
     "publisher_class": "パブリッシャークラス",
@@ -291,6 +292,9 @@
     "vulnsource_osv_advisories_enable": "Google OSV アドバイザリ ミラーリングを有効にするエコシステムを選択します",
     "vulnsource_osv_alias_sync_warning": "OSV は同一でない脆弱性をエイリアスとして報告する場合があります。ご注意ください。",
     "vulnsource_osv_base_url": "OSV ベース URL",
+    "welcome_message": "ウェルカムメッセージ",
+    "welcome_message_desc": "ユーザーがサインインする前に、Dependency-Track の開始ページに表示されるウェルカム メッセージをカスタマイズします。",
+    "welcome_message_enable": "ウェルカムメッセージを有効にする",
     "workflow_step_timeout": "ステップタイムアウト",
     "workflows": "ワークフロー"
   },

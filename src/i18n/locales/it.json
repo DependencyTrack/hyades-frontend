@@ -192,6 +192,7 @@
     "permissions": "Autorizzazioni",
     "personal_access_token": "Token di accesso personale",
     "portfolio_access_control": "Controllo degli accessi al portafoglio",
+    "preview": "Anteprima",
     "project_access": "Accesso al progetto",
     "publisher": "Editore",
     "publisher_class": "Classe editore",
@@ -291,6 +292,9 @@
     "vulnsource_osv_advisories_enable": "Seleziona l'ecosistema per abilitare il mirroring dell'advisory OSV di Google",
     "vulnsource_osv_alias_sync_warning": "OSV può segnalare vulnerabilità non identiche come alias. Procedi con cautela.",
     "vulnsource_osv_base_url": "URL di base OSV",
+    "welcome_message": "Messaggio di benvenuto",
+    "welcome_message_desc": "Personalizza il messaggio di benvenuto che appare nella pagina iniziale di Dependency-Track prima che gli utenti accedano.",
+    "welcome_message_enable": "Abilita il messaggio di benvenuto",
     "workflow_step_timeout": "Passaggio Timeout",
     "workflows": "Flussi di lavoro"
   },

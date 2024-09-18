@@ -192,6 +192,7 @@
     "permissions": "Разрешения",
     "personal_access_token": "Токен личного доступа",
     "portfolio_access_control": "Контроль доступа к портфолио",
+    "preview": "Предварительный просмотр",
     "project_access": "Доступ к проекту",
     "publisher": "Издатель",
     "publisher_class": "Класс издателя",
@@ -291,6 +292,9 @@
     "vulnsource_osv_advisories_enable": "Выберите экосистему, чтобы включить зеркалирование рекомендаций Google OSV.",
     "vulnsource_osv_alias_sync_warning": "OSV может сообщать о неидентичных уязвимостях как псевдонимах. Действовать с осторожностью.",
     "vulnsource_osv_base_url": "Базовый URL-адрес OSV",
+    "welcome_message": "Приветственное сообщение",
+    "welcome_message_desc": "Настройте приветственное сообщение, которое появляется на стартовой странице Dependency-Track перед входом пользователей.",
+    "welcome_message_enable": "Включить приветственное сообщение",
     "workflow_step_timeout": "Тайм-аут шага",
     "workflows": "Рабочие процессы"
   },
