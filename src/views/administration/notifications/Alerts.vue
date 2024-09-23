@@ -170,6 +170,18 @@ export default {
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectProjectModal')"/>
                       </div>
                     </b-form-group>
+                    <b-form-group v-if="limitToVisible" id="tagLimits" :label="this.$t('admin.limit_to_tags')">
+                      <vue-tags-input
+                        id="limitToTagsInput"
+                        v-model="tag"
+                        :tags="tags"
+                        :add-on-key="addOnKeys"
+                        :placeholder="$t('message.add_tag')"
+                        :autocomplete-items="tagsAutoCompleteItems"
+                        @tags-changed="(newTags) => (this.tags = newTags)"
+                        class="mw-100 bg-transparent text-lowercase"
+                      />
+                    </b-form-group>
                   <div v-if="limitToVisible === true">
                       <c-switch id="isNotifyChildrenEnabled" color="primary" v-model="notifyChildren" label v-bind="labelIcon"/>
                       {{ $t('admin.include_active_children') }}
@@ -226,6 +238,7 @@ export default {
               SelectTeamModal,
               BToggleableDisplayButton,
               BInputGroupFormInput,
+              VueTagsInput,
               cSwitch,
             },
             data() {
@@ -248,6 +261,11 @@ export default {
                 projects: row.projects,
                 teams: row.teams,
                 limitToVisible: false,
+                tag: '', // The contents of a tag as its being typed into the vue-tag-input
+                tags: [], // An array of tags bound to the vue-tag-input
+                tagsAutoCompleteItems: [],
+                tagsAutoCompleteDebounce: null,
+                addOnKeys: [9, 13, 32, ':', ';', ','], // Separators used when typing tags into the vue-tag-input
                 labelIcon: {
                   dataOn: '\u2713',
                   dataOff: '\u2715',
@@ -264,29 +282,24 @@ export default {
               };
             },
             created() {
+              this.initializeTags();
               this.parseDestination(this.alert);
               this.parseToken(this.alert);
               this.parseTokenHeader(this.alert);
               this.parseJiraTicketType(this.alert);
             },
             watch: {
-              enabled() {
-                this.updateNotificationRule();
+              alert() {
+                this.initializeTags();
               },
-              logSuccessfulPublish() {
-                this.updateNotificationRule();
-              },
-              notifyChildren() {
-                this.updateNotificationRule();
-              },
-              notifyOn() {
-                this.updateNotificationRule();
-              },
-              teams() {
-                this.updateNotificationRule();
-              },
+              tag: 'searchTags',
             },
             methods: {
+              initializeTags: function () {
+                this.tags = (this.alert.tags || []).map((tag) => ({
+                  text: tag.name,
+                }));
+              },
               formatProjectLabel: function (projectName, projectVersion) {
                 if (projectName && projectVersion) {
                   return projectName + ' ' + projectVersion;
@@ -347,6 +360,9 @@ export default {
                       tokenHeader: this.tokenHeader,
                     }),
                     notifyOn: this.notifyOn,
+                    tags: this.tags.map((tag) => {
+                      return { name: tag.text };
+                    }),
                   })
                   .then((response) => {
                     this.alert = response.data;
@@ -464,6 +480,20 @@ export default {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
+              searchTags: function () {
+                if (!this.tag) {
+                  return;
+                }
+                clearTimeout(this.tagsAutoCompleteDebounce);
+                this.tagsAutoCompleteDebounce = setTimeout(() => {
+                  const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(this.tag)}&pageNumber=1&pageSize=6`;
+                  this.axios.get(url).then((response) => {
+                    this.tagsAutoCompleteItems = response.data.map((tag) => {
+                      return { text: tag.name };
+                    });
+                  });
+                }, 250);
+              },
             },
           });
         },
@@ -486,3 +516,7 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@import '../../../assets/scss/vendors/vue-tags-input/vue-tags-input';
+</style>
