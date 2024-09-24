@@ -35,6 +35,7 @@ import SelectTeamModal from '../../administration/accessmanagement/SelectTeamMod
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import BToggleableDisplayButton from '../../components/BToggleableDisplayButton';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+import VueTagsInput from '@johmun/vue-tags-input';
 import { Switch as cSwitch } from '@coreui/vue';
 
 export default {
