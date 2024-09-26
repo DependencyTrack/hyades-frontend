@@ -59,7 +59,7 @@ export default {
         this.$refs.table.refreshOptions({
           showBtnDeleteSelected: this.isPermitted([
             this.PERMISSIONS.POLICY_MANAGEMENT,
-            this.PERMISSIONS.POLICY_MANAGEMENT_DELETE,
+            this.PERMISSIONS.POLICY_MANAGEMENT_UPDATE,
           ]),
         });
         clearInterval(interval);
