@@ -4,8 +4,8 @@ import i18n from '../i18n';
 import EventBus from '../shared/eventbus';
 import { getToken, hasPermission } from '../shared/permissions';
 import { getContextPath } from '../shared/utils';
-import CryptoAsset from "../views/portfolio/projects/CryptoAsset";
-import CryptoAssets from "../views/portfolio/cryptoassets/CryptoAssets";
+import CryptoAsset from '../views/portfolio/projects/CryptoAsset';
+import CryptoAssets from '../views/portfolio/cryptoassets/CryptoAssets';
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer');
@@ -257,7 +257,7 @@ function configRoutes() {
         {
           path: '/cryptoassets/:uuid',
           name: 'CryptoAsset',
-          props: (route) => ( { uuid: route.params.uuid } ),
+          props: (route) => ({ uuid: route.params.uuid }),
           component: CryptoAsset,
           meta: {
             i18n: 'message.projects',

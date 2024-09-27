@@ -103,7 +103,7 @@ export default {
         this.numberOfKeys = metrics[metrics.length - 1].numberOfKeys;
       } else {
         this.numberOfCryptographicAssets = 0;
-        this.mostUsedAlgorithmName = "";
+        this.mostUsedAlgorithmName = '';
         this.mostUsedAlgorithmPercentage = 0;
         this.numberOfKeys = 0;
       }

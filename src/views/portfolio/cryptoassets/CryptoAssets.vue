@@ -121,7 +121,7 @@ export default {
         { value: 'ASSET TYPE', text: this.$t('message.crypto_assetType') },
       ],
       assetTypeOptions: [
-        { value: null, text: "ALL"},
+        { value: null, text: 'ALL' },
         { value: 'ALGORITHM', text: 'Algorithm' },
         { value: 'CERTIFICATE', text: 'Certificate' },
         { value: 'RELATED_CRYPTO_MATERIAL', text: 'Related Crypto Material' },

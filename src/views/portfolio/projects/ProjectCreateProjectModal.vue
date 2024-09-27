@@ -237,7 +237,10 @@ export default {
         { value: 'DEVICE', text: this.$i18n.t('message.component_device') },
         { value: 'FIRMWARE', text: this.$i18n.t('message.component_firmware') },
         { value: 'FILE', text: this.$i18n.t('message.component_file') },
-        { value: 'CRYPTOGRAPHIC_ASSET', text: this.$i18n.t('message.component_cryptographic_asset') },
+        {
+          value: 'CRYPTOGRAPHIC_ASSET',
+          text: this.$i18n.t('message.component_cryptographic_asset'),
+        },
       ],
       selectableLicenses: [],
       selectedLicense: '',
