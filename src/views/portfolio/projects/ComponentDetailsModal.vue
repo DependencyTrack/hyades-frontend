@@ -204,6 +204,741 @@
           </b-form-group>
         </b-card>
       </b-tab>
+      <div v-if="component.cryptoAssetProperties != undefined">
+        <b-tab>
+          <template v-slot:title
+            ><i class="fa fa-lock"></i>
+            {{ $t('message.component_cryptographic_properties') }}</template
+          >
+          <b-card>
+            <b-input-group-form-select
+              id="component-assetType-input"
+              required="true"
+              v-model="component.cryptoAssetProperties.assetType"
+              :options="assetTypeOptions"
+              :label="$t('message.crypto_assetType')"
+              :tooltip="$t('message.crypto_assetType_desc')"
+              :disabled="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            />
+            <b-input-group-form-input
+              id="component-oid-input"
+              input-group-size="mb-3"
+              type="text"
+              v-model="component.cryptoAssetProperties.oid"
+              lazy="true"
+              required="false"
+              feedback="true"
+              autofocus="false"
+              :label="$t('message.crypto_oid')"
+              :tooltip="this.$t('message.crypto_oid_desc')"
+              :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            />
+            <div
+              v-if="component.cryptoAssetProperties.assetType === 'algorithm'"
+            >
+              <b-input-group-form-select
+                id="component-algo-primitive-input"
+                required="false"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties.primitive
+                "
+                :options="primitiveOptions"
+                :label="$t('message.crypto_algo_primitive')"
+                :tooltip="$t('message.crypto_algo_primitive_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-algo-parameter-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties
+                    .parameterSetIdentifier
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_algo_parameterSetId')"
+                :tooltip="this.$t('message.crypto_algo_parameterSetId_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-algo-curve-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties.curve
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_algo_curve')"
+                :tooltip="this.$t('message.crypto_algo_curve_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select
+                id="component-algo-execEnv-input"
+                required="false"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties
+                    .executionEnvironment
+                "
+                :options="execEnvOptions"
+                :label="$t('message.crypto_algo_execEnv')"
+                :tooltip="$t('message.crypto_algo_execEnv_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select
+                id="component-algo-implPlfm-input"
+                required="false"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties
+                    .implementationPlatform
+                "
+                :options="implPflmOptions"
+                :label="$t('message.crypto_algo_implPlfm')"
+                :tooltip="$t('message.crypto_algo_implPlfm_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select
+                id="component-algo-certLvl-input"
+                required="false"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties
+                    .certificationLevel
+                "
+                :options="certLvlOptions"
+                :label="$t('message.crypto_algo_certLvl')"
+                :tooltip="$t('message.crypto_algo_certLvl_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select
+                id="component-algo-mode-input"
+                required="false"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties.mode
+                "
+                :options="modeOptions"
+                :label="$t('message.crypto_algo_mode')"
+                :tooltip="$t('message.crypto_algo_mode_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select
+                id="component-algo-padding-input"
+                required="false"
+                v-model="
+                  component.cryptoAssetProperties.algorithmProperties.padding
+                "
+                :options="paddingOptions"
+                :label="$t('message.crypto_algo_padding')"
+                :tooltip="$t('message.crypto_algo_padding_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select-multiple
+                id="component-algo-cryptoFunctions-input"
+                required="false"
+                v-model="
+                  this.component.cryptoAssetProperties.algorithmProperties
+                    .cryptoFunctions
+                "
+                :options="cryptoFunctionOptions"
+                :label="$t('message.crypto_algo_cryptoFunctions')"
+                :tooltip="$t('message.crypto_algo_cryptoFunctions_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input-number
+                id="component-algo-classicalSL-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  this.component.cryptoAssetProperties.algorithmProperties
+                    .classicalSecurityLevel
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_algo_classicalSL')"
+                :tooltip="this.$t('message.crypto_algo_classicalSL_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input-number
+                id="component-algo-nistQSL-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  this.component.cryptoAssetProperties.algorithmProperties
+                    .nistQuantumSecurityLevel
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_algo_nistQSL')"
+                :tooltip="this.$t('message.crypto_algo_nistQSL_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+            </div>
+            <div
+              v-else-if="
+                component.cryptoAssetProperties.assetType === 'certificate'
+              "
+            >
+              <b-input-group-form-input
+                id="component-cert-subject-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .subjectName
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_subject')"
+                :tooltip="this.$t('message.crypto_cert_subject_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-issuer-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .issuerName
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_issuer')"
+                :tooltip="this.$t('message.crypto_cert_issuer_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-notValidBefore-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .notValidBefore
+                "
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_notValidBefore')"
+                :tooltip="this.$t('message.crypto_cert_notValidBefore_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-notValidAfter-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .notValidAfter
+                "
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_notValidAfter')"
+                :tooltip="this.$t('message.crypto_cert_notValidAfter_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-signAlgoRef-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .signatureAlgorithmRef
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_signAlgoRef')"
+                :tooltip="this.$t('message.crypto_cert_signAlgoRef_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-subjPubKeyRef-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .subjectPublicKeyRef
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_subjPubKeyRef')"
+                :tooltip="this.$t('message.crypto_cert_subjPubKeyRef_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-format-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .certificateFormat
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_format')"
+                :tooltip="this.$t('message.crypto_cert_format_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-cert-ext-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.certificateProperties
+                    .certificateExtension
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_cert_ext')"
+                :tooltip="this.$t('message.crypto_cert_ext_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+            </div>
+            <div
+              v-else-if="
+                component.cryptoAssetProperties.assetType ===
+                'related-crypto-material'
+              "
+            >
+              <b-input-group-form-select
+                id="component-rcm-type-input"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties.type
+                "
+                required="false"
+                :options="typeOptions"
+                :label="$t('message.crypto_rcm_type')"
+                :tooltip="$t('message.crypto_rcm_type_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-id-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .identifier
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_id')"
+                :tooltip="this.$t('message.crypto_rcm_id_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-select
+                id="component-rcm-state-input"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .state
+                "
+                required="false"
+                :options="stateOptions"
+                :label="$t('message.crypto_rcm_state')"
+                :tooltip="$t('message.crypto_rcm_state_desc')"
+                :disabled="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-algoRef-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .algorithmRef
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_algoRef')"
+                :tooltip="this.$t('message.crypto_rcm_algoRef_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-cdate-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .creationDate
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_cdate')"
+                :tooltip="this.$t('message.crypto_rcm_cdate_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-adate-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .activationDate
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_adate')"
+                :tooltip="this.$t('message.crypto_rcm_adate_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-udate-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .updateDate
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_udate')"
+                :tooltip="this.$t('message.crypto_rcm_udate_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-edate-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .expirationDate
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_edate')"
+                :tooltip="this.$t('message.crypto_rcm_edate_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-value-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .value
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_value')"
+                :tooltip="this.$t('message.crypto_rcm_value_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input-number
+                id="component-rcm-size-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  this.component.cryptoAssetProperties.relatedMaterialProperties
+                    .size
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_size')"
+                :tooltip="this.$t('message.crypto_rcm_size_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-format-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .format
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_format')"
+                :tooltip="this.$t('message.crypto_rcm_format_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-secByMech-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .securedByMechanism
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_secByMech')"
+                :tooltip="this.$t('message.crypto_rcm_secByMech_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-rcm-secByAlgoRef-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.relatedMaterialProperties
+                    .securedByAlgorithmRef
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_rcm_secByAlgoRef')"
+                :tooltip="this.$t('message.crypto_rcm_secByAlgoRef_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+            </div>
+            <div
+              v-else-if="
+                component.cryptoAssetProperties.assetType === 'protocol'
+              "
+            >
+              <b-input-group-form-select
+                id="component-prot-type-input"
+                v-model="
+                  component.cryptoAssetProperties.protocolProperties.type
+                "
+                :options="protocolTypeOptions"
+                :label="$t('message.crypto_prot_type')"
+                :tooltip="this.$t('message.crypto_prot_type_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-version-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="
+                  component.cryptoAssetProperties.protocolProperties.version
+                "
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_version')"
+                :tooltip="this.$t('message.crypto_prot_version_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.cipherSuites"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_cipherSuites')"
+                :tooltip="$t('message.crypto_prot_cipherSuites_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.ikev2Encr"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_ikev2Encr')"
+                :tooltip="$t('message.crypto_prot_ikev2Encr_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.ikev2Prf"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_ikev2Prf')"
+                :tooltip="$t('message.crypto_prot_ikev2Prf_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.ikev2Integ"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_ikev2Integ')"
+                :tooltip="$t('message.crypto_prot_ikev2Integ_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.ikev2Ke"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_ikev2Ke')"
+                :tooltip="$t('message.crypto_prot_ikev2Ke_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.ikev2Esn"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_ikev2Esn')"
+                :tooltip="$t('message.crypto_prot_ikev2Esn_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <b-input-group-form-input
+                id="component-prot-ciphersuites-input"
+                input-group-size="mb-3"
+                type="text"
+                v-model="this.ikev2Auth"
+                lazy="true"
+                required="false"
+                feedback="true"
+                autofocus="false"
+                :label="$t('message.crypto_prot_ikev2Auth')"
+                :tooltip="$t('message.crypto_prot_ikev2Auth_desc')"
+                :readonly="
+                  this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
+                "
+              />
+              <!--b-input-group-form-input
+              id="component-prot-cryptoRefs-input"
+              input-group-size="mb-3"
+              type="text"
+              v-model="component.cryptoAssetProperties.protocolProperties.cryptoRefs"
+              lazy="true"
+              required="false"
+              feedback="true"
+              autofocus="false"
+              :label="$t('message.crypto_prot_cryptoRefs')"
+              :tooltip="this.$t('message.crypto_prot_cryptoRefs_desc')"
+              :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            /-->
+            </div>
+          </b-card>
+        </b-tab>
+      </div>
       <b-tab>
         <template v-slot:title
           ><i class="fa fa-balance-scale"></i>
@@ -500,7 +1235,9 @@
 
 <script>
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+import BInputGroupFormInputNumber from '../../../forms/BInputGroupFormInputNumber';
 import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
+import BInputGroupFormSelectMultiple from '../../../forms/BInputGroupFormSelectMultiple';
 import ComponentPropertiesModal from './ComponentPropertiesModal.vue';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import xssFilters from 'xss-filters';
@@ -511,7 +1248,9 @@ export default {
   mixins: [permissionsMixin],
   components: {
     BInputGroupFormInput,
+    BInputGroupFormInputNumber,
     BInputGroupFormSelect,
+    BInputGroupFormSelectMultiple,
     ComponentPropertiesModal,
   },
   props: {
@@ -540,6 +1279,203 @@ export default {
         { value: 'DEVICE', text: this.$i18n.t('message.component_device') },
         { value: 'FIRMWARE', text: this.$i18n.t('message.component_firmware') },
         { value: 'FILE', text: this.$i18n.t('message.component_file') },
+        {
+          value: 'CRYPTOGRAPHIC_ASSET',
+          text: this.$i18n.t('message.component_cryptographic_asset'),
+        },
+      ],
+      assetTypeOptions: [
+        { value: 'algorithm', text: 'Algorithm' },
+        { value: 'certificate', text: 'Certificate' },
+        { value: 'related-crypto-material', text: 'Related Crypto Material' },
+        { value: 'protocol', text: 'Protocol' },
+      ],
+      primitiveOptions: [
+        { value: 'drbg', text: 'Deterministic Random Bit Generator' },
+        { value: 'mac', text: 'Message Authentication Code' },
+        { value: 'block-cipher', text: 'Block Cipher' },
+        { value: 'stream-cipher', text: 'Stream Cipher' },
+        { value: 'signature', text: 'Signature' },
+        { value: 'hash', text: 'Hash' },
+        { value: 'pke', text: 'Public Key Encryption' },
+        { value: 'xof', text: 'XOF' },
+        { value: 'kdf', text: 'Key Derivation Function' },
+        { value: 'key-agree', text: 'Key Agreement' },
+        { value: 'kem', text: 'Key Encapsulation Mechanism' },
+        { value: 'ae', text: 'Authenticated Encryption' },
+        { value: 'other', text: 'Other' },
+      ],
+      execEnvOptions: [
+        { value: 'software-plain-ram', text: 'Plain RAM Software' },
+        { value: 'software-encrypted-ram', text: 'Encrypted RAM Software' },
+        {
+          value: 'software-tee',
+          text: 'Software in Trusted Execution Environment',
+        },
+        { value: 'hardware', text: 'Hardware' },
+        { value: 'other', text: 'Other' },
+      ],
+      implPflmOptions: [
+        { value: 'generic', text: 'generic' },
+        { value: 'x86_32', text: 'x86_32' },
+        { value: 'x86_64', text: 'X86_64' },
+        { value: 'armv7-a', text: 'armv7-a' },
+        { value: 'armv7-m', text: 'armv7-m' },
+        { value: 'armv8-a', text: 'armv8-a' },
+        { value: 'armv8-m', text: 'armv8-m' },
+        { value: 'armv9-a', text: 'armv9-a' },
+        { value: 'armv9-m', text: 'armv9-m' },
+        { value: 's390x', text: 's390x' },
+        { value: 'ppc64', text: 'ppc64' },
+        { value: 'ppc64le', text: 'ppc64le' },
+        { value: 'other', text: 'Other' },
+      ],
+      certLvlOptions: [
+        { value: 'none', text: 'None' },
+        { value: 'fips140-1-l1', text: 'FIPS 140-1 Level 1' },
+        { value: 'fips140-1-l2', text: 'FIPS 140-1 Level 2' },
+        { value: 'fips140-1-l3', text: 'FIPS 140-1 Level 3' },
+        { value: 'fips140-1-l4', text: 'FIPS 140-1 Level 4' },
+        { value: 'fips140-2-l1', text: 'FIPS 140-2 Level 1' },
+        { value: 'fips140-2-l2', text: 'FIPS 140-2 Level 2' },
+        { value: 'fips140-2-l3', text: 'FIPS 140-2 Level 3' },
+        { value: 'fips140-2-l4', text: 'FIPS 140-2 Level 4' },
+        { value: 'fips140-3-l1', text: 'FIPS 140-3 Level 1' },
+        { value: 'fips140-3-l2', text: 'FIPS 140-3 Level 2' },
+        { value: 'fips140-3-l3', text: 'FIPS 140-3 Level 3' },
+        { value: 'fips140-3-l4', text: 'FIPS 140-3 Level 4' },
+        {
+          value: 'cc-eal1',
+          text: 'Common Criteria - Evaluation Assurance Level 1',
+        },
+        {
+          value: 'cc-eal1+',
+          text: 'Common Criteria - Evaluation Assurance Level 1 (Augmented)',
+        },
+        {
+          value: 'cc-eal2',
+          text: 'Common Criteria - Evaluation Assurance Level 2',
+        },
+        {
+          value: 'cc-eal2+',
+          text: 'Common Criteria - Evaluation Assurance Level 2 (Augmented)',
+        },
+        {
+          value: 'cc-eal3',
+          text: 'Common Criteria - Evaluation Assurance Level 3',
+        },
+        {
+          value: 'cc-eal3+',
+          text: 'Common Criteria - Evaluation Assurance Level 3 (Augmented)',
+        },
+        {
+          value: 'cc-eal4',
+          text: 'Common Criteria - Evaluation Assurance Level 4',
+        },
+        {
+          value: 'cc-eal4+',
+          text: 'Common Criteria - Evaluation Assurance Level 4 (Augmented)',
+        },
+        {
+          value: 'cc-eal5',
+          text: 'Common Criteria - Evaluation Assurance Level 5',
+        },
+        {
+          value: 'cc-eal5+',
+          text: 'Common Criteria - Evaluation Assurance Level 5 (Augmented)',
+        },
+        {
+          value: 'cc-eal6',
+          text: 'Common Criteria - Evaluation Assurance Level 6',
+        },
+        {
+          value: 'cc-eal6+',
+          text: 'Common Criteria - Evaluation Assurance Level 6 (Augmented)',
+        },
+        {
+          value: 'cc-eal7',
+          text: 'Common Criteria - Evaluation Assurance Level 7',
+        },
+        {
+          value: 'cc-eal7+',
+          text: 'Common Criteria - Evaluation Assurance Level 7 (Augmented)',
+        },
+        { value: 'other', text: 'Other' },
+      ],
+      modeOptions: [
+        { value: 'cbc', text: 'Cipher Block Chaining' },
+        { value: 'ecb', text: 'Electronic Codebook' },
+        { value: 'gcm', text: 'Galois/counter' },
+        { value: 'ofb', text: 'Output Feedback' },
+        { value: 'ctr', text: 'Counter' },
+        { value: 'other', text: 'Other' },
+      ],
+      paddingOptions: [
+        {
+          value: 'pkcs5',
+          text: 'Public Key Cryptography Standard: Password-Based Cryptography',
+        },
+        {
+          value: 'pkcs7',
+          text: 'Public Key Cryptography Standard: Cryptographic Message Syntax',
+        },
+        {
+          value: 'pkcs1v15',
+          text: 'Public Key Cryptography Standard: RSA Cryptography v1.5r',
+        },
+        { value: 'oaep', text: 'Optimal Asymmetric Encryption Padding' },
+        { value: 'raw', text: 'Raw' },
+        { value: 'other', text: 'Other' },
+      ],
+      cryptoFunctionOptions: [
+        { value: 'generate', text: 'generate' },
+        { value: 'keygen', text: 'keygen' },
+        { value: 'encrypt', text: 'encrypt' },
+        { value: 'decrypt', text: 'decrypt' },
+        { value: 'digest', text: 'digest' },
+        { value: 'tag', text: 'tag' },
+        { value: 'keyderive', text: 'keyderive' },
+        { value: 'sign', text: 'sign' },
+        { value: 'verify', text: 'verify' },
+        { value: 'encapsulate', text: 'encapsulate' },
+        { value: 'decapsulate', text: 'decapsulate' },
+        { value: 'other', text: 'Other' },
+      ],
+      typeOptions: [
+        { value: 'private_key', text: 'Private Key (asymmetric)' },
+        { value: 'public-key', text: 'Public Key (asymmetric)' },
+        { value: 'secret-key', text: 'Secret Key (symmetric)' },
+        { value: 'key', text: 'Key' },
+        { value: 'ciphertext', text: 'Ciphertext' },
+        { value: 'signature', text: 'Signature' },
+        { value: 'digest', text: 'Digest' },
+        { value: 'initialization-vector', text: 'Initialization Vector' },
+        { value: 'seed', text: 'Seed' },
+        { value: 'salt', text: 'Salt' },
+        { value: 'shared-secret', text: 'Shared Secret' },
+        { value: 'tag', text: 'Authentication Tag' },
+        { value: 'additional-data', text: 'Additional Data' },
+        { value: 'password', text: 'Password' },
+        { value: 'credential', text: 'Credential' },
+        { value: 'token', text: 'Token' },
+        { value: 'other', text: 'Other' },
+      ],
+      stateOptions: [
+        { value: 'pre-activation', text: 'pre-activation' },
+        { value: 'active', text: 'active' },
+        { value: 'suspended', text: 'suspended' },
+        { value: 'deactivated', text: 'deactivated' },
+        { value: 'compromised', text: 'compromised' },
+        { value: 'destroyed', text: 'destroyed' },
+      ],
+      protocolTypeOptions: [
+        { value: 'tls', text: 'Transport Layer Security' },
+        { value: 'ssh', text: 'Secure Shell' },
+        { value: 'ipsec', text: 'Internet Protocol Security' },
+        { value: 'ike', text: 'Internet Key Exchange' },
+        { value: 'sstp', text: 'Secure Socket Tunneling Protocol' },
+        { value: 'wpa', text: 'Wi-Fi Protected Access' },
+        { value: 'other', text: 'Other' },
       ],
       selectableLicenses: [],
       selectedLicense: '',
@@ -671,6 +1607,36 @@ export default {
   },
   beforeUpdate() {
     //console.log(this.component);
+    if (
+      this.component.hasOwnProperty('cryptoAssetProperties') &&
+      this.component.cryptoAssetProperties.hasOwnProperty('protocolProperties')
+    ) {
+      let pp = this.component.cryptoAssetProperties.protocolProperties;
+      if (pp.hasOwnProperty('cipherSuites')) {
+        this.cipherSuites = pp.cipherSuites.map((a) => a.name).join(', ');
+      }
+
+      if (pp.hasOwnProperty('ikev2Types')) {
+        if (pp.ikev2Types.hasOwnProperty('encr')) {
+          this.ikev2Encr = pp.ikev2Types.encr.join(', ');
+        }
+        if (pp.ikev2Types.hasOwnProperty('prf')) {
+          this.ikev2Prf = pp.ikev2Types.prf.join(', ');
+        }
+        if (pp.ikev2Types.hasOwnProperty('integ')) {
+          this.ikev2Integ = pp.ikev2Types.integ.join(', ');
+        }
+        if (pp.ikev2Types.hasOwnProperty('ke')) {
+          this.ikev2Ke = pp.ikev2Types.ke.join(', ');
+        }
+        if (pp.ikev2Types.hasOwnProperty('esn')) {
+          this.ikev2Esn = pp.ikev2Types.esn.join(', ');
+        }
+        if (pp.ikev2Types.hasOwnProperty('auth')) {
+          this.ikev2Auth = pp.ikev2Types.auth.join(', ');
+        }
+      }
+    }
   },
   methods: {
     updateComponent: function () {

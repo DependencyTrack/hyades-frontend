@@ -91,6 +91,12 @@ export default {
           permission: permissions.VIEW_PORTFOLIO,
         },
         {
+          name: this.$t('message.crypto_assets'),
+          url: '/cryptoassets',
+          icon: 'fa fa-lock',
+          permission: permissions.VIEW_PORTFOLIO,
+        },
+        {
           name: this.$t('message.vulnerabilities'),
           url: '/vulnerabilities',
           icon: 'fa fa-shield',

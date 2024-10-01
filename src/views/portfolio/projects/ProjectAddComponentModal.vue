@@ -293,6 +293,10 @@ export default {
         { value: 'DEVICE', text: this.$i18n.t('message.component_device') },
         { value: 'FIRMWARE', text: this.$i18n.t('message.component_firmware') },
         { value: 'FILE', text: this.$i18n.t('message.component_file') },
+        {
+          value: 'CRYPTOGRAPHIC_ASSET',
+          text: this.$i18n.t('message.component_cryptographic_asset'),
+        },
       ],
       selectableLicenses: [],
       selectedLicense: '',
@@ -370,8 +374,7 @@ export default {
         .then((response) => {
           // Allow for license to be un-selected.
           this.selectableLicenses.push({ value: '', text: '' });
-          for (let i = 0; i < response.data.length; i++) {
-            let license = response.data[i];
+          for (const license of response.data) {
             this.selectableLicenses.push({
               value: license.licenseId,
               text: license.name,
