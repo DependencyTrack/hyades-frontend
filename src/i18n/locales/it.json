@@ -98,7 +98,7 @@
     "enable_email": "Abilita e-mail",
     "enable_index_consistency_check": "Abilita il controllo periodico della coerenza",
     "enable_risk_score_history_check": "Ricalcolare la ponderazione del punteggio di rischio sulla cronologia del progetto",
-    "enable_svg_badge": "Abilita il supporto del badge SVG (non autenticato)",
+    "enable_svg_badge": "Abilita l'accesso al badge SVG non autenticato (deprecato)",
     "enabled": "Abilitato",
     "enabled_for_tags": "Abilitato per i tag",
     "experimental": "Sperimentale",
