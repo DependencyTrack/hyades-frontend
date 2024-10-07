@@ -98,7 +98,7 @@
     "enable_email": "Enable email",
     "enable_index_consistency_check": "Enable periodic consistency check",
     "enable_risk_score_history_check": "Recalculate risk score weighting on project history",
-    "enable_svg_badge": "Enable SVG badge support (unauthenticated)",
+    "enable_svg_badge": "Enable unauthenticated SVG badge access (deprecated)",
     "enabled": "Enabled",
     "enabled_for_tags": "Enabled for tags",
     "experimental": "Experimental",

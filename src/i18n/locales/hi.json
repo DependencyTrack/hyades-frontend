@@ -98,7 +98,7 @@
     "enable_email": "ईमेल सक्षम करें",
     "enable_index_consistency_check": "आवधिक संगतता जांच सक्षम करें",
     "enable_risk_score_history_check": "प्रोजेक्ट इतिहास पर जोखिम स्कोर भार की पुनर्गणना करें",
-    "enable_svg_badge": "SVG बैज समर्थन सक्षम करें (अप्रमाणित)",
+    "enable_svg_badge": "अप्रमाणित एसवीजी बैज एक्सेस सक्षम करें (बहिष्कृत)",
     "enabled": "सक्रिय",
     "enabled_for_tags": "टैग के लिए सक्षम",
     "experimental": "प्रयोगात्मक",

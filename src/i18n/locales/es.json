@@ -98,7 +98,7 @@
     "enable_email": "Habilitar correo electrónico",
     "enable_index_consistency_check": "Habilitar la verificación periódica de coherencia",
     "enable_risk_score_history_check": "Recalcular la ponderación de la puntuación de riesgo en el historial del proyecto",
-    "enable_svg_badge": "Habilitar la compatibilidad con insignias SVG (sin autenticar)",
+    "enable_svg_badge": "Habilitar el acceso a la insignia SVG sin autenticar (en desuso)",
     "enabled": "Activado",
     "enabled_for_tags": "Habilitado para etiquetas",
     "experimental": "Experimental",
