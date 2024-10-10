@@ -80,7 +80,7 @@ getDefaultLanguage().then((defaultLanguage) => {
       defaultLanguage ||
       navigator.language ||
       navigator.userLanguage,
-      );
+  );
   i18n.locale = matchedLocale;
 });
 
