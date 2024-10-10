@@ -728,6 +728,7 @@
     "policy_management": "Управління політикою",
     "policy_name": "Назва політики",
     "policy_operation_mode": "Режим роботи",
+    "policy_violation_audit": "Аудит порушень політики",
     "policy_violations": "Порушення політики",
     "policy_violations_by_classification": "Порушення політики за класифікацією",
     "policy_violations_by_state": "Порушення політики державою",
