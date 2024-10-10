@@ -6,7 +6,10 @@
           size="md"
           variant="outline-primary"
           v-b-modal.projectAddComponentModal
-          v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+          v-permission:or="[
+            PERMISSIONS.PORTFOLIO_MANAGEMENT,
+            PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+          ]"
         >
           <span class="fa fa-plus"></span> {{ $t('message.add_component') }}
         </b-button>
@@ -14,7 +17,10 @@
           size="md"
           variant="outline-primary"
           @click="removeDependencies"
-          v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+          v-permission:or="[
+            PERMISSIONS.PORTFOLIO_MANAGEMENT,
+            PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
+          ]"
         >
           <span class="fa fa-minus"></span> {{ $t('message.remove_component') }}
         </b-button>
@@ -23,10 +29,7 @@
           size="md"
           variant="outline-primary"
           v-b-modal.projectUploadBomModal
-          v-permission:or="[
-            PERMISSIONS.PORTFOLIO_MANAGEMENT,
-            PERMISSIONS.BOM_UPLOAD,
-          ]"
+          v-permission="PERMISSIONS.BOM_UPLOAD"
         >
           <span class="fa fa-upload"></span> {{ $t('message.upload_bom') }}
         </b-button>
@@ -49,6 +52,18 @@
             href="#"
             >{{ $t('message.inventory_with_vulnerabilities') }}</b-dropdown-item
           >
+        </b-dropdown>
+        <b-dropdown
+          variant="outline-primary"
+          v-permission="PERMISSIONS.VIEW_PORTFOLIO"
+        >
+          <template #button-content>
+            <span class="fa fa-download"></span>
+            {{ $t('message.download_component') }}
+          </template>
+          <b-dropdown-item @click="downloadTable('csv')" href="#">{{
+            $t('message.csv_filetype')
+          }}</b-dropdown-item>
         </b-dropdown>
         <span
           id="switch-container-outdated"
@@ -120,6 +135,7 @@ import xssFilters from 'xss-filters';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import common from '../../../shared/common';
 import SeverityProgressBar from '../../components/SeverityProgressBar';
+import { get } from 'lodash-es';
 
 export default {
   components: {
@@ -172,13 +188,7 @@ export default {
           field: 'version',
           sortable: true,
           formatter: (value, row, index) => {
-            if (
-              Object.prototype.hasOwnProperty.call(row, 'repositoryMeta') &&
-              Object.prototype.hasOwnProperty.call(
-                row.repositoryMeta,
-                'latestVersion',
-              )
-            ) {
+            if (row.repositoryMeta && row.repositoryMeta.latestVersion) {
               row.latestVersion = row.repositoryMeta.latestVersion;
               if (
                 compareVersions(row.repositoryMeta.latestVersion, row.version) >
@@ -504,6 +514,47 @@ export default {
           document.body.appendChild(link);
           link.click();
         });
+    },
+    buildTableFile: function (json, fileType) {
+      if (fileType == 'csv') {
+        const items = json.data;
+        const header = [
+          'name',
+          'version',
+          'group',
+          'internal',
+          'resolvedLicense.licenseId',
+          'lastInheritedRiskScore',
+          'metrics.vulnerabilities',
+        ]; //Object.keys(items[0])//as long as the structure of the json doesnt change these can be static
+        const csv = [
+          header.join(','),
+          ...items.map((row) =>
+            header.map((header) => get(row, header)).join(','),
+          ),
+        ].join('\r\n');
+        const url = window.URL.createObjectURL(new Blob([csv]));
+        const link = document.createElement('a');
+        link.href = url;
+        let filename = 'componentTable.csv';
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+      }
+    },
+    downloadTable: async function (fileType) {
+      const result = await this.downloadTableJson();
+      this.buildTableFile(result, fileType);
+    },
+    downloadTableJson: async function () {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/project/${this.uuid}?limit=1000000&offset=0`;
+      try {
+        let response = await this.axios.get(url);
+        return response;
+      } catch (e) {
+        console.log(e);
+        return e;
+      }
     },
     tableLoaded: function (data) {
       loadUserPreferencesForBootstrapTable(

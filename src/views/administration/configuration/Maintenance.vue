@@ -1,0 +1,160 @@
+<template>
+  <b-card no-body :header="header">
+    <b-card-body>
+      <b-form-group
+        :label="$t('admin.metrics')"
+        label-size="lg"
+        label-class="font-weight-bold pt-0 mb-0"
+      >
+        <b-form-group :label="$t('admin.retention')">
+          <b-input-group :append="$t('admin.days')">
+            <b-form-input
+              type="number"
+              v-model="metricsRetentionDays"
+            ></b-form-input>
+          </b-input-group>
+        </b-form-group>
+      </b-form-group>
+      <b-form-group
+        :label="$t('admin.tags')"
+        label-size="lg"
+        label-class="font-weight-bold pt-0 mb-0"
+      >
+        <c-switch
+          color="primary"
+          v-model="tagsDeleteUnused"
+          label
+          v-bind="switchLabelIcon"
+        />{{ $t('admin.tags_delete_unused') }}
+      </b-form-group>
+      <b-form-group
+        :label="$t('admin.vulnerability_scans')"
+        label-size="lg"
+        label-class="font-weight-bold pt-0 mb-0"
+      >
+        <b-form-group :label="$t('admin.retention')">
+          <b-input-group :append="$t('admin.hours')">
+            <b-form-input
+              type="number"
+              v-model="vulnScanRetentionHours"
+            ></b-form-input>
+          </b-input-group>
+        </b-form-group>
+      </b-form-group>
+      <b-form-group
+        :label="$t('admin.workflows')"
+        label-size="lg"
+        label-class="font-weight-bold pt-0 mb-0"
+      >
+        <b-form-group :label="$t('admin.retention')">
+          <b-input-group :append="$t('admin.hours')">
+            <b-form-input
+              type="number"
+              v-model="workflowRetentionHours"
+            ></b-form-input>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group :label="$t('admin.workflow_step_timeout')">
+          <b-input-group :append="$t('admin.minutes')">
+            <b-form-input
+              type="number"
+              v-model="workflowStepTimeoutMinutes"
+            ></b-form-input>
+          </b-input-group>
+        </b-form-group>
+      </b-form-group>
+    </b-card-body>
+    <b-card-footer>
+      <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
+        $t('message.update')
+      }}</b-button>
+    </b-card-footer>
+  </b-card>
+</template>
+
+<script>
+import { Switch as cSwitch } from '@coreui/vue';
+import common from '../../../shared/common';
+import configPropertyMixin from '../mixins/configPropertyMixin';
+
+export default {
+  mixins: [configPropertyMixin],
+  props: {
+    header: String,
+  },
+  components: {
+    cSwitch,
+  },
+  data() {
+    return {
+      metricsRetentionDays: null,
+      tagsDeleteUnused: null,
+      vulnScanRetentionHours: null,
+      workflowRetentionHours: null,
+      workflowStepTimeoutMinutes: null,
+      switchLabelIcon: {
+        dataOn: '\u2713',
+        dataOff: '\u2715',
+      },
+    };
+  },
+  methods: {
+    saveChanges: function () {
+      this.updateConfigProperties([
+        {
+          groupName: 'maintenance',
+          propertyName: 'metrics.retention.days',
+          propertyValue: this.metricsRetentionDays,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'tags.delete.unused',
+          propertyValue: this.tagsDeleteUnused,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'vuln.scan.retention.hours',
+          propertyValue: this.vulnScanRetentionHours,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'workflow.retention.hours',
+          propertyValue: this.workflowRetentionHours,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'workflow.step.timeout.minutes',
+          propertyValue: this.workflowStepTimeoutMinutes,
+        },
+      ]);
+    },
+  },
+  created() {
+    this.axios.get(this.configUrl).then((response) => {
+      let configItems = response.data.filter(
+        (item) => item.groupName === 'maintenance',
+      );
+      for (let i = 0; i < configItems.length; i++) {
+        let item = configItems[i];
+        switch (item.propertyName) {
+          case 'metrics.retention.days':
+            this.metricsRetentionDays = item.propertyValue;
+            break;
+          case 'tags.delete.unused':
+            this.tagsDeleteUnused = common.toBoolean(item.propertyValue);
+            break;
+          case 'vuln.scan.retention.hours':
+            this.vulnScanRetentionHours = item.propertyValue;
+            break;
+          case 'workflow.retention.hours':
+            this.workflowRetentionHours = item.propertyValue;
+            break;
+          case 'workflow.step.timeout.minutes':
+            this.workflowStepTimeoutMinutes = item.propertyValue;
+            break;
+        }
+      }
+    });
+  },
+};
+</script>

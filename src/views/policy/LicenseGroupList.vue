@@ -1,11 +1,23 @@
 <template>
-  <div class="animated fadeIn" v-permission="'POLICY_MANAGEMENT'">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      'POLICY_MANAGEMENT',
+      'POLICY_MANAGEMENT_CREATE',
+      'POLICY_MANAGEMENT_READ',
+      'POLICY_MANAGEMENT_UPDATE',
+      'POLICY_MANAGEMENT_DELETE',
+    ]"
+  >
     <div id="licenseGroupsToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.createLicenseGroupModal
-        v-permission="PERMISSIONS.POLICY_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.POLICY_MANAGEMENT,
+          PERMISSIONS.POLICY_MANAGEMENT_CREATE,
+        ]"
       >
         <span class="fa fa-plus"></span>
         {{ $t('message.create_license_group') }}
@@ -119,13 +131,13 @@ export default {
                     <b-form-group :label="this.$t('message.licenses')">
                       <div class="list-group">
                         <span v-for="license in licenses">
-                          <actionable-list-group-item :value="license.name" :delete-icon="true" v-on:actionClicked="removeLicense(license)"/>
+                          <actionable-list-group-item :value="license.name" v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :delete-icon="true" v-on:actionClicked="removeLicense(license)"/>
                         </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectLicenseModal')"/>
+                        <actionable-list-group-item v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectLicenseModal')"/>
                       </div>
                     </b-form-group>
                     <div style="text-align:right">
-                       <b-button variant="outline-danger" @click="deleteLicenseGroup">{{ $t('message.delete_license_group') }}</b-button>
+                       <b-button v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_DELETE']" variant="outline-danger" @click="deleteLicenseGroup">{{ $t('message.delete_license_group') }}</b-button>
                     </div>
                   </b-col>
                 </b-row>

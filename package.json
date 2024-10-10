@@ -1,6 +1,6 @@
 {
   "name": "@dependencytrack/frontend",
-  "version": "5.4.0",
+  "version": "5.5.0",
   "description": "Single Page Application for OWASP Dependency-Track",
   "author": "Steve Springett",
   "homepage": "https://dependencytrack.org/",
@@ -28,7 +28,7 @@
     "@coreui/vue": "2.1.2",
     "@johmun/vue-tags-input": "2.1.0",
     "@monaco-editor/loader": "1.4.0",
-    "axios": "1.6.8",
+    "axios": "1.7.4",
     "bootstrap": "4.6.2",
     "bootstrap-table": "1.22.4",
     "bootstrap-vue": "2.23.1",
@@ -93,6 +93,9 @@
     "vue-template-compiler": "2.7.16"
   },
   "overrides": {
+    "@cyclonedx/cyclonedx-npm": {
+      "@cyclonedx/cyclonedx-library": "6.11.0"
+    },
     "vue-bootstrap-toggle": {
       "merge": "2.1.1"
     }

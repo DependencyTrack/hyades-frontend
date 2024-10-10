@@ -27,7 +27,12 @@
             :tooltip="this.$t('message.project_name_desc')"
             :feedback-text="$t('message.required_project_name')"
             v-on:change="syncReadOnlyNameField"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="project-version-input"
@@ -41,7 +46,12 @@
             v-on:change="syncReadOnlyVersionField"
             :label="$t('message.version')"
             :tooltip="this.$t('message.component_version_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-select
             id="v-classifier-input"
@@ -50,7 +60,12 @@
             :options="availableClassifiers"
             :label="$t('message.classifier')"
             :tooltip="$t('message.component_classifier_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <div style="margin-bottom: 1rem">
             <label>Parent</label>
@@ -81,7 +96,12 @@
               id="project-description-description"
               v-model="project.description"
               rows="3"
-              :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+              :readonly="
+                this.isNotPermitted([
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+                ])
+              "
             />
           </b-form-group>
           <b-form-group
@@ -95,9 +115,15 @@
               :tags="tags"
               :add-on-key="addOnKeys"
               :placeholder="$t('message.add_tag')"
+              :autocomplete-items="tagsAutoCompleteItems"
               @tags-changed="(newTags) => (this.tags = newTags)"
               class="mw-100 bg-transparent text-lowercase"
-              :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+              :readonly="
+                this.isNotPermitted([
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+                ])
+              "
             />
           </b-form-group>
           <c-switch
@@ -107,7 +133,10 @@
             v-model="project.active"
             label
             :disabled="
-              this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT) ||
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ]) ||
               (project.active && this.hasActiveChild(project))
             "
             v-bind="labelIcon"
@@ -174,7 +203,12 @@
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="project-purl-input"
@@ -184,7 +218,12 @@
             required="false"
             :label="$t('message.package_url_full')"
             :tooltip="this.$t('message.component_package_url_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="project-cpe-input"
@@ -194,7 +233,12 @@
             required="false"
             :label="$t('message.cpe_full')"
             :tooltip="$t('message.component_cpe_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
           <b-input-group-form-input
             id="project-swidTagId-input"
@@ -204,7 +248,12 @@
             required="false"
             :label="$t('message.swid_tagid')"
             :tooltip="$t('message.component_swid_tagid_desc')"
-            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            :readonly="
+              this.isNotPermitted([
+                PERMISSIONS.PORTFOLIO_MANAGEMENT,
+                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+              ])
+            "
           />
         </b-card>
       </b-tab>
@@ -411,21 +460,30 @@
         size="md"
         variant="outline-danger"
         @click="deleteProject()"
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
+        ]"
         >{{ $t('message.delete') }}</b-button
       >
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.projectPropertiesModal
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+        ]"
         >{{ $t('message.properties') }}</b-button
       >
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.projectAddVersionModal
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_CREATE,
+        ]"
         >{{ $t('message.add_version') }}</b-button
       >
       <b-button size="md" variant="secondary" @click="cancel()">{{
@@ -435,7 +493,10 @@
         size="md"
         variant="primary"
         @click="updateProject()"
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
+        ]"
         >{{ $t('message.update') }}</b-button
       >
     </template>
@@ -500,6 +561,8 @@ export default {
       availableParents: [],
       tag: '', // The contents of a tag as its being typed into the vue-tag-input
       tags: [], // An array of tags bound to the vue-tag-input
+      tagsAutoCompleteItems: [],
+      tagsAutoCompleteDebounce: null,
       addOnKeys: [9, 13, 32, ':', ';', ','], // Separators used when typing tags into the vue-tag-input
       labelIcon: {
         dataOn: '\u2713',
@@ -648,6 +711,9 @@ export default {
       this.$root.$emit('bv::show::modal', 'projectDetailsModal');
     });
   },
+  watch: {
+    tag: 'searchTags',
+  },
   methods: {
     initializeTags: function () {
       this.tags = (this.project.tags || []).map((tag) => ({ text: tag.name }));
@@ -749,6 +815,20 @@ export default {
           this.isLoading = false;
         });
       }
+    },
+    searchTags: function () {
+      if (!this.tag) {
+        return;
+      }
+      clearTimeout(this.tagsAutoCompleteDebounce);
+      this.tagsAutoCompleteDebounce = setTimeout(() => {
+        const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(this.tag)}&pageNumber=1&pageSize=6`;
+        this.axios.get(url).then((response) => {
+          this.tagsAutoCompleteItems = response.data.map((tag) => {
+            return { text: tag.name };
+          });
+        });
+      }, 250);
     },
     resetValues: function () {
       this.selectedParent = this.parent;

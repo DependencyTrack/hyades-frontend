@@ -1,5 +1,14 @@
 <template>
-  <div class="animated fadeIn" v-permission="'SYSTEM_CONFIGURATION'">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      'SYSTEM_CONFIGURATION',
+      'SYSTEM_CONFIGURATION_CREATE',
+      'SYSTEM_CONFIGURATION_READ',
+      'SYSTEM_CONFIGURATION_UPDATE',
+      'SYSTEM_CONFIGURATION_DELETE',
+    ]"
+  >
     <b-row>
       <b-col xs="6" sm="4" md="4" lg="3" id="admin-menu-column">
         <admin-menu />
@@ -28,6 +37,7 @@ import Search from './configuration/Search.vue';
 import TaskScheduler from './configuration/TaskScheduler.vue';
 import RiskScore from './configuration/RiskScore.vue';
 import Experimental from './configuration/Experimental.vue';
+import WelcomeMessage from './configuration/WelcomeMessage.vue';
 // Analyzer plugins
 import InternalAnalyzer from './analyzers/InternalAnalyzer';
 import OssIndexAnalyzer from './analyzers/OssIndexAnalyzer';
@@ -73,6 +83,7 @@ export default {
     EventBus,
     AdminMenu,
     General,
+    WelcomeMessage,
     BomFormats,
     Email,
     Jira,

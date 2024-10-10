@@ -371,6 +371,16 @@ button:focus {
   background-color: transparent;
   border: 1px solid $primary;
 }
+.badge-team {
+    color: $primary;
+    background-color: transparent;
+    border: 1px solid $primary;
+  }
+  .badge-team:hover {
+    color: $light-blue;
+    background-color: transparent;
+    border: 1px solid $primary;
+  }
 td a.detail-icon {
   font-size: 150%;
   line-height: 1.0;

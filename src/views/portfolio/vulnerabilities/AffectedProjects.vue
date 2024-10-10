@@ -104,7 +104,7 @@ export default {
         showRefresh: true,
         pagination: true,
         silentSort: false,
-        sidePagination: 'client',
+        sidePagination: 'server',
         queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,
@@ -113,6 +113,10 @@ export default {
           refresh: 'fa-refresh',
         },
         url: this.apiUrl(),
+        responseHandler: function (res, xhr) {
+          res.total = xhr.getResponseHeader('X-Total-Count');
+          return res;
+        },
       },
     };
   },
@@ -126,8 +130,12 @@ export default {
       }
       return url;
     },
-    tableLoaded: function (array) {
-      this.$emit('total', array.length);
+    tableLoaded: function (data) {
+      if (data && data.total !== undefined) {
+        this.$emit('total', data.total);
+      } else {
+        this.$emit('total', '?');
+      }
     },
     refreshTable: function () {
       this.$refs.table.refresh({

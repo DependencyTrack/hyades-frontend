@@ -6,7 +6,10 @@
         size="md"
         variant="outline-primary"
         @click="initializeProjectCreateProjectModal"
-        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
+        v-permission:or="[
+          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.PORTFOLIO_MANAGEMENT_CREATE,
+        ]"
       >
         <span class="fa fa-plus"></span> {{ $t('message.create_project') }}
       </b-button>
@@ -97,6 +100,10 @@ export default {
       let tag = this.$route.query.tag;
       if (tag) {
         queryParams['tag'] = tag;
+      }
+      let team = this.$route.query.team;
+      if (team) {
+        queryParams['team'] = team;
       }
       let classifier = this.$route.query.classifier;
       if (classifier) {
@@ -290,6 +297,34 @@ export default {
           },
         },
         {
+          title: this.$t('message.teams'),
+          field: 'teams',
+          sortable: false,
+          visible: false,
+          routerFunc: () => this.$router, // Injecting $router directly causes recursion errors in Vue...
+          formatter(value, row, index) {
+            const router = this.routerFunc();
+            let team_string = '';
+            if (row.teams) {
+              team_string =
+                row.teams
+                  ?.slice(0, 2)
+                  .map((teams) => common.formatProjectTeamLabel(router, teams))
+                  .join(' ') || '';
+              if (row.teams.length > 2) {
+                team_string += ` <span class="d-none">`;
+                team_string += row.teams
+                  .slice(2)
+                  ?.map((teams) => common.formatProjectTeamLabel(router, teams))
+                  .join(' ');
+                team_string += `</span>`;
+                team_string += `<a href="#" title="show all teams" class="badge badge-team" onclick="this.previousElementSibling.classList.toggle('d-none')">…</a>`;
+              }
+            }
+            return team_string;
+          },
+        },
+        {
           title: this.$t('message.version'),
           field: 'version',
           sortable: true,
@@ -330,7 +365,7 @@ export default {
             return value === true ? '<i class="fa fa-check-square-o" />' : '';
           },
           align: 'center',
-          sortable: true,
+          sortable: false,
         },
         {
           title: this.$t('message.components'),

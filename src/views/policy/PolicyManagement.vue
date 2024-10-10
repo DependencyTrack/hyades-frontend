@@ -1,5 +1,14 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.POLICY_MANAGEMENT">
+  <div
+    class="animated fadeIn"
+    v-permission:or="[
+      PERMISSIONS.POLICY_MANAGEMENT,
+      PERMISSIONS.POLICY_MANAGEMENT_CREATE,
+      PERMISSIONS.POLICY_MANAGEMENT_READ,
+      PERMISSIONS.POLICY_MANAGEMENT_UPDATE,
+      PERMISSIONS.POLICY_MANAGEMENT_DELETE,
+    ]"
+  >
     <b-tabs
       class="body-bg-color"
       style="border-left: 0; border-right: 0; border-top: 0"
