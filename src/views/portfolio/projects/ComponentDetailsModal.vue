@@ -746,21 +746,17 @@
                   this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
                 "
               />
-              <b-input-group-form-input
+              <b-input-group-form-select
                 id="component-rcm-secByMech-input"
-                input-group-size="mb-3"
-                type="text"
                 v-model="
                   component.cryptoAssetProperties.relatedMaterialProperties
-                    .securedByMechanism
+                    .securedBy.mechanism
                 "
-                lazy="true"
                 required="false"
-                feedback="true"
-                autofocus="false"
+                :options="mechanismOptions"
                 :label="$t('message.crypto_rcm_secByMech')"
-                :tooltip="this.$t('message.crypto_rcm_secByMech_desc')"
-                :readonly="
+                :tooltip="$t('message.crypto_rcm_secByMech_desc')"
+                :disabled="
                   this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)
                 "
               />
@@ -770,7 +766,7 @@
                 type="text"
                 v-model="
                   component.cryptoAssetProperties.relatedMaterialProperties
-                    .securedByAlgorithmRef
+                    .securedBy.algorithmRef
                 "
                 lazy="true"
                 required="false"
@@ -1467,6 +1463,12 @@ export default {
         { value: 'deactivated', text: 'deactivated' },
         { value: 'compromised', text: 'compromised' },
         { value: 'destroyed', text: 'destroyed' },
+      ],
+      mechanismOptions: [
+        { value: 'HSM', text: 'Hardware Secirity Module' },
+        { value: 'TPM', text: 'Trusted Platform Module' },
+        { value: 'SGX', text: 'Software Guard Extensions' },
+        { value: 'Software', text: 'Software' },
       ],
       protocolTypeOptions: [
         { value: 'tls', text: 'Transport Layer Security' },
