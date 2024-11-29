@@ -34,8 +34,13 @@ export default {
           title: 'ID',
           field: 'id',
           sortable: true,
-          // TODO: Truncate to prevent UUID from taking too much space.
-          // TODO: Add hyperlink to detail view.
+          formatter: (value) => {
+            const detailsUrl = this.$router.resolve({
+              name: 'Workflow Run Details',
+              params: { runId: value },
+            }).href;
+            return `<a href="${detailsUrl}" target="_blank"><span class="d-inline-block text-truncate" style="max-width: 150px">${value}</span></a>`;
+          },
         },
         {
           title: 'Workflow',
@@ -50,8 +55,22 @@ export default {
           field: 'status',
           sortable: false,
           formatter(value, row) {
-            // TODO: Replace runtimeStatus with icon.
-            return `${value} (${row.runtimeStatus})`;
+            // TODO: i18n for status text.
+            let iconName = 'fa-question';
+            if (row.runtimeStatus === 'CANCELLED') {
+              iconName = 'fa-ban';
+            } else if (row.runtimeStatus === 'FAILED') {
+              iconName = 'fa-fire';
+            } else if (row.runtimeStatus === 'SUSPENDED') {
+              iconName = 'fa-pause';
+            } else if (row.runtimeStatus === 'RUNNING') {
+              iconName = 'fa-play';
+            } else if (row.runtimeStatus === 'PENDING') {
+              iconName = 'fa-hourglass-start';
+            } else if (row.runtimeStatus === 'COMPLETED') {
+              iconName = 'fa-check';
+            }
+            return `<span class="fa ${iconName} text-primary">&nbsp;</span> ${value}`;
           },
         },
         {

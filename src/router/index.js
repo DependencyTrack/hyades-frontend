@@ -1078,7 +1078,7 @@ function configRoutes() {
             },
             {
               path: 'workflows/:runId',
-              name: 'Workflow Run',
+              name: 'Workflow Run Details',
               props: (route) => ({
                 runId: route.params.runId,
               }),
