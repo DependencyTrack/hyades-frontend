@@ -101,6 +101,8 @@ const PortfolioAccessControl = () =>
 
 const WorkflowsOverview = () =>
   import('@/views/administration/workflows/WorkflowsOverview');
+const WorkflowDetails = () =>
+  import('@/views/administration/workflows/WorkflowDetails');
 
 const Component = () => import('@/views/portfolio/projects/Component');
 const Service = () => import('@/views/portfolio/projects/Service');
@@ -1072,6 +1074,19 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_UPDATE',
                   'SYSTEM_CONFIGURATION_DELETE',
                 ],
+              },
+            },
+            {
+              path: 'workflows/:runId',
+              name: 'Workflow Run',
+              props: (route) => ({
+                runId: route.params.runId,
+              }),
+              component: WorkflowDetails,
+              meta: {
+                i18n: 'message.projects',
+                sectionPath: '/admin',
+                permissions: ['SYSTEM_CONFIGURATION_READ'],
               },
             },
           ],
