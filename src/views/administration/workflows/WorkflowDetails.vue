@@ -26,6 +26,7 @@ export default {
       run: null,
       isCompleted: false,
       timelineItems: [],
+      pollInterval: null,
     };
   },
   beforeMount() {
@@ -41,6 +42,10 @@ export default {
           `${this.$api.BASE_URL}/${this.$api.URL_WORKFLOW}/run/${this.runId}`,
         )
         .then((response) => {
+          if (this.run && this.run.updatedAt === response.data.updatedAt) {
+            return;
+          }
+
           this.run = response.data;
           this.isCompleted =
             this.run.runtimeStatus !== 'PENDING' &&
@@ -165,6 +170,13 @@ export default {
           }
 
           this.timelineItems = events;
+
+          if (!this.isCompleted && !this.pollInterval) {
+            this.pollInterval = setInterval(this.loadData, 3000);
+          } else if (this.isCompleted && this.pollInterval) {
+            clearInterval(this.pollInterval);
+            this.pollInterval = null;
+          }
         });
     },
   },
