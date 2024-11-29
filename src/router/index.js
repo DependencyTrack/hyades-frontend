@@ -99,6 +99,9 @@ const Permissions = () =>
 const PortfolioAccessControl = () =>
   import('@/views/administration/accessmanagement/PortfolioAccessControl');
 
+const WorkflowsOverview = () =>
+  import('@/views/administration/workflows/WorkflowsOverview');
+
 const Component = () => import('@/views/portfolio/projects/Component');
 const Service = () => import('@/views/portfolio/projects/Service');
 const Vulnerability = () =>
@@ -1051,6 +1054,23 @@ function configRoutes() {
                   'ACCESS_MANAGEMENT_READ',
                   'ACCESS_MANAGEMENT_UPDATE',
                   'ACCESS_MANAGEMENT_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'workflows/overview',
+              component: WorkflowsOverview,
+              meta: {
+                title: 'Workflows Overview',
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                permissions: [
+                  // TODO: Workflow permissions.
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
                 ],
               },
             },

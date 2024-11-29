@@ -77,6 +77,8 @@ import OidcUsers from './accessmanagement/OidcUsers';
 import Permissions from './accessmanagement/Permissions';
 import PortfolioAccessControl from './accessmanagement/PortfolioAccessControl';
 import Teams from './accessmanagement/Teams';
+// Workflows
+import WorkflowsOverview from './workflows/WorkflowsOverview';
 
 export default {
   components: {
@@ -125,6 +127,7 @@ export default {
     Teams,
     Permissions,
     PortfolioAccessControl,
+    WorkflowsOverview,
   },
   created() {
     // Specifies the admin plugin metadata (Vue component, i18n name, and href) of the plugin to load
