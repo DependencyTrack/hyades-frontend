@@ -900,6 +900,7 @@
     "weakness": "Weakness",
     "will_not_fix": "Will not fix",
     "workaround_available": "Workaround available",
+    "workflow_runs": "Workflow Runs",
     "x_trust_boundary": "Cross Trust Boundary"
   },
   "operator": {

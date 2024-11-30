@@ -154,6 +154,18 @@ export default {
           ],
         },
         {
+          name: 'Workflow Runs',
+          url: '/workflowRuns',
+          icon: 'fa fa-list',
+          permission: [
+            permissions.SYSTEM_CONFIGURATION,
+            permissions.SYSTEM_CONFIGURATION_CREATE,
+            permissions.SYSTEM_CONFIGURATION_READ,
+            permissions.SYSTEM_CONFIGURATION_UPDATE,
+            permissions.SYSTEM_CONFIGURATION_DELETE,
+          ],
+        },
+        {
           name: this.$t('message.administration'),
           url: '/admin',
           icon: 'fa fa-cogs',
