@@ -150,6 +150,7 @@ export default {
               events.push({
                 timestamp: event.timestamp,
                 title: `Run started`,
+                argument: this.jsonFromPayload(event.runStarted.argument),
               });
             } else if (event.runCancelled) {
               events.push({
