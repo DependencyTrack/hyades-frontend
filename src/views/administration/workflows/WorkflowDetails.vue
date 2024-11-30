@@ -6,12 +6,34 @@
         :reverse="false"
         :loading="!isCompleted"
         variant="primary"
-      />
+      >
+        <template v-slot:item="slotProps">
+          <p v-if="slotProps.item.content">{{ slotProps.item.content }}</p>
+          <p v-if="slotProps.item.argument">
+            <strong>Argument</strong>
+            <vue-json-pretty
+              :deep="1"
+              :showLength="true"
+              :data="slotProps.item.argument"
+            />
+          </p>
+          <p v-if="slotProps.item.result">
+            <strong>Result</strong>
+            <vue-json-pretty
+              :deep="1"
+              :showLength="true"
+              :data="slotProps.item.result"
+            />
+          </p>
+        </template>
+      </event-timeline>
     </b-card-body>
   </b-card>
 </template>
 
 <script>
+import VueJsonPretty from 'vue-json-pretty';
+import 'vue-json-pretty/lib/styles.css';
 import EventTimeline from '@/views/components/EventTimeline';
 import common from '@/shared/common';
 
@@ -19,7 +41,7 @@ export default {
   props: {
     header: String,
   },
-  components: { EventTimeline },
+  components: { EventTimeline, VueJsonPretty },
   data() {
     return {
       runId: null,
@@ -89,9 +111,13 @@ export default {
             } else if (event.activityTaskScheduled) {
               const activityName = event.activityTaskScheduled.name;
               activityByScheduledEventId.set(event.id, activityName);
+
               events.push({
                 timestamp: event.timestamp,
                 title: `Activity ${activityName} scheduled`,
+                argument: this.jsonFromPayload(
+                  event.activityTaskScheduled.argument,
+                ),
               });
             } else if (event.activityTaskCompleted) {
               const activityName = activityByScheduledEventId.get(
@@ -100,6 +126,9 @@ export default {
               events.push({
                 timestamp: event.timestamp,
                 title: `Activity ${activityName} completed`,
+                result: this.jsonFromPayload(
+                  event.activityTaskCompleted.result,
+                ),
               });
             } else if (event.activityTaskFailed) {
               const activityName = activityByScheduledEventId.get(
@@ -108,7 +137,7 @@ export default {
               events.push({
                 timestamp: event.timestamp,
                 title: `Activity ${activityName} failed`,
-                // TODO: Failure details.
+                content: event.activityTaskFailed.failureDetails,
               });
             } else if (event.subWorkflowRunScheduled) {
               const subWorkflowRun = {
@@ -121,6 +150,9 @@ export default {
                 timestamp: event.timestamp,
                 title: `Sub workflow run ${subWorkflowRun.runId} scheduled`,
                 content: `Workflow: ${subWorkflowRun.name}/${subWorkflowRun.version}`,
+                argument: this.jsonFromPayload(
+                  event.subWorkflowRunScheduled.argument,
+                ),
               });
             } else if (event.subWorkflowRunCompleted) {
               const subWorkflowRun = subWorkflowRunByScheduledEventId.get(
@@ -130,6 +162,9 @@ export default {
                 timestamp: event.timestamp,
                 title: `Sub workflow run ${subWorkflowRun.runId} completed`,
                 content: `Workflow: ${subWorkflowRun.name}/${subWorkflowRun.version}`,
+                result: this.jsonFromPayload(
+                  event.subWorkflowRunCompleted.result,
+                ),
               });
             } else if (event.subWorkflowRunFailed) {
               const subWorkflowRun = subWorkflowRunByScheduledEventId.get(
@@ -145,6 +180,7 @@ export default {
               events.push({
                 timestamp: event.timestamp,
                 title: `Side effect executed`, // TODO: Name?
+                result: this.jsonFromPayload(event.sideEffectExecuted.result),
               });
             } else if (event.timerScheduled) {
               timerByScheduledEventId.set(event.id, 'name'); // TODO: Add named timers.
@@ -165,11 +201,15 @@ export default {
               events.push({
                 timestamp: event.timestamp,
                 title: `External event ${event.externalEventReceived.id} received`,
+                result: this.jsonFromPayload(
+                  event.externalEventReceived.content,
+                ),
               });
             }
           }
 
           this.timelineItems = events;
+          console.log(this.timelineItems);
 
           if (!this.isCompleted && !this.pollInterval) {
             this.pollInterval = setInterval(this.loadData, 3000);
@@ -179,6 +219,31 @@ export default {
           }
         });
     },
+    jsonFromPayload(payload) {
+      if (payload && payload.protoContent) {
+        let protoContent = payload.protoContent;
+        delete protoContent['@type'];
+        return protoContent;
+      }
+
+      return null;
+    },
   },
 };
 </script>
+
+<style lang="scss">
+@import '../../../assets/scss/style.scss';
+
+.vjs-tree {
+  @extend code;
+  padding: 0.5em;
+}
+
+.vjs-tree-node {
+  &.is-highlight,
+  &:hover {
+    background-color: $secondary;
+  }
+}
+</style>
