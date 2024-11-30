@@ -14,8 +14,8 @@
 
 <script>
 import xssFilters from 'xss-filters';
-import common from '../../../shared/common';
-import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
+import common from '../../shared/common';
+import bootstrapTableMixin from '../../mixins/bootstrapTableMixin';
 
 export default {
   props: {
@@ -39,7 +39,7 @@ export default {
               name: 'Workflow Run Details',
               params: { runId: value },
             }).href;
-            return `<a href="${detailsUrl}" target="_blank"><span class="d-inline-block text-truncate" style="max-width: 150px">${value}</span></a>`;
+            return `<a href="${detailsUrl}"><span class="d-inline-block text-truncate" style="max-width: 150px">${value}</span></a>`;
           },
         },
         {
@@ -47,7 +47,7 @@ export default {
           field: 'workflowName',
           sortable: true,
           formatter(value, row) {
-            return `${value}/${row.workflowVersion}`;
+            return `${value} v${row.workflowVersion}`;
           },
         },
         {

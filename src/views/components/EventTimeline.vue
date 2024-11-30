@@ -25,7 +25,7 @@
         </div>
 
         <small class="mb-1 item-description">
-          <slot :item="item" name="item">
+          <slot :item="item" :index="index" name="item">
             {{ item.content || '' }}
           </slot>
         </small>
@@ -44,6 +44,7 @@ export default {
     loading: Boolean,
     dateFormat: String,
     variant: String,
+    reverse: Boolean,
   },
   components: { BListGroup, BListGroupItem, BSpinner },
   methods: {
@@ -57,6 +58,10 @@ export default {
           ...items,
           { spinner: true, timestamp: 'time', title: 'loading' },
         ];
+      }
+
+      if (this.reverse) {
+        items.reverse();
       }
 
       return items;

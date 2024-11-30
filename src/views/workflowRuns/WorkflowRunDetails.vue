@@ -1,34 +1,96 @@
 <template>
-  <b-card no-body :header="header">
-    <b-card-body>
-      <event-timeline
-        :items="timelineItems"
-        :reverse="false"
-        :loading="!isCompleted"
-        variant="primary"
-      >
-        <template v-slot:item="slotProps">
-          <p v-if="slotProps.item.content">{{ slotProps.item.content }}</p>
-          <p v-if="slotProps.item.argument">
-            <strong>Argument</strong>
-            <vue-json-pretty
-              :deep="1"
-              :showLength="true"
-              :data="slotProps.item.argument"
-            />
-          </p>
-          <p v-if="slotProps.item.result">
-            <strong>Result</strong>
-            <vue-json-pretty
-              :deep="1"
-              :showLength="true"
-              :data="slotProps.item.result"
-            />
-          </p>
-        </template>
-      </event-timeline>
-    </b-card-body>
-  </b-card>
+  <div class="row">
+    <div class="col-6">
+      <b-card no-body>
+        <b-card-body> </b-card-body>
+      </b-card>
+    </div>
+    <div class="col-6">
+      <b-card no-body header="History">
+        <b-card-body>
+          <event-timeline
+            :items="timelineItems"
+            :reverse="true"
+            :loading="!isCompleted"
+            variant="primary"
+          >
+            <template v-slot:item="slotProps">
+              <p v-if="slotProps.item.content">{{ slotProps.item.content }}</p>
+              <div v-if="slotProps.item.argument || slotProps.item.result">
+                <ul
+                  class="nav nav-tabs"
+                  :id="`history-event-${slotProps.index}-payload-tab`"
+                  role="tablist"
+                >
+                  <li
+                    v-if="slotProps.item.argument"
+                    class="nav-item"
+                    role="presentation"
+                  >
+                    <a
+                      class="nav-link active"
+                      :id="`history-event-${slotProps.index}-payload-tab-argument`"
+                      data-toggle="tab"
+                      role="tab"
+                      :aria-controls="`history-event-${slotProps.index}-payload-tab-argument-content`"
+                      aria-selected="false"
+                      ><span class="fa fa-inbox"></span>&nbsp; Argument</a
+                    >
+                  </li>
+                  <li
+                    v-if="slotProps.item.result"
+                    class="nav-item"
+                    role="presentation"
+                  >
+                    <a
+                      class="nav-link"
+                      :id="`history-event-${slotProps.index}-payload-tab-result`"
+                      data-toggle="tab"
+                      role="tab"
+                      :aria-controls="`history-event-${slotProps.index}-payload-tab-result-content`"
+                      :aria-selected="!slotProps.item.argument"
+                      ><span class="fa fa-arrow-right"></span>&nbsp; Result</a
+                    >
+                  </li>
+                </ul>
+                <div
+                  class="tab-content p-0"
+                  :id="`history-event-${slotProps.index}-payload-tab-content`"
+                >
+                  <div
+                    v-if="slotProps.item.argument"
+                    class="tab-pane fade show active p-0"
+                    :id="`history-event-${slotProps.index}-payload-tab-argument-content`"
+                    role="tabpanel"
+                    :aria-labelledby="`history-event-${slotProps.index}-payload-tab-argument`"
+                  >
+                    <vue-json-pretty
+                      :deep="1"
+                      :showLength="true"
+                      :data="slotProps.item.argument"
+                    />
+                  </div>
+                  <div
+                    v-if="slotProps.item.result"
+                    :class="`tab-pane fade p-0 ${!slotProps.item.argument ? 'show active' : ''}`"
+                    :id="`history-event-${slotProps.index}-payload-tab-result-content`"
+                    role="tabpanel"
+                    :aria-labelledby="`history-event-${slotProps.index}-payload-tab-result`"
+                  >
+                    <vue-json-pretty
+                      :deep="1"
+                      :showLength="true"
+                      :data="slotProps.item.result"
+                    />
+                  </div>
+                </div>
+              </div>
+            </template>
+          </event-timeline>
+        </b-card-body>
+      </b-card>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -36,6 +98,7 @@ import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import EventTimeline from '@/views/components/EventTimeline';
 import common from '@/shared/common';
+import EventBus from '@/shared/eventbus';
 
 export default {
   props: {
@@ -56,6 +119,9 @@ export default {
   },
   mounted() {
     this.loadData();
+  },
+  destroyed() {
+    EventBus.$emit('crumble');
   },
   methods: {
     loadData() {
@@ -209,7 +275,6 @@ export default {
           }
 
           this.timelineItems = events;
-          console.log(this.timelineItems);
 
           if (!this.isCompleted && !this.pollInterval) {
             this.pollInterval = setInterval(this.loadData, 3000);
@@ -217,6 +282,11 @@ export default {
             clearInterval(this.pollInterval);
             this.pollInterval = null;
           }
+
+          EventBus.$emit(
+            'addCrumb',
+            `${this.run.workflowName} v${this.run.workflowVersion} ▸ ${this.runId}`,
+          );
         });
     },
     jsonFromPayload(payload) {
@@ -233,7 +303,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../../assets/scss/style.scss';
+@import '../../assets/scss/style.scss';
 
 .vjs-tree {
   @extend code;

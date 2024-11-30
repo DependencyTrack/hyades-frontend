@@ -53,6 +53,7 @@ const acceptableRootContextPaths = [
   '/vulnerability',
   '/license',
   '/vulnerabilityAudit',
+  '/workflowRuns',
   '/login',
   '/change-password',
 ];

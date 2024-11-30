@@ -394,24 +394,6 @@ export default {
             },
           ],
         },
-        {
-          name: 'Workflows',
-          id: 'workflows',
-          permission: [
-            ACCESS_MANAGEMENT,
-            ACCESS_MANAGEMENT_CREATE,
-            ACCESS_MANAGEMENT_READ,
-            ACCESS_MANAGEMENT_UPDATE,
-            ACCESS_MANAGEMENT_DELETE,
-          ],
-          children: [
-            {
-              component: 'WorkflowsOverview',
-              name: 'Overview',
-              route: 'workflows/overview',
-            },
-          ],
-        },
       ],
     };
   },

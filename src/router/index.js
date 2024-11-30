@@ -99,10 +99,9 @@ const Permissions = () =>
 const PortfolioAccessControl = () =>
   import('@/views/administration/accessmanagement/PortfolioAccessControl');
 
-const WorkflowsOverview = () =>
-  import('@/views/administration/workflows/WorkflowsOverview');
-const WorkflowDetails = () =>
-  import('@/views/administration/workflows/WorkflowDetails');
+const WorkflowRunList = () => import('@/views/workflowRuns/WorkflowRunList');
+const WorkflowRunDetails = () =>
+  import('@/views/workflowRuns/WorkflowRunDetails');
 
 const Component = () => import('@/views/portfolio/projects/Component');
 const Service = () => import('@/views/portfolio/projects/Service');
@@ -334,6 +333,39 @@ function configRoutes() {
               'POLICY_MANAGEMENT_READ',
               'POLICY_MANAGEMENT_UPDATE',
               'POLICY_MANAGEMENT_DELETE',
+            ],
+          },
+        },
+        {
+          path: 'workflowRuns',
+          name: 'Workflow Runs',
+          component: WorkflowRunList,
+          meta: {
+            title: 'WorkflowRunList',
+            i18n: 'message.workflow_runs',
+            sectionPath: '/workflowRuns',
+            permissions: [
+              // TODO: Workflow permissions.
+              'SYSTEM_CONFIGURATION',
+              'SYSTEM_CONFIGURATION_READ',
+              'SYSTEM_CONFIGURATION_UPDATE',
+            ],
+          },
+        },
+        {
+          path: 'workflowRuns/:runId',
+          name: 'Workflow Run Details',
+          props: (route) => ({
+            runId: route.params.runId,
+          }),
+          component: WorkflowRunDetails,
+          meta: {
+            i18n: 'message.workflow_runs',
+            sectionPath: '/workflowRuns',
+            permissions: [
+              // TODO: Workflow permissions.
+              'SYSTEM_CONFIGURATION',
+              'SYSTEM_CONFIGURATION_READ',
             ],
           },
         },
@@ -1057,36 +1089,6 @@ function configRoutes() {
                   'ACCESS_MANAGEMENT_UPDATE',
                   'ACCESS_MANAGEMENT_DELETE',
                 ],
-              },
-            },
-            {
-              path: 'workflows/overview',
-              component: WorkflowsOverview,
-              meta: {
-                title: 'Workflows Overview',
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                permissions: [
-                  // TODO: Workflow permissions.
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'workflows/:runId',
-              name: 'Workflow Run Details',
-              props: (route) => ({
-                runId: route.params.runId,
-              }),
-              component: WorkflowDetails,
-              meta: {
-                i18n: 'message.projects',
-                sectionPath: '/admin',
-                permissions: ['SYSTEM_CONFIGURATION_READ'],
               },
             },
           ],
