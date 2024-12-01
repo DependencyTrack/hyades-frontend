@@ -52,7 +52,7 @@ export default {
       return this.variant || 'primary';
     },
     orderedItems() {
-      let items = this.items;
+      let items = [...this.items];
       if (this.loading) {
         items = [
           ...items,

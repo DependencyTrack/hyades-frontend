@@ -109,10 +109,19 @@ export default {
     return {
       runId: null,
       run: null,
-      isCompleted: false,
       timelineItems: [],
       pollInterval: null,
     };
+  },
+  computed: {
+    isCompleted() {
+      return (
+        this.run &&
+        this.run.runtimeStatus !== 'PENDING' &&
+        this.run.runtimeStatus !== 'RUNNING' &&
+        this.run.runtimeStatus !== 'SUSPENDED'
+      );
+    },
   },
   beforeMount() {
     this.runId = this.$route.params.runId;
@@ -134,18 +143,13 @@ export default {
             return;
           }
 
-          this.run = response.data;
-          this.isCompleted =
-            this.run.runtimeStatus !== 'PENDING' &&
-            this.run.runtimeStatus !== 'RUNNING' &&
-            this.run.runtimeStatus !== 'SUSPENDED';
-
+          let run = response.data;
           let events = [];
           let activityByScheduledEventId = new Map();
           let subWorkflowRunByScheduledEventId = new Map();
           let timerByScheduledEventId = new Map();
 
-          for (let event of this.run.eventLog) {
+          for (let event of run.eventLog) {
             if (event.runStarted) {
               events.push({
                 timestamp: event.timestamp,
@@ -275,6 +279,7 @@ export default {
             }
           }
 
+          this.run = run;
           this.timelineItems = events;
 
           if (!this.isCompleted && !this.pollInterval) {
@@ -292,7 +297,7 @@ export default {
     },
     jsonFromPayload(payload) {
       if (payload && payload.protoContent) {
-        let protoContent = payload.protoContent;
+        let protoContent = structuredClone(payload.protoContent);
         delete protoContent['@type'];
         return protoContent;
       }
