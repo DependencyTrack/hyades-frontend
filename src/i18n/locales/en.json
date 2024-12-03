@@ -886,6 +886,7 @@
     "violations_unaudited": "Violations Unaudited",
     "vulnerabilities": "Vulnerabilities",
     "vulnerabilities_by_occurrence": "Vulnerabilities By Occurrence",
+    "vulnerabilities_tagged_with": "Vulnerabilities tagged with {tag}",
     "vulnerability": "Vulnerability",
     "vulnerability_audit": "Vulnerability Audit",
     "vulnerability_created": "Vulnerability created",

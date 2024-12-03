@@ -886,6 +886,7 @@
     "violations_unaudited": "監査されていない違反",
     "vulnerabilities": "脆弱性",
     "vulnerabilities_by_occurrence": "発生頻度別の脆弱性",
+    "vulnerabilities_tagged_with": "{tag} でタグ付けされた脆弱性",
     "vulnerability": "脆弱性",
     "vulnerability_audit": "脆弱性監査",
     "vulnerability_created": "脆弱性が発生",

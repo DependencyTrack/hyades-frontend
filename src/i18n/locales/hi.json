@@ -886,6 +886,7 @@
     "violations_unaudited": "उल्लंघन असंपरीक्षित",
     "vulnerabilities": "कमजोरियों",
     "vulnerabilities_by_occurrence": "घटना के आधार पर कमज़ोरियाँ",
+    "vulnerabilities_tagged_with": "{tag} के साथ टैग किए गए कमज़ोरियाँ",
     "vulnerability": "भेद्यता",
     "vulnerability_audit": "भेद्यता ऑडिट",
     "vulnerability_created": "भेद्यता निर्मित हुई",

@@ -886,6 +886,7 @@
     "violations_unaudited": "Naruszenia nieskontrolowane",
     "vulnerabilities": "Luki",
     "vulnerabilities_by_occurrence": "Luki według wystąpienia",
+    "vulnerabilities_tagged_with": "Luki oznaczone tagiem {tag}",
     "vulnerability": "Słaby punkt",
     "vulnerability_audit": "Audyt podatności",
     "vulnerability_created": "Utworzono lukę",

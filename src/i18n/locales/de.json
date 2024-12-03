@@ -886,6 +886,7 @@
     "violations_unaudited": "Verstöße ungeprüft",
     "vulnerabilities": "Sicherheitslücken",
     "vulnerabilities_by_occurrence": "Schwachstellen nach Vorkommen",
+    "vulnerabilities_tagged_with": "Sicherheitslücken mit dem Tag {tag}",
     "vulnerability": "Verletzlichkeit",
     "vulnerability_audit": "Schwachstellen-Audit",
     "vulnerability_created": "Schwachstelle geschaffen",

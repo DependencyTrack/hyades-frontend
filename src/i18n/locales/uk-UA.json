@@ -886,6 +886,7 @@
     "violations_unaudited": "Порушення не перевірені",
     "vulnerabilities": "Вразливі місця",
     "vulnerabilities_by_occurrence": "Уразливості за виникненням",
+    "vulnerabilities_tagged_with": "уразливості з тегом {tag}",
     "vulnerability": "Вразливість",
     "vulnerability_audit": "Аудит вразливостей",
     "vulnerability_created": "Створено вразливість",
