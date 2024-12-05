@@ -878,6 +878,7 @@
     "violations_unaudited": "Нарушения не проверены",
     "vulnerabilities": "Уязвимости",
     "vulnerabilities_by_occurrence": "Уязвимости по возникновению",
+    "vulnerabilities_tagged_with": "Уязвимости с тегом {tag}",
     "vulnerability": "Уязвимость",
     "vulnerability_audit": "Аудит уязвимостей",
     "vulnerability_created": "Уязвимость создана",

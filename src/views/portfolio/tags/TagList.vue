@@ -22,6 +22,7 @@ import bootstrapTableMixin from '@/mixins/bootstrapTableMixin';
 import TaggedNotificationRuleListModal from '@/views/portfolio/tags/TaggedNotificationRuleListModal.vue';
 import TaggedPoliciesListModal from '@/views/portfolio/tags/TaggedPoliciesListModal.vue';
 import TaggedProjectListModal from '@/views/portfolio/tags/TaggedProjectListModal.vue';
+import TaggedVulnerabilityListModal from '@/views/portfolio/tags/TaggedVulnerabilityListModal.vue';
 import i18n from '@/i18n';
 export default {
   mixins: [bootstrapTableMixin, permissionsMixin, routerMixin],
@@ -122,6 +123,38 @@ export default {
                 return {
                   index: index,
                   tagName: row.name,
+                  value: value,
+                };
+              },
+            });
+          },
+        },
+        {
+          title: this.$t('message.vulnerabilities'),
+          field: 'vulnerabilityCount',
+          sortable: true,
+          formatter: (value, row, index) => {
+            if (value === 0) {
+              return value;
+            }
+
+            return this.vueFormatter({
+              i18n,
+              components: {
+                TaggedVulnerabilityListModal,
+              },
+              mixins: [permissionsMixin],
+              template: `
+                  <div>
+                    <b-link v-b-modal="\`taggedVulnerabilityListModal-${index}\`">{{ value }}</b-link>
+                    <span v-if="error" class="fa fa-apple"></span>
+                    <tagged-vulnerability-list-modal :tag="tagName" :index="index"/>
+                  </div>`,
+              data() {
+                return {
+                  index: index,
+                  tagName: row.name,
+                  error: row.error,
                   value: value,
                 };
               },

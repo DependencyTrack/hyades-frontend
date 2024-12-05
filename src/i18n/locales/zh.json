@@ -878,6 +878,7 @@
     "violations_unaudited": "违规行为未经审计",
     "vulnerabilities": "漏洞",
     "vulnerabilities_by_occurrence": "漏洞发生情况",
+    "vulnerabilities_tagged_with": "用 {tag} 标记的漏洞",
     "vulnerability": "漏洞",
     "vulnerability_audit": "漏洞审计",
     "vulnerability_created": "造成漏洞",

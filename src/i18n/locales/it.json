@@ -878,6 +878,7 @@
     "violations_unaudited": "Violazioni non certificate",
     "vulnerabilities": "Vulnerabilità",
     "vulnerabilities_by_occurrence": "Vulnerabilità per occorrenza",
+    "vulnerabilities_tagged_with": "Vulnerabilità taggati con {tag}",
     "vulnerability": "Vulnerabilità",
     "vulnerability_audit": "Controllo delle vulnerabilità",
     "vulnerability_created": "Vulnerabilità creata",
