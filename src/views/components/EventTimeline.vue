@@ -19,6 +19,12 @@
       <div v-if="!item.spinner" class="item-content">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">
+            <span
+              v-if="item.eventId !== undefined"
+              class="badge badge-tag text-lowercase mr-1"
+            >
+              {{ item.eventId }}
+            </span>
             {{ item.title }}
           </h5>
           <small class="mt-2"> {{ formatTimestamp(item.timestamp) }}</small>
@@ -30,6 +36,7 @@
           </slot>
         </small>
       </div>
+      <hr v-if="index !== itemsCount() - 1" class="ml-3 mr-3" />
     </b-list-group-item>
   </b-list-group>
 </template>

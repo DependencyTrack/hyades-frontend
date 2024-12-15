@@ -177,6 +177,8 @@ export default {
         showRefresh: true,
         pagination: true,
         silentSort: false,
+        sortName: 'updatedAt',
+        sortOrder: 'desc',
         sidePagination: 'server',
         queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',

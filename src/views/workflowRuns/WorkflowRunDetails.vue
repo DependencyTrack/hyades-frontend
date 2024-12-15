@@ -2,7 +2,35 @@
   <div class="row">
     <div class="col-6">
       <b-card no-body>
-        <b-card-body> </b-card-body>
+        <b-card-body>
+          <div class="d-flex justify-content-between">
+            <h2>
+              {{ run.workflowName }}
+              <span class="badge badge-light">v{{ run.workflowVersion }}</span>
+            </h2>
+            <b-button-group>
+              <b-button :disabled="!canBePaused"
+                ><span class="fa fa-pause"></span
+              ></b-button>
+              <b-button :disabled="!canBeResumed"
+                ><span class="fa fa-play"></span
+              ></b-button>
+              <b-button :disabled="!canBeCancelled"
+                ><span class="fa fa-ban"></span
+              ></b-button>
+            </b-button-group>
+          </div>
+          <hr />
+          <div class="d-flex align-items-start">
+            <a
+              v-for="tag in run.tags"
+              class="badge badge-pill badge-secondary mr-2 font-sm"
+              :href="tagLink(tag)"
+            >
+              <span class="fa fa-tag">&nbsp;</span> {{ tag }}
+            </a>
+          </div>
+        </b-card-body>
       </b-card>
     </div>
     <div class="col-6">
@@ -16,7 +44,10 @@
           >
             <template v-slot:item="slotProps">
               <p v-if="slotProps.item.content">{{ slotProps.item.content }}</p>
-              <div v-if="slotProps.item.argument || slotProps.item.result">
+              <div
+                v-if="slotProps.item.argument || slotProps.item.result"
+                class="mt-1"
+              >
                 <ul
                   class="nav nav-tabs"
                   :id="`history-event-${slotProps.index}-payload-tab`"
@@ -109,6 +140,7 @@ export default {
     return {
       runId: null,
       run: null,
+      parentRun: null,
       timelineItems: [],
       pollInterval: null,
     };
@@ -122,6 +154,51 @@ export default {
         this.run.runtimeStatus !== 'SUSPENDED'
       );
     },
+    canBePaused() {
+      if (this.isCompleted || this.run.runtimeStatus === 'SUSPENDED') {
+        return false;
+      } else if (!this.run.eventInbox) {
+        return true;
+      }
+
+      for (let event of this.run.eventInbox) {
+        if (event.runSuspended) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+    canBeResumed() {
+      if (this.isCompleted || this.run.runtimeStatus !== 'SUSPENDED') {
+        return false;
+      } else if (!this.run.eventInbox) {
+        return true;
+      }
+
+      for (let event of this.run.eventInbox) {
+        if (event.runResumed) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+    canBeCancelled() {
+      if (this.isCompleted) {
+        return false;
+      } else if (!this.run.eventInbox) {
+        return true;
+      }
+
+      for (let event of this.run.eventInbox) {
+        if (event.runCancelled) {
+          return false;
+        }
+      }
+
+      return true;
+    },
   },
   beforeMount() {
     this.runId = this.$route.params.runId;
@@ -133,6 +210,25 @@ export default {
     EventBus.$emit('crumble');
   },
   methods: {
+    tagLink(tag) {
+      if (!tag) {
+        return '#';
+      }
+
+      const tagParts = tag.split('=', 2);
+      if (tagParts.length !== 2) {
+        return '#';
+      }
+
+      if (tagParts[0] === 'project') {
+        return this.$router.resolve({
+          name: 'Project',
+          params: { uuid: tagParts[1] },
+        }).href;
+      }
+
+      return '#';
+    },
     loadData() {
       this.axios
         .get(
@@ -150,11 +246,20 @@ export default {
           let timerByScheduledEventId = new Map();
 
           for (let event of run.eventLog) {
-            if (event.runStarted) {
+            if (event.runScheduled) {
+              events.push({
+                timestamp: event.timestamp,
+                title: 'Run scheduled',
+                argument: this.jsonFromPayload(event.runScheduled.argument),
+              });
+
+              if (event.runScheduled.parentRun) {
+                this.parentRun = event.runScheduled.parentRun;
+              }
+            } else if (event.runStarted) {
               events.push({
                 timestamp: event.timestamp,
                 title: `Run started`,
-                argument: this.jsonFromPayload(event.runStarted.argument),
               });
             } else if (event.runCancelled) {
               events.push({
@@ -180,98 +285,115 @@ export default {
                 title: `Run resumed`,
               });
             } else if (event.activityTaskScheduled) {
+              const eventId = event.id || 0;
               const activityName = event.activityTaskScheduled.name;
-              activityByScheduledEventId.set(event.id, activityName);
+              activityByScheduledEventId.set(eventId, activityName);
 
               events.push({
+                eventId: eventId,
                 timestamp: event.timestamp,
-                title: `Activity ${activityName} scheduled`,
+                title: `Activity "${activityName}" scheduled`,
                 argument: this.jsonFromPayload(
                   event.activityTaskScheduled.argument,
                 ),
               });
             } else if (event.activityTaskCompleted) {
-              const activityName = activityByScheduledEventId.get(
-                event.activityTaskCompleted.taskScheduledEventId,
-              );
+              const scheduledEventId =
+                event.activityTaskCompleted.taskScheduledEventId || 0;
+              const activityName =
+                activityByScheduledEventId.get(scheduledEventId);
               events.push({
+                eventId: scheduledEventId,
                 timestamp: event.timestamp,
-                title: `Activity ${activityName} completed`,
+                title: `Activity "${activityName}" completed`,
                 result: this.jsonFromPayload(
                   event.activityTaskCompleted.result,
                 ),
               });
             } else if (event.activityTaskFailed) {
-              const activityName = activityByScheduledEventId.get(
-                event.activityTaskFailed.taskScheduledEventId,
-              );
+              const scheduledEventId =
+                event.activityTaskFailed.taskScheduledEventId || 0;
+              const activityName =
+                activityByScheduledEventId.get(scheduledEventId);
               events.push({
+                eventId: scheduledEventId,
                 timestamp: event.timestamp,
-                title: `Activity ${activityName} failed`,
+                title: `Activity "${activityName}" failed`,
                 content: event.activityTaskFailed.failureDetails,
               });
             } else if (event.subWorkflowRunScheduled) {
+              const eventId = event.id || 0;
               const subWorkflowRun = {
                 runId: event.subWorkflowRunScheduled.runId,
                 name: event.subWorkflowRunScheduled.workflowName,
                 version: event.subWorkflowRunScheduled.workflowVersion,
               };
-              subWorkflowRunByScheduledEventId.set(event.id, subWorkflowRun);
+              subWorkflowRunByScheduledEventId.set(eventId, subWorkflowRun);
               events.push({
+                eventId: eventId,
                 timestamp: event.timestamp,
-                title: `Sub workflow run ${subWorkflowRun.runId} scheduled`,
-                content: `Workflow: ${subWorkflowRun.name}/${subWorkflowRun.version}`,
+                // TODO: Render workflow name as hyperlink to the respective run.
+                title: `Sub workflow run "${subWorkflowRun.name} v${subWorkflowRun.version}" scheduled`,
                 argument: this.jsonFromPayload(
                   event.subWorkflowRunScheduled.argument,
                 ),
               });
             } else if (event.subWorkflowRunCompleted) {
-              const subWorkflowRun = subWorkflowRunByScheduledEventId.get(
-                event.subWorkflowRunCompleted.runScheduledEventId,
-              );
+              const scheduledEventId =
+                event.subWorkflowRunCompleted.runScheduledEventId;
+              const subWorkflowRun =
+                subWorkflowRunByScheduledEventId.get(scheduledEventId);
               events.push({
+                eventId: scheduledEventId,
                 timestamp: event.timestamp,
-                title: `Sub workflow run ${subWorkflowRun.runId} completed`,
-                content: `Workflow: ${subWorkflowRun.name}/${subWorkflowRun.version}`,
+                // TODO: Render workflow name as hyperlink to the respective run.
+                title: `Sub workflow run "${subWorkflowRun.name} v${subWorkflowRun.version}" completed`,
                 result: this.jsonFromPayload(
                   event.subWorkflowRunCompleted.result,
                 ),
               });
             } else if (event.subWorkflowRunFailed) {
-              const subWorkflowRun = subWorkflowRunByScheduledEventId.get(
-                event.subWorkflowRunFailed.runScheduledEventId,
-              );
+              const scheduledEventId =
+                event.subWorkflowRunFailed.runScheduledEventId;
+              const subWorkflowRun =
+                subWorkflowRunByScheduledEventId.get(scheduledEventId);
               events.push({
+                eventId: scheduledEventId,
                 timestamp: event.timestamp,
-                title: `Sub workflow run ${subWorkflowRun.runId} failed`,
+                title: `Sub workflow run "${subWorkflowRun.runId}" failed`,
                 // TODO: Failure details.
                 content: `Workflow: ${subWorkflowRun.name}/${subWorkflowRun.version}`,
               });
             } else if (event.sideEffectExecuted) {
               events.push({
+                eventId: event.sideEffectExecuted.sideEffectEventId || 0,
                 timestamp: event.timestamp,
-                title: `Side effect executed`, // TODO: Name?
+                title: `Side effect "${event.sideEffectExecuted.name}" executed`, // TODO: Name?
                 result: this.jsonFromPayload(event.sideEffectExecuted.result),
               });
             } else if (event.timerScheduled) {
-              timerByScheduledEventId.set(event.id, 'name'); // TODO: Add named timers.
+              const eventId = event.id || 0;
+              const timerName = event.timerScheduled.name;
+              timerByScheduledEventId.set(eventId, timerName);
               events.push({
+                eventId: eventId,
                 timestamp: event.timestamp,
-                title: `Timer (name) scheduled`,
+                title: `Timer "${timerName}" scheduled`,
                 content: `Elapses at: ${common.formatTimestamp(event.timerScheduled.elapseAt, true)}`,
               });
             } else if (event.timerFired) {
-              const timer = timerByScheduledEventId.get(
-                event.timerFired.timerScheduledEventId,
-              );
+              const scheduledEventId =
+                event.timerFired.timerScheduledEventId || 0;
+              const timer = timerByScheduledEventId.get(scheduledEventId);
               events.push({
+                eventId: scheduledEventId,
                 timestamp: event.timerFired.elapseAt,
-                title: `Timer ${timer} fired`,
+                title: `Timer "${timer}" fired`,
               });
             } else if (event.externalEventReceived) {
               events.push({
                 timestamp: event.timestamp,
-                title: `External event ${event.externalEventReceived.id} received`,
+                title: `External event "${event.externalEventReceived.id}" received`,
                 result: this.jsonFromPayload(
                   event.externalEventReceived.content,
                 ),
