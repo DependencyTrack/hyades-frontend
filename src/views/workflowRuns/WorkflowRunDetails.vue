@@ -157,11 +157,11 @@ export default {
     canBePaused() {
       if (this.isCompleted || this.run.runtimeStatus === 'SUSPENDED') {
         return false;
-      } else if (!this.run.eventInbox) {
+      } else if (!this.run.inbox) {
         return true;
       }
 
-      for (let event of this.run.eventInbox) {
+      for (let event of this.run.inbox) {
         if (event.runSuspended) {
           return false;
         }
@@ -172,11 +172,11 @@ export default {
     canBeResumed() {
       if (this.isCompleted || this.run.runtimeStatus !== 'SUSPENDED') {
         return false;
-      } else if (!this.run.eventInbox) {
+      } else if (!this.run.inbox) {
         return true;
       }
 
-      for (let event of this.run.eventInbox) {
+      for (let event of this.run.inbox) {
         if (event.runResumed) {
           return false;
         }
@@ -187,11 +187,11 @@ export default {
     canBeCancelled() {
       if (this.isCompleted) {
         return false;
-      } else if (!this.run.eventInbox) {
+      } else if (!this.run.inbox) {
         return true;
       }
 
-      for (let event of this.run.eventInbox) {
+      for (let event of this.run.inbox) {
         if (event.runCancelled) {
           return false;
         }
@@ -245,7 +245,7 @@ export default {
           let subWorkflowRunByScheduledEventId = new Map();
           let timerByScheduledEventId = new Map();
 
-          for (let event of run.eventLog) {
+          for (let event of run.journal) {
             if (event.runScheduled) {
               events.push({
                 timestamp: event.timestamp,
@@ -381,14 +381,14 @@ export default {
                 title: `Timer "${timerName}" scheduled`,
                 content: `Elapses at: ${common.formatTimestamp(event.timerScheduled.elapseAt, true)}`,
               });
-            } else if (event.timerFired) {
+            } else if (event.timerElapsed) {
               const scheduledEventId =
-                event.timerFired.timerScheduledEventId || 0;
+                event.timerElapsed.timerScheduledEventId || 0;
               const timer = timerByScheduledEventId.get(scheduledEventId);
               events.push({
                 eventId: scheduledEventId,
-                timestamp: event.timerFired.elapseAt,
-                title: `Timer "${timer}" fired`,
+                timestamp: event.timerElapsed.elapseAt,
+                title: `Timer "${timer}" elapsed`,
               });
             } else if (event.externalEventReceived) {
               events.push({
