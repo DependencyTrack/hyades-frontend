@@ -70,7 +70,7 @@ export default {
             } else if (row.runtimeStatus === 'COMPLETED') {
               iconName = 'fa-check';
             }
-            return `<span class="fa ${iconName} text-primary">&nbsp;</span> ${value}`;
+            return `<span class="fa ${iconName} text-primary">&nbsp;</span> ${value || row.runtimeStatus}`;
           },
         },
         {
