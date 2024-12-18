@@ -247,9 +247,22 @@ export default {
 
           for (let event of run.journal) {
             if (event.runScheduled) {
+              let content = '';
+              if (event.runScheduled.concurrencyGroupId) {
+                content += `Concurrency Group ID: ${event.runScheduled.concurrencyGroupId}`;
+              }
+              if (event.runScheduled.priority) {
+                if (content) {
+                  content += ', ';
+                }
+
+                content += `Priority: ${event.runScheduled.priority}`;
+              }
+
               events.push({
                 timestamp: event.timestamp,
                 title: 'Run scheduled',
+                content: content,
                 argument: this.jsonFromPayload(event.runScheduled.argument),
               });
 
@@ -289,10 +302,22 @@ export default {
               const activityName = event.activityTaskScheduled.name;
               activityByScheduledEventId.set(eventId, activityName);
 
+              let content = '';
+              if (event.activityTaskScheduled.priority) {
+                content += `Priority: ${event.activityTaskScheduled.priority}`;
+              }
+              if (event.activityTaskScheduled.scheduledFor) {
+                if (content) {
+                  content += ', ';
+                }
+                content = `Scheduled for: ${event.activityTaskScheduled.scheduledFor}`;
+              }
+
               events.push({
                 eventId: eventId,
                 timestamp: event.timestamp,
                 title: `Activity "${activityName}" scheduled`,
+                content: content,
                 argument: this.jsonFromPayload(
                   event.activityTaskScheduled.argument,
                 ),
@@ -328,12 +353,22 @@ export default {
                 name: event.subWorkflowRunScheduled.workflowName,
                 version: event.subWorkflowRunScheduled.workflowVersion,
               };
+
+              let content = `Run ID: ${subWorkflowRun.runId}`;
+              if (event.subWorkflowRunScheduled.concurrencyGroupId) {
+                content += `, Concurrency Group ID: ${event.subWorkflowRunScheduled.concurrencyGroupId}`;
+              }
+              if (event.subWorkflowRunScheduled.priority) {
+                content += `, Priority: ${event.subWorkflowRunScheduled.priority}`;
+              }
+
               subWorkflowRunByScheduledEventId.set(eventId, subWorkflowRun);
               events.push({
                 eventId: eventId,
                 timestamp: event.timestamp,
                 // TODO: Render workflow name as hyperlink to the respective run.
                 title: `Sub workflow run "${subWorkflowRun.name} v${subWorkflowRun.version}" scheduled`,
+                content: content,
                 argument: this.jsonFromPayload(
                   event.subWorkflowRunScheduled.argument,
                 ),

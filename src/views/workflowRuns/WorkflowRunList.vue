@@ -45,7 +45,7 @@ export default {
         {
           title: 'Workflow',
           field: 'workflowName',
-          sortable: true,
+          sortable: false,
           formatter(value, row) {
             return `${value} v${row.workflowVersion}`;
           },
@@ -76,6 +76,15 @@ export default {
         {
           title: 'Created',
           field: 'createdAt',
+          visible: false,
+          sortable: true,
+          formatter(value) {
+            return common.formatTimestamp(value, true);
+          },
+        },
+        {
+          title: 'Started',
+          field: 'startedAt',
           visible: false,
           sortable: true,
           formatter(value) {
