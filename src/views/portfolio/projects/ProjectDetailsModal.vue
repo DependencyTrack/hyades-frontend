@@ -854,10 +854,12 @@ export default {
   computed: {
     inactiveSinceTimestamp: function () {
       return this.project.inactiveSince
-        ? this.$t('message.inactive_since') + ": " + common.formatTimestamp(this.project.inactiveSince, true)
+        ? this.$t('message.inactive_since') +
+            ': ' +
+            common.formatTimestamp(this.project.inactiveSince, true)
         : this.$t('message.inactive');
     },
-  }
+  },
 };
 </script>
 
