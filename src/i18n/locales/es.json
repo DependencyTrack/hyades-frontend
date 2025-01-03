@@ -535,6 +535,7 @@
     "in_triage": "En triaje",
     "inactive": "Inactivo",
     "inactive_active_children": "El proyecto no se puede configurar como inactivo si tiene hijos activos",
+    "inactive_since": "Inactivo desde",
     "inactive_versions": "Versiones inactivas",
     "include_acl": "Incluir lista de control de acceso",
     "include_audit_history": "Incluir historial de auditoría",
