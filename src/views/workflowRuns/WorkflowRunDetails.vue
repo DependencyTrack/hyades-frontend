@@ -45,7 +45,11 @@
             <template v-slot:item="slotProps">
               <p v-if="slotProps.item.content">{{ slotProps.item.content }}</p>
               <div
-                v-if="slotProps.item.argument || slotProps.item.result"
+                v-if="
+                  slotProps.item.argument ||
+                  slotProps.item.result ||
+                  slotProps.item.failure
+                "
                 class="mt-1"
               >
                 <ul
@@ -79,8 +83,27 @@
                       data-toggle="tab"
                       role="tab"
                       :aria-controls="`history-event-${slotProps.index}-payload-tab-result-content`"
-                      :aria-selected="!slotProps.item.argument"
+                      :aria-selected="
+                        !slotProps.item.argument && !slotProps.item.failure
+                      "
                       ><span class="fa fa-arrow-right"></span>&nbsp; Result</a
+                    >
+                  </li>
+                  <li
+                    v-if="slotProps.item.failure"
+                    class="nav-item"
+                    role="presentation"
+                  >
+                    <a
+                      class="nav-link"
+                      :id="`history-event-${slotProps.index}-payload-tab-failure`"
+                      data-toggle="tab"
+                      role="tab"
+                      :aria-controls="`history-event-${slotProps.index}-payload-tab-failure-content`"
+                      :aria-selected="
+                        !slotProps.item.argument && !slotProps.item.result
+                      "
+                      ><span class="fa fa-fire"></span>&nbsp; Failure</a
                     >
                   </li>
                 </ul>
@@ -103,7 +126,7 @@
                   </div>
                   <div
                     v-if="slotProps.item.result"
-                    :class="`tab-pane fade p-0 ${!slotProps.item.argument ? 'show active' : ''}`"
+                    :class="`tab-pane fade p-0 ${!slotProps.item.argument && !slotProps.item.failure ? 'show active' : ''}`"
                     :id="`history-event-${slotProps.index}-payload-tab-result-content`"
                     role="tabpanel"
                     :aria-labelledby="`history-event-${slotProps.index}-payload-tab-result`"
@@ -112,6 +135,19 @@
                       :deep="1"
                       :showLength="true"
                       :data="slotProps.item.result"
+                    />
+                  </div>
+                  <div
+                    v-if="slotProps.item.failure"
+                    :class="`tab-pane fade p-0 ${!slotProps.item.argument && !slotProps.item.result ? 'show active' : ''}`"
+                    :id="`history-event-${slotProps.index}-payload-tab-failure-content`"
+                    role="tabpanel"
+                    :aria-labelledby="`history-event-${slotProps.index}-payload-tab-failure`"
+                  >
+                    <vue-json-pretty
+                      :deep="1"
+                      :showLength="true"
+                      :data="slotProps.item.failure"
                     />
                   </div>
                 </div>
@@ -286,6 +322,8 @@ export default {
                 timestamp: event.timestamp,
                 title: `Run completed`,
                 content: `Status: ${event.runCompleted.status}`,
+                failure: event.runCompleted.failure,
+                result: this.jsonFromPayload(event.runCompleted.result),
               });
             } else if (event.runSuspended) {
               events.push({
@@ -344,7 +382,7 @@ export default {
                 eventId: scheduledEventId,
                 timestamp: event.timestamp,
                 title: `Activity "${activityName}" failed`,
-                content: event.activityTaskFailed.failureDetails,
+                failure: event.activityTaskFailed.failure,
               });
             } else if (event.subWorkflowRunScheduled) {
               const eventId = event.id || 0;
