@@ -147,7 +147,7 @@
           <b-input-group-form-switch
             id="project-details-active"
             :label-on="$t('message.active')"
-            :label-off="$t('message.inactive')"
+            :label-off="$t(`${inactiveSinceTimestamp}`)"
             v-model="project.active"
             :tooltip="$t('message.inactive_active_children')"
             :disabled="
@@ -849,6 +849,15 @@ export default {
     resetValues: function () {
       this.selectedParent = this.parent;
       this.availableParents = [{ name: '', version: '', uuid: null }];
+    },
+  },
+  computed: {
+    inactiveSinceTimestamp: function () {
+      return this.project.inactiveSince
+        ? this.$t('message.inactive_since') +
+            ': ' +
+            common.formatTimestamp(this.project.inactiveSince, true)
+        : this.$t('message.inactive');
     },
   },
 };
