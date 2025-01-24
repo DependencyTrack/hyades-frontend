@@ -15,7 +15,7 @@
           label-for="input-1"
           label-class="required"
         >
-        <b-form-input
+          <b-form-input
             id="input-1"
             v-model="version"
             class="required"
