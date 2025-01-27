@@ -235,7 +235,7 @@ export default {
               '../../../vulnerabilities/' +
                 row.vulnerability.source +
                 '/' +
-                value,
+                encodeURIComponent(value),
             );
             return (
               common.formatSourceLabel(row.vulnerability.source) +
@@ -260,7 +260,7 @@ export default {
                   '../../../vulnerabilities/' +
                     alias.source +
                     '/' +
-                    alias.vulnId,
+                    encodeURIComponent(alias.vulnId),
                 );
                 label +=
                   common.formatSourceLabel(alias.source) +
