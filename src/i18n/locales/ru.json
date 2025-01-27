@@ -733,6 +733,7 @@
     "policy_last_bundle_sync_failed": "Последняя синхронизация пакета не удалась",
     "policy_management": "Управление политиками",
     "policy_name": "Название политики",
+    "policy_operation_mode": "Режим работы",
     "policy_violation_audit": "Аудит нарушений политики",
     "policy_violations": "Нарушения политики",
     "policy_violations_by_classification": "Нарушения политики по классификации",
