@@ -66,6 +66,7 @@ export default {
         queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,
+        maintainMetaData: true,
         icons: {
           refresh: 'fa-refresh',
         },

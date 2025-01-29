@@ -288,25 +288,31 @@ export default {
               },
               updatePermissionSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
+                let updatePromise = Promise.resolve();
                 for (let i = 0; i < selections.length; i++) {
                   let selection = selections[i];
                   let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${selection.name}/user/${this.username}`;
-                  this.axios
-                    .post(url)
-                    .then((response) => {
+                  updatePromise = updatePromise.then((response) => {
+                    if (response && response.data) {
                       this.syncVariables(response.data);
-                      this.$toastr.s(this.$t('message.updated'));
-                    })
-                    .catch((error) => {
-                      if (error.response.status === 304) {
-                        //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                      } else {
-                        this.$toastr.w(
-                          this.$t('condition.unsuccessful_action'),
-                        );
-                      }
-                    });
+                    }
+                    return this.axios.post(url);
+                  });
                 }
+                updatePromise
+                  .then((response) => {
+                    if (response && response.data) {
+                      this.syncVariables(response.data);
+                    }
+                    this.$toastr.s(this.$t('message.updated'));
+                  })
+                  .catch((error) => {
+                    if (error.response.status === 304) {
+                      //this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                    } else {
+                      this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                    }
+                  });
               },
               removePermission: function (permission) {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${this.username}`;
@@ -316,7 +322,7 @@ export default {
                     this.syncVariables(response.data);
                     this.$toastr.s(this.$t('message.updated'));
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
