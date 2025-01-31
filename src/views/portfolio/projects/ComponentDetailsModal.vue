@@ -476,7 +476,7 @@
         variant="outline-primary"
         v-b-modal.componentPropertiesModal
         v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
+          PERMISSIONS.VIEW_PORTFOLIO,
           PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
         ]"
         >{{ $t('message.properties') }}</b-button
