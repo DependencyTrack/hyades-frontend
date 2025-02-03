@@ -18,7 +18,6 @@
     </div>
     <DefaultFooter />
     <profile-edit-modal />
-    <snapshot-modal />
   </div>
 </template>
 
@@ -38,14 +37,12 @@ import DefaultHeader from './DefaultHeader';
 import DefaultFooter from './DefaultFooter';
 import EventBus from '../shared/eventbus';
 import ProfileEditModal from '../views/components/ProfileEditModal';
-import SnapshotModal from '../views/components/SnapshotModal';
 import * as permissions from '../shared/permissions';
 
 export default {
   name: 'DefaultContainer',
   components: {
     ProfileEditModal,
-    SnapshotModal,
     AppSidebar,
     AppAside,
     Breadcrumb,
@@ -231,10 +228,6 @@ export default {
     },
   },
   mounted() {
-    if (this.$dtrack && this.$dtrack.version.includes('SNAPSHOT')) {
-      this.$root.$emit('bv::show::modal', 'snapshotModal');
-    }
-
     this.isSidebarMinimized =
       localStorage && localStorage.getItem('isSidebarMinimized') !== null
         ? localStorage.getItem('isSidebarMinimized') === 'true'

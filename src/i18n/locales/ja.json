@@ -825,7 +825,6 @@
     "show_suppressed_findings": "抑制されている結果を表示",
     "show_suppressed_violations": "抑制されている違反を表示",
     "show_update_information": "古くなったコンポーネントを強調表示する",
-    "snapshot_notification": "スナップショット通知",
     "source_header": "ソースヘッダー",
     "spdx_license_id": "SPDX ライセンス ID",
     "state": "状態",

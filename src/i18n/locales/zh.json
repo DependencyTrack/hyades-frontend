@@ -825,7 +825,6 @@
     "show_suppressed_findings": "显示隐藏的发现",
     "show_suppressed_violations": "显示已抑制的违规行为",
     "show_update_information": "突出显示过时的组件",
-    "snapshot_notification": "快照通知",
     "source_header": "源标头",
     "spdx_license_id": "SPDX 许可证 ID",
     "state": "状态",
