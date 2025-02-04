@@ -18,7 +18,6 @@
     </div>
     <DefaultFooter />
     <profile-edit-modal />
-    <snapshot-modal />
   </div>
 </template>
 
@@ -38,14 +37,12 @@ import DefaultHeader from './DefaultHeader';
 import DefaultFooter from './DefaultFooter';
 import EventBus from '../shared/eventbus';
 import ProfileEditModal from '../views/components/ProfileEditModal';
-import SnapshotModal from '../views/components/SnapshotModal';
 import * as permissions from '../shared/permissions';
 
 export default {
   name: 'DefaultContainer',
   components: {
     ProfileEditModal,
-    SnapshotModal,
     AppSidebar,
     AppAside,
     Breadcrumb,
@@ -117,13 +114,22 @@ export default {
             element: '',
             attributes: {},
           },
-          permission: permissions.VIEW_VULNERABILITY,
+          permissions: [
+            permissions.VIEW_VULNERABILITY,
+            permissions.VIEW_POLICY_VIOLATION,
+          ],
         },
         {
           name: this.$t('message.vulnerability_audit'),
           url: '/vulnerabilityAudit',
           icon: 'fa fa-tasks',
           permission: permissions.VIEW_VULNERABILITY,
+        },
+        {
+          name: this.$t('message.policy_violation_audit'),
+          url: '/policyViolationAudit',
+          icon: 'fa fa-fire',
+          permission: permissions.VIEW_POLICY_VIOLATION,
         },
         {
           title: true,
@@ -193,12 +199,17 @@ export default {
       subSectionUuid,
       subSectionLabel,
     ) {
+      let sectionName = this.$route.meta.sectionName;
       let sectionLabel = this.$t(this.$route.meta.i18n);
       let sectionPath = this.$route.meta.sectionPath;
       if (crumbName && subSectionName && subSectionUuid && subSectionLabel) {
         return [
-          { path: '', name: this.$t('message.home') },
-          { path: sectionPath, name: sectionLabel },
+          { path: '', name: 'Home', meta: { label: this.$t('message.home') } },
+          {
+            path: sectionPath,
+            name: sectionName,
+            meta: { label: sectionLabel },
+          },
           {
             name: subSectionName,
             params: { uuid: subSectionUuid },
@@ -208,23 +219,27 @@ export default {
         ];
       } else if (crumbName) {
         return [
-          { path: '', name: this.$t('message.home') },
-          { path: sectionPath, name: sectionLabel },
+          { path: '', name: 'Home', meta: { label: this.$t('message.home') } },
+          {
+            path: sectionPath,
+            name: sectionName,
+            meta: { label: sectionLabel },
+          },
           { name: crumbName, active: true },
         ];
       } else {
         return [
-          { path: '', name: this.$t('message.home') },
-          { path: sectionPath, name: sectionLabel },
+          { path: '', name: 'Home', meta: { label: this.$t('message.home') } },
+          {
+            path: sectionPath,
+            name: sectionName,
+            meta: { label: sectionLabel },
+          },
         ];
       }
     },
   },
   mounted() {
-    if (this.$dtrack && this.$dtrack.version.includes('SNAPSHOT')) {
-      this.$root.$emit('bv::show::modal', 'snapshotModal');
-    }
-
     this.isSidebarMinimized =
       localStorage && localStorage.getItem('isSidebarMinimized') !== null
         ? localStorage.getItem('isSidebarMinimized') === 'true'
@@ -260,8 +275,12 @@ export default {
       let array = [];
       for (const item of this.nav) {
         if (
-          item.permission !== null &&
-          permissions.hasPermission(item.permission, decodedToken)
+          (item.permission !== null &&
+            permissions.hasPermission(item.permission, decodedToken)) ||
+          (Object.prototype.hasOwnProperty.call(item, 'permissions') &&
+            item.permissions.some((permission) =>
+              permissions.hasPermission(permission, decodedToken),
+            ))
         ) {
           array.push(item);
         }
