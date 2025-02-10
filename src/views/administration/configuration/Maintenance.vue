@@ -42,11 +42,11 @@
             ></b-form-input>
           </b-input-group>
         </b-form-group>
-        <b-form-group :label="$t('admin.cadence')">
+        <b-form-group :label="$t('admin.versions')">
           <b-input-group :append="$t('message.inactive_versions')">
             <b-form-input
               type="number"
-              v-model="projectRetentionCadence"
+              v-model="projectRetentionVersions"
             ></b-form-input>
           </b-input-group>
         </b-form-group>
@@ -124,10 +124,10 @@ export default {
   data() {
     return {
       metricsRetentionDays: null,
-      projectRetentionTypes: ['AGE', 'CADENCE'],
+      projectRetentionTypes: ['AGE', 'VERSIONS'],
       projectRetentionTypeSelected: '',
       projectRetentionDays: null,
-      projectRetentionCadence: null,
+      projectRetentionVersions: null,
       tagsDeleteUnused: null,
       vulnScanRetentionHours: null,
       workflowRetentionHours: null,
@@ -158,8 +158,8 @@ export default {
         },
         {
           groupName: 'maintenance',
-          propertyName: 'projects.retention.cadence',
-          propertyValue: this.projectRetentionCadence,
+          propertyName: 'projects.retention.versions',
+          propertyValue: this.projectRetentionVersions,
         },
         {
           groupName: 'maintenance',
@@ -201,8 +201,8 @@ export default {
           case 'projects.retention.days':
             this.projectRetentionDays = item.propertyValue;
             break;
-          case 'projects.retention.cadence':
-            this.projectRetentionCadence = item.propertyValue;
+          case 'projects.retention.versions':
+            this.projectRetentionVersions = item.propertyValue;
             break;
           case 'tags.delete.unused':
             this.tagsDeleteUnused = common.toBoolean(item.propertyValue);
