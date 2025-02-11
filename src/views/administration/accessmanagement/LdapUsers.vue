@@ -2,11 +2,21 @@
   <b-card no-body :header="header">
     <b-card-body>
       <div id="customToolbar">
-        <b-button size="md" variant="outline-primary" v-b-modal.createLdapUserModal>
+        <b-button
+          size="md"
+          variant="outline-primary"
+          v-b-modal.createLdapUserModal
+        >
           <span class="fa fa-plus"></span> {{ $t('admin.create_user') }}
         </b-button>
       </div>
-      <bootstrap-table v-on:refreshTable="refreshTable" ref="table" :columns="columns" :data="data" :options="options">
+      <bootstrap-table
+        v-on:refreshTable="refreshTable"
+        ref="table"
+        :columns="columns"
+        :data="data"
+        :options="options"
+      >
       </bootstrap-table>
     </b-card-body>
     <create-ldap-user-modal v-on:refreshTable="refreshTable" />
@@ -75,8 +85,8 @@ export default {
           formatter(value, row, index) {
             return value
               ? xssFilters.inHTMLData(
-                common.valueWithDefault(value.length, '0'),
-              )
+                  common.valueWithDefault(value.length, '0'),
+                )
               : 0;
           },
         },
@@ -122,8 +132,8 @@ export default {
                     </b-form-group>
                     <b-form-group :label="this.$t('admin.permissions')">
                       <div class="list-group">
-                        <span v-for="permission in ldapUser.permissions">
-                          <actionable-list-group-item :tooltip="$t('admin.remove_permission')" :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
+                        <span v-for="permission in permissions">
+                          <actionable-list-group-item :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
                       </div>
@@ -134,6 +144,7 @@ export default {
                        <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
                     </div>
                   </b-col>
+                  <select-role-modal v-on:selection="selectRoleModal" />
                   <select-team-modal v-on:selection="updateTeamSelection" />
                   <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
                   <select-permission-modal v-on:selection="updatePermissionSelection" />
@@ -163,22 +174,22 @@ export default {
             },
             methods: {
               getUserObjectKey: function () {
-                return "ldapUser"
+                return 'ldapUser';
               },
               getUserObject: function () {
-                return this.ldapUser
+                return this.ldapUser;
               },
               deleteUser: function () {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_LDAP}`;
-                const event = 'admin:ldapusers:rowDeleted'
+                const event = 'admin:ldapusers:rowDeleted';
 
-                this._deleteUser(url, event)
+                this._deleteUser(url, event);
               },
               updateTeamSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectTeamModal');
-                const event = 'admin:ldapusers:rowUpdate';;
+                const event = 'admin:ldapusers:rowUpdate';
 
-                this._updateTeamSelection(event, selections)
+                this._updateTeamSelection(event, selections);
               },
               removeTeamMembership: function (teamUUID) {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
@@ -200,7 +211,7 @@ export default {
                 this._removePermission(permission);
               },
               syncVariables: function (userObj) {
-                Object.assign(this.ldapUser, userObj)
+                Object.assign(this.ldapUser, userObj);
                 // Object.assign(this.ldapUser, ldapUser)
                 this.loadUserRoles(this.ldapUser.username); // mixin
               },

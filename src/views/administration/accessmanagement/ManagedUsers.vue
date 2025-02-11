@@ -2,11 +2,20 @@
   <b-card no-body :header="header">
     <b-card-body>
       <div id="customToolbar">
-        <b-button size="md" variant="outline-primary" v-b-modal.createManagedUserModal>
+        <b-button
+          size="md"
+          variant="outline-primary"
+          v-b-modal.createManagedUserModal
+        >
           <span class="fa fa-plus"></span> {{ $t('admin.create_user') }}
         </b-button>
       </div>
-      <bootstrap-table ref="table" :columns="columns" :data="data" :options="options">
+      <bootstrap-table
+        ref="table"
+        :columns="columns"
+        :data="data"
+        :options="options"
+      >
       </bootstrap-table>
     </b-card-body>
     <create-managed-user-modal v-on:refreshTable="refreshTable" />
@@ -87,8 +96,8 @@ export default {
           formatter(value, row, index) {
             return value
               ? xssFilters.inHTMLData(
-                common.valueWithDefault(value.length, '0'),
-              )
+                  common.valueWithDefault(value.length, '0'),
+                )
               : 0;
           },
         },
@@ -126,8 +135,8 @@ export default {
                     </b-form-group>
                     <b-form-group :label="this.$t('admin.roles')">
                       <div class="list-group">
-                        <span v-for="projectRole in projectRoles">
-                          <project-role-list-group-item :projectRole="projectRole" :delete-icon="true" v-on:removeClicked="removeRole(projectRole)"/>
+                        <span v-for="mappedrole in mappedroles">
+                          <actionable-list-group-item :value="mappedrole.name" :delete-icon="true" v-on:actionClicked=""/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectRoleModal')"/>
                       </div>
@@ -162,6 +171,7 @@ export default {
                   <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
                   <select-permission-modal v-on:selection="updatePermissionSelection" />
                   <change-password-modal :managed-user="managedUser" />
+                  <select-role-modal v-on:selection="selectRoleModal" />
                 </b-row>
               `,
             mixins: [permissionsMixin, userManagementMixin],
@@ -178,7 +188,8 @@ export default {
             },
             data() {
               return {
-                index, row,
+                index,
+                row,
                 managedUser: row,
                 username: row.username,
                 teams: row.teams,
@@ -196,7 +207,7 @@ export default {
               };
             },
             created() {
-              this.loadUserRoles(this.managedUser.username)
+              this.loadUserRoles(this.managedUser.username);
             },
             watch: {
               forcePasswordChange() {
@@ -211,10 +222,10 @@ export default {
             },
             methods: {
               getUserObjectKey: function () {
-                return "managedUser"
+                return 'managedUser';
               },
               getUserObject: function () {
-                return this.managedUser
+                return this.managedUser;
               },
               updateUser: function () {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
@@ -239,41 +250,41 @@ export default {
                     this.$toastr.s(this.$t('message.updated'));
                   })
                   .catch((error) => {
-                    console.error(error)
+                    console.error(error);
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
               deleteUser: function () {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
-                this._deleteUser(url)
+                this._deleteUser(url);
               },
               updateTeamSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectTeamModal');
                 // const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
                 const event = 'admin:managedusers:rowUpdate';
-                this._updateTeamSelection(event, selections)
+                this._updateTeamSelection(event, selections);
               },
               removeTeamMembership: function (teamUUID) {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
                 const event = 'admin:managedusers:rowUpdate';
-                this._removeTeamMembership(url, event, teamUUID)
+                this._removeTeamMembership(url, event, teamUUID);
               },
               updateRoleSelection: function (selection) {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.managedUser.username}/role`;
                 this._updateRoleSelection(url, selection);
               },
               removeRole: function (projectRole) {
-                this._removeRole(projectRole)
+                this._removeRole(projectRole);
               },
               updatePermissionSelection: function (selections) {
-                this._updatePermissionSelection(selections)
+                this._updatePermissionSelection(selections);
               },
               removePermission: function (permission) {
-                this._removePermission(permission)
+                this._removePermission(permission);
               },
               syncVariables: function (managedUser) {
-                Object.assign(this.managedUser, managedUser)
-                this.loadUserRoles(this.managedUser.username)
+                Object.assign(this.managedUser, managedUser);
+                this.loadUserRoles(this.managedUser.username);
               },
             },
           });

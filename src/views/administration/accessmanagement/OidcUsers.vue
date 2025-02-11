@@ -34,8 +34,7 @@ import ProjectRoleListGroupItem from './ProjectRoleListGroupItem.vue';
 import SelectTeamModal from './SelectTeamModal';
 import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
-import SelectRoleModal from './SelectRoleModal.vue';
-import rolesMixin from '../../../mixins/rolesMixin';
+import SelectProjectModal from './SelectProjectModal.vue';
 
 export default {
   props: {
@@ -123,8 +122,8 @@ export default {
                     </b-form-group>
                     <b-form-group :label="this.$t('admin.roles')">
                       <div class="list-group">
-                        <span v-for="projectRole in projectRoles">
-                          <project-role-list-group-item :projectRole="projectRole" :delete-icon="true" v-on:removeClicked="removeRole(projectRole)"/>
+                        <span v-for="mappedrole in mappedroles">
+                          <actionable-list-group-item :value="mappedrole.name" :delete-icon="true" v-on:actionClicked=""/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectRoleModal')"/>
                       </div>
@@ -146,6 +145,7 @@ export default {
                   <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
                   <select-team-modal v-on:selection="updateTeamSelection" />
                   <select-permission-modal v-on:selection="updatePermissionSelection" />
+                  <select-role-modal v-on:selection="selectRoleModal" />
                 </b-row>
               `,
             mixins: [permissionsMixin, rolesMixin],
@@ -155,6 +155,7 @@ export default {
               SelectRoleModal,
               SelectTeamModal,
               SelectPermissionModal,
+              SelectProjectModal,
             },
             data() {
               return {
