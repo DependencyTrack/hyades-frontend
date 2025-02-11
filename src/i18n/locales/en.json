@@ -118,6 +118,8 @@
     "general_template_configuration": "General template configuration",
     "github": "GitHub",
     "github_advisories": "GitHub Advisories",
+    "gitlab_integration": "GitLab",
+    "integration_gitlab_enable": "Enable GitLab Integration",
     "go_modules": "Go Modules",
     "group": "Group",
     "hackage": "Hackage",
