@@ -9,11 +9,6 @@
         v-bind="labelIcon"
       />{{ $t('admin.integration_gitlab_enable') }}
     </b-card-body>
-    <b-card-footer>
-      <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
-        $t('message.update')
-      }}</b-button>
-    </b-card-footer>
   </b-card>
 </template>
 
@@ -23,6 +18,11 @@ import { Switch as cSwitch } from '@coreui/vue';
 import axios from 'axios'; // Import axios
 import common from '../../../shared/common';
 import configPropertyMixin from '../mixins/configPropertyMixin';
+
+const GITLAB_ENABLED = {
+  getGroupName: () => 'integrations',
+  getPropertyName: () => 'gitlab.enabled',
+};
 
 export default {
   mixins: [configPropertyMixin],
@@ -60,9 +60,7 @@ export default {
       .then((response) => {
         const configItems = response.data.filter((item) => {
           return (
-            // eslint-disable-next-line no-undef
             item.groupName === GITLAB_ENABLED.getGroupName() &&
-            // eslint-disable-next-line no-undef
             item.propertyName === GITLAB_ENABLED.getPropertyName()
           );
         });
@@ -72,6 +70,13 @@ export default {
       })
       .catch((error) => {
         console.error('Error fetching configuration data:', error);
+        if (error.response) {
+          console.error('Error response:', error.response);
+        } else if (error.request) {
+          console.error('Error request:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
       });
   },
 };
