@@ -42,11 +42,9 @@ export default {
       try {
         this.updateConfigProperties([
           {
-            // eslint-disable-next-line no-undef
-            groupName: GITLAB_ENABLED.getGroupName(),
-            // eslint-disable-next-line no-undef
-            propertyName: GITLAB_ENABLED.getPropertyName(),
-            propertyValue: String.valueOf(this.enabled),
+            groupName: 'integrations',
+            propertyName: 'gitlab.enabled',
+            propertyValue: this.enabled,
           },
         ]);
       } catch (error) {
@@ -55,24 +53,17 @@ export default {
     },
   },
   created() {
-    this.axios
-      .get(this.configUrl)
-      .then((response) => {
-        const configItems = response.data.filter((item) => {
-          return (
-            // eslint-disable-next-line no-undef
-            item.groupName === GITLAB_ENABLED.getGroupName() &&
-            // eslint-disable-next-line no-undef
-            item.propertyName === GITLAB_ENABLED.getPropertyName()
-          );
-        });
-        if (configItems.length > 0) {
-          this.enabled = common.toBoolean(configItems[0].propertyValue);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching configuration data:', error);
+    this.axios.get(this.configUrl).then((response) => {
+      const configItems = response.data.filter((item) => {
+        return (
+          item.groupName === 'integrations' &&
+          item.propertyName === 'gitlab.enabled'
+        );
       });
+      if (configItems.length > 0) {
+        this.enabled = common.toBoolean(configItems[0].propertyValue);
+      }
+    });
   },
 };
 </script>
