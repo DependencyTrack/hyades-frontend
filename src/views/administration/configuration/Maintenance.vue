@@ -26,7 +26,8 @@
             v-model="enableProjectRetention"
             label
             v-bind="switchLabelIcon"
-          /> {{ $t('admin.project_retention_enable') }}
+          />
+          {{ $t('admin.project_retention_enable') }}
         </b-form-group>
         <b-form-group
           :label="$t('message.project_retention_type')"
