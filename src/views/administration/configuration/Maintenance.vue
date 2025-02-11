@@ -158,13 +158,10 @@ export default {
         },
         {
           groupName: 'maintenance',
-          propertyName: 'projects.retention.enable',
-          propertyValue: this.enableProjectRetention,
-        },
-        {
-          groupName: 'maintenance',
           propertyName: 'projects.retention.type',
-          propertyValue: this.projectRetentionTypeSelected,
+          propertyValue: this.enableProjectRetention
+            ? this.projectRetentionTypeSelected
+            : null,
         },
         {
           groupName: 'maintenance',
@@ -210,10 +207,9 @@ export default {
           case 'metrics.retention.days':
             this.metricsRetentionDays = item.propertyValue;
             break;
-          case 'projects.retention.enable':
-            this.enableProjectRetention = common.toBoolean(item.propertyValue);
-            break;
           case 'projects.retention.type':
+            this.enableProjectRetention =
+              item.propertyValue == null ? false : true;
             this.projectRetentionTypeSelected = item.propertyValue;
             break;
           case 'projects.retention.days':
