@@ -193,6 +193,7 @@
     "portfolio_access_control": "Portfolio-Zugriffskontrolle",
     "preview": "Vorschau",
     "project_access": "Projektzugriff",
+    "project_retention_enable": "Aktivieren Sie das Löschen inaktiver Projekte",
     "publisher": "Publisher",
     "publisher_class": "Publisher-Klasse",
     "python": "Python",

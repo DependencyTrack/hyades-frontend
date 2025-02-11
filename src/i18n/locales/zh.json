@@ -193,6 +193,7 @@
     "portfolio_access_control": "portfolio 访问控制",
     "preview": "预览",
     "project_access": "项目访问",
+    "project_retention_enable": "启用非活动项目删除",
     "publisher": "发行商",
     "publisher_class": "发行商分类",
     "python": "Python",

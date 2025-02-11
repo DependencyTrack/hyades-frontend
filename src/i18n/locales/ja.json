@@ -193,6 +193,7 @@
     "portfolio_access_control": "ポートフォリオアクセス制御",
     "preview": "プレビュー",
     "project_access": "プロジェクトへのアクセス",
+    "project_retention_enable": "非アクティブなプロジェクトの削除を有効にする",
     "publisher": "パブリッシャー",
     "publisher_class": "パブリッシャークラス",
     "python": "Python",

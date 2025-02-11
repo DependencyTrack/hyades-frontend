@@ -20,6 +20,14 @@
         label-size="lg"
         label-class="font-weight-bold pt-0 mb-0"
       >
+        <b-form-group>
+          <c-switch
+            color="primary"
+            v-model="enableProjectRetention"
+            label
+            v-bind="switchLabelIcon"
+          /> {{ $t('admin.project_retention_enable') }}
+        </b-form-group>
         <b-form-group
           :label="$t('message.project_retention_type')"
           v-slot="{ projectRetention }"
@@ -124,6 +132,7 @@ export default {
   data() {
     return {
       metricsRetentionDays: null,
+      enableProjectRetention: null,
       projectRetentionTypes: ['AGE', 'VERSIONS'],
       projectRetentionTypeSelected: '',
       projectRetentionDays: null,
@@ -145,6 +154,11 @@ export default {
           groupName: 'maintenance',
           propertyName: 'metrics.retention.days',
           propertyValue: this.metricsRetentionDays,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'projects.retention.enable',
+          propertyValue: this.enableProjectRetention,
         },
         {
           groupName: 'maintenance',
@@ -194,6 +208,9 @@ export default {
         switch (item.propertyName) {
           case 'metrics.retention.days':
             this.metricsRetentionDays = item.propertyValue;
+            break;
+          case 'projects.retention.enable':
+            this.enableProjectRetention = common.toBoolean(item.propertyValue);
             break;
           case 'projects.retention.type':
             this.projectRetentionTypeSelected = item.propertyValue;

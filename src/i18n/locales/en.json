@@ -193,6 +193,7 @@
     "portfolio_access_control": "Portfolio Access Control",
     "preview": "Preview",
     "project_access": "Project access",
+    "project_retention_enable": "Enable Inactive Project Deletion",
     "publisher": "Publisher",
     "publisher_class": "Publisher class",
     "python": "Python",

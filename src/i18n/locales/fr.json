@@ -193,6 +193,7 @@
     "portfolio_access_control": "Contrôle d'accès au portefolio",
     "preview": "Aperçu",
     "project_access": "Accès au projet",
+    "project_retention_enable": "Activer la suppression des projets inactifs",
     "publisher": "Éditeur",
     "publisher_class": "Classe d'éditeur",
     "python": "Python",

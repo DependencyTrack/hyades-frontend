@@ -193,6 +193,7 @@
     "portfolio_access_control": "Контроль доступу до портфоліо",
     "preview": "Попередній перегляд",
     "project_access": "Доступ до проекту",
+    "project_retention_enable": "Увімкнути видалення неактивного проекту",
     "publisher": "Видавець",
     "publisher_class": "Клас видавця",
     "python": "Python",
