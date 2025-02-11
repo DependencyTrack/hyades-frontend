@@ -21,13 +21,13 @@
             </b-button-group>
           </div>
           <hr />
-          <div class="d-flex align-items-start">
+          <div class="d-flex align-items-start" v-if="run && run.labels">
             <a
-              v-for="tag in run.tags"
+              v-for="[name, value] in Object.entries(run.labels)"
               class="badge badge-pill badge-secondary mr-2 font-sm"
-              :href="tagLink(tag)"
+              :href="labelLink(name, value)"
             >
-              <span class="fa fa-tag">&nbsp;</span> {{ tag }}
+              <span class="fa fa-tag">&nbsp;</span> {{ name }}: {{ value }}
             </a>
           </div>
         </b-card-body>
@@ -246,20 +246,15 @@ export default {
     EventBus.$emit('crumble');
   },
   methods: {
-    tagLink(tag) {
-      if (!tag) {
+    labelLink(name, value) {
+      if (!name) {
         return '#';
       }
 
-      const tagParts = tag.split('=', 2);
-      if (tagParts.length !== 2) {
-        return '#';
-      }
-
-      if (tagParts[0] === 'project') {
+      if (name === 'project') {
         return this.$router.resolve({
           name: 'Project',
-          params: { uuid: tagParts[1] },
+          params: { uuid: value },
         }).href;
       }
 
