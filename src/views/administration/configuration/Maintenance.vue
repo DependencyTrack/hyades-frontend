@@ -16,6 +16,51 @@
         </b-form-group>
       </b-form-group>
       <b-form-group
+        :label="$t('message.projects')"
+        label-size="lg"
+        label-class="font-weight-bold pt-0 mb-0"
+      >
+        <b-form-group>
+          <c-switch
+            color="primary"
+            v-model="enableProjectRetention"
+            label
+            v-bind="switchLabelIcon"
+          />
+          {{ $t('admin.project_retention_enable') }}
+        </b-form-group>
+        <b-form-group
+          :label="$t('message.project_retention_type')"
+          v-slot="{ projectRetention }"
+        >
+          <b-form-radio-group
+            v-model="projectRetentionTypeSelected"
+            :options="projectRetentionTypes"
+            :aria-describedby="projectRetention"
+            name="radios-btn-default"
+            button-variant="outline-primary"
+            class="cvss-calc cvss-calc-3-btn"
+            buttons
+          />
+        </b-form-group>
+        <b-form-group :label="$t('message.age')">
+          <b-input-group :append="$t('admin.days')">
+            <b-form-input
+              type="number"
+              v-model="projectRetentionDays"
+            ></b-form-input>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group :label="$t('admin.versions')">
+          <b-input-group :append="$t('message.inactive_versions')">
+            <b-form-input
+              type="number"
+              v-model="projectRetentionVersions"
+            ></b-form-input>
+          </b-input-group>
+        </b-form-group>
+      </b-form-group>
+      <b-form-group
         :label="$t('admin.tags')"
         label-size="lg"
         label-class="font-weight-bold pt-0 mb-0"
@@ -88,6 +133,11 @@ export default {
   data() {
     return {
       metricsRetentionDays: null,
+      enableProjectRetention: null,
+      projectRetentionTypes: ['AGE', 'VERSIONS'],
+      projectRetentionTypeSelected: '',
+      projectRetentionDays: null,
+      projectRetentionVersions: null,
       tagsDeleteUnused: null,
       vulnScanRetentionHours: null,
       workflowRetentionHours: null,
@@ -105,6 +155,23 @@ export default {
           groupName: 'maintenance',
           propertyName: 'metrics.retention.days',
           propertyValue: this.metricsRetentionDays,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'projects.retention.type',
+          propertyValue: this.enableProjectRetention
+            ? this.projectRetentionTypeSelected
+            : null,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'projects.retention.days',
+          propertyValue: this.projectRetentionDays,
+        },
+        {
+          groupName: 'maintenance',
+          propertyName: 'projects.retention.versions',
+          propertyValue: this.projectRetentionVersions,
         },
         {
           groupName: 'maintenance',
@@ -139,6 +206,17 @@ export default {
         switch (item.propertyName) {
           case 'metrics.retention.days':
             this.metricsRetentionDays = item.propertyValue;
+            break;
+          case 'projects.retention.type':
+            this.enableProjectRetention =
+              item.propertyValue == null ? false : true;
+            this.projectRetentionTypeSelected = item.propertyValue;
+            break;
+          case 'projects.retention.days':
+            this.projectRetentionDays = item.propertyValue;
+            break;
+          case 'projects.retention.versions':
+            this.projectRetentionVersions = item.propertyValue;
             break;
           case 'tags.delete.unused':
             this.tagsDeleteUnused = common.toBoolean(item.propertyValue);
