@@ -8,6 +8,14 @@
         label
         v-bind="labelIcon"
       />{{ $t('admin.integration_gitlab_enable') }}
+      <br />
+      <c-switch
+        id="includeArchived"
+        color="primary"
+        v-model="includeArchived"
+        label
+        v-bind="labelIcon"
+      />{{ $t('admin.include_archived_projects') }}
     </b-card-body>
     <b-card-footer>
       <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
@@ -35,6 +43,7 @@ export default {
   data() {
     return {
       enabled: false,
+      includeArchived: false,
     };
   },
   methods: {
@@ -45,6 +54,11 @@ export default {
             groupName: 'integrations',
             propertyName: 'gitlab.enabled',
             propertyValue: this.enabled,
+          },
+          {
+            groupName: 'integrations',
+            propertyName: 'gitlab.include_archieved_projects',
+            propertyValue: this.includeArchived,
           },
         ]);
       } catch (error) {
@@ -62,6 +76,17 @@ export default {
       });
       if (configItems.length > 0) {
         this.enabled = common.toBoolean(configItems[0].propertyValue);
+      }
+      const configItemsincludeArchived = response.data.include((item) => {
+        return (
+          item.groupName === 'integrations' &&
+          item.propertyName === 'gitlab.include_archived_projects'
+        );
+      });
+      if (configItemsincludeArchived.length > 0) {
+        this.includeArchived = common.toBoolean(
+          configItemsincludeArchived[0].propertyValue,
+        );
       }
     });
   },
