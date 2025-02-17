@@ -993,7 +993,7 @@ function configRoutes() {
               path: 'integrations/gitlab',
               name: 'Gitlab',
               component: () =>
-                import('@/views/administration/integrations/Gitlab'),
+                import('@/views/administration/integrations/GitLab'),
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
