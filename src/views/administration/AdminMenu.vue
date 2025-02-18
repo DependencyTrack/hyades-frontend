@@ -330,9 +330,9 @@ export default {
               route: 'integrations/defectDojo',
             },
             {
-              component: 'GitlabIntegration',
-              name: this.$t('admin.gitlab_integration'),
-              route: 'integrations/gitlab',
+              component: 'GitlabProjectSync',
+              name: this.$t('admin.gitlab_project_sync'),
+              route: 'integrations/gitlabProjectSync',
             },
             {
               component: 'FortifySsc',
