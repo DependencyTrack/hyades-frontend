@@ -16,6 +16,17 @@
         label
         v-bind="labelIcon"
       />{{ $t('admin.include_archived_projects') }}
+      <br />
+      <b-form-group :label="$t('admin.topics')">
+        <b-form-tags
+          v-model="topics"
+          tag-variant="primary"
+          tag-pills
+          separator=","
+          remove-on-delete
+        >
+        </b-form-tags>
+      </b-form-group>
     </b-card-body>
     <b-card-footer>
       <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
@@ -44,6 +55,7 @@ export default {
     return {
       enabled: false,
       includeArchived: false,
+      topics: [],
     };
   },
   methods: {
@@ -57,8 +69,13 @@ export default {
           },
           {
             groupName: 'integrations',
-            propertyName: 'gitlab.include_archieved_projects',
+            propertyName: 'gitlab.include.archived',
             propertyValue: this.includeArchived,
+          },
+          {
+            groupName: 'integrations',
+            propertyName: 'gitlab.topics',
+            propertyValue: this.topics.join(','),
           },
         ]);
       } catch (error) {
@@ -77,16 +94,25 @@ export default {
       if (configItems.length > 0) {
         this.enabled = common.toBoolean(configItems[0].propertyValue);
       }
-      const configItemsincludeArchived = response.data.include((item) => {
+      const configItemsincludeArchived = response.data.filter((item) => {
         return (
           item.groupName === 'integrations' &&
-          item.propertyName === 'gitlab.include_archived_projects'
+          item.propertyName === 'gitlab.include.archived'
         );
       });
       if (configItemsincludeArchived.length > 0) {
         this.includeArchived = common.toBoolean(
           configItemsincludeArchived[0].propertyValue,
         );
+      }
+      const configItemstopics = response.data.filter((item) => {
+        return (
+          item.groupName === 'integrations' &&
+          item.propertyName === 'gitlab.topics'
+        );
+      });
+      if (configItemstopics.length > 0) {
+        this.topics = configItemstopics[0].propertyValue.split(',');
       }
     });
   },

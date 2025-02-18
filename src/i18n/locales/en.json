@@ -275,6 +275,7 @@
     "templates": "Templates",
     "test_notification_queued": "A test notification has been queued",
     "token": "Token",
+    "topics": "Topics",
     "trivy": "Trivy",
     "url": "URL",
     "user_created": "User created",
