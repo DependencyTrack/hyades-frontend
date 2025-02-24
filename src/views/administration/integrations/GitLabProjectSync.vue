@@ -17,31 +17,67 @@
         v-bind="labelIcon"
       />{{ $t('admin.include_archived_projects') }}
       <br />
-      <b-form-group :label="$t('admin.topics')">
-        <b-form-tags
-          v-model="topics"
-          tag-variant="primary"
-          tag-pills
-          separator=","
-          remove-on-delete
-        >
-        </b-form-tags>
-      </b-form-group>
     </b-card-body>
     <b-card-footer>
-      <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
-        $t('message.update')
-      }}</b-button>
+      <b-row>
+        <b-col>
+          <h5>Topics</h5>
+          <div class="mb-2">
+            <ul style="width: 700px; list-style-type: none; padding: 0">
+              <li v-for="(topic, index) in topics" :key="index">
+                <actionable-list-group-item
+                  :value="topic"
+                  :delete-icon="true"
+                  v-on:actionClicked="removeTopic(index)"
+                >
+                  {{ topic }}
+                </actionable-list-group-item>
+              </li>
+              <li>
+                <actionable-list-group-item
+                  :add-icon="true"
+                  v-on:actionClicked="openAddTopicModal"
+                >
+                </actionable-list-group-item>
+              </li>
+            </ul>
+          </div>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-modal
+            id="add-topic-modal"
+            :title="$t('admin.create_topic')"
+            @hidden="clearNewTopic"
+            @ok="addTopic"
+          >
+            <b-form-group :label="$t('admin.topic_name')">
+              <b-form-input
+                v-model="newTopic"
+                type="text"
+                class="px-12"
+              ></b-form-input>
+            </b-form-group>
+          </b-modal>
+          <b-button
+            variant="outline-primary"
+            class="px-5 mt-2"
+            @click="saveChanges"
+            >{{ $t('message.update') }}</b-button
+          >
+        </b-col>
+      </b-row>
     </b-card-footer>
   </b-card>
 </template>
-
 <script>
 import { Switch as cSwitch } from '@coreui/vue';
 // eslint-disable-next-line no-unused-vars
 import axios from 'axios'; // Import axios
 import common from '../../../shared/common';
 import configPropertyMixin from '../mixins/configPropertyMixin';
+import ActionableListGroupItem from '../../components/ActionableListGroupItem';
 
 export default {
   mixins: [configPropertyMixin],
@@ -50,15 +86,34 @@ export default {
   },
   components: {
     cSwitch,
+    ActionableListGroupItem,
   },
   data() {
     return {
       enabled: false,
       includeArchived: false,
       topics: [],
+      newTopic: '',
     };
   },
   methods: {
+    openAddTopicModal() {
+      this.$bvModal.show('add-topic-modal');
+    },
+    addTopic() {
+      if (this.newTopic && !this.topics.includes(this.newTopic)) {
+        this.topics.push(this.newTopic);
+        this.newTopic = '';
+      }
+      this.$bvModal.hide('add-topic-modal');
+    },
+    clearNewTopic() {
+      this.newTopic = '';
+    },
+    removeTopic(index) {
+      console.log('Removing topic at index:', index);
+      this.topics.splice(index, 1);
+    },
     saveChanges: function () {
       try {
         this.updateConfigProperties([
@@ -75,7 +130,7 @@ export default {
           {
             groupName: 'integrations',
             propertyName: 'gitlab.topics',
-            propertyValue: this.topics.join(','),
+            propertyValue: JSON.stringify(this.topics),
           },
         ]);
       } catch (error) {
@@ -112,7 +167,7 @@ export default {
         );
       });
       if (configItemstopics.length > 0) {
-        this.topics = configItemstopics[0].propertyValue.split(',');
+        this.topics = JSON.parse(configItemstopics[0].propertyValue);
       }
     });
   },

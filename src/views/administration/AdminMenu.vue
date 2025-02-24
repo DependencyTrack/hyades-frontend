@@ -331,8 +331,8 @@ export default {
             },
             {
               component: 'GitlabIntegration',
-              name: this.$t('admin.gitlab_integration'),
-              route: 'integrations/gitlab',
+              name: this.$t('admin.gitlabprojectsync'),
+              route: 'integrations/gitlabprojectsync',
             },
             {
               component: 'FortifySsc',
