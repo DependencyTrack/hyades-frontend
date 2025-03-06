@@ -125,7 +125,7 @@ export default {
             i18n,
             template: `
                 <b-row class="expanded-row">
-                  <b-col sm="6">
+                  <b-col sm="10">
                     <b-form-group :label="this.$t('admin.team_membership')">
                       <div class="list-group">
                         <span v-for="team in teams">
@@ -134,34 +134,27 @@ export default {
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTeamModal')"/>
                       </div>
                     </b-form-group>
-                    </b-form-group>
                     <b-form-group :label="this.$t('admin.permissions')">
                       <div class="list-group">
                         <span v-for="permission in permissions">
                           <actionable-list-group-item :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
                         </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
+                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectProjectModal')"/>
                       </div>
                     </b-form-group>
                     <b-form-group :label="this.$t('admin.roles')">
                       <div class="list-group">
-                        <span v-for="role in roles">
-                          <actionable-list-group-item :value="role.name" :delete-icon="true" v-on:actionClicked="removeRoleMembership(role.uuid)"/>
-                          <span v-for="project in role.projects">
-                            {{ project.name }}
-                          </span>
-                          <b-button size="sm" variant="outline-primary" @click="selectProjectForRole(role)">{{ $t('admin.select_project') }}</b-button>
+                        <span v-for="mappedrole in mappedroles">
+                          <actionable-list-group-item :value="mappedrole.name" :delete-icon="true" v-on:actionClicked=""/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectRoleModal')"/>
                       </div>
                     </b-form-group>
                   </b-col>
-                 </b-col>
-                    <div style="text-align:right">
-                       <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
-                    </div>
-                  </b-col>
-                  <select-role-modal v-on:selection="updateRoleSelection" />
+                  <div style="text-align:right">
+                    <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
+                  </div>
+                  <select-role-modal v-on:selection="selectRoleModal" />
                   <select-team-modal v-on:selection="updateTeamSelection" />
                   <select-permission-modal v-on:selection="updatePermissionSelection" />
                   <select-project-modal v-on:selection="updateProjectSelection" />
@@ -182,7 +175,7 @@ export default {
                 teams: row.teams,
                 permissions: row.permissions,
                 projects: row.projects,
-                roles: row.roles,
+                mappedroles: row.mappedroles,
               };
             },
             methods: {

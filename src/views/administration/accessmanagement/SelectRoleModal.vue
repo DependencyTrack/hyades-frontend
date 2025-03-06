@@ -1,81 +1,139 @@
 <template>
   <b-modal
     id="selectRoleModal"
-    size="lg"
+    @hide="resetValues()"
+    size="md"
     hide-header-close
     no-stacking
-    :title="$t('admin.select_role')"
+    :title="$t('admin.assign_role')"
   >
-    <bootstrap-table
-      ref="table"
-      :columns="columns"
-      :data="data"
-      :options="options"
-    >
-    </bootstrap-table>
+    <b-card no-body :header="header">
+      <b-card-body>
+        <b-form-group :label="this.$t('admin.project_access')">
+          <div class="list-group">
+            <span v-for="project in projects" :key="project.uuid">
+              <actionable-list-group-item
+                :value="projectLabel(project.name, project.version)"
+                :href="projectUri(project.uuid)"
+                :delete-icon="true"
+                v-on:actionClicked="removeProjectMapping(project.uuid)"
+              />
+            </span>
+            <actionable-list-group-item
+              :add-icon="true"
+              v-on:actionClicked="
+                $root.$emit('bv::show::modal', 'selectProjectModal')
+              "
+            />
+          </div>
+        </b-form-group>
+      </b-card-body>
+      <b-card-body>
+        <b-input-group-form-select
+          v-model="$selectedRole"
+          :options="availableRoles"
+          :label="$t('admin.role')"
+          rules="required"
+        />
+      </b-card-body>
+    </b-card>
     <template v-slot:modal-footer="{ cancel }">
       <b-button size="md" variant="secondary" @click="cancel()">{{
-        $t('message.cancel')
+        $t('message.close')
       }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="$emit('selection', $refs.table.getSelections())"
-        >{{ $t('message.select') }}</b-button
-      >
+      <b-button size="md" variant="primary" @click="createRole()">{{
+        $t('message.assign')
+      }}</b-button>
     </template>
   </b-modal>
 </template>
 
 <script>
-import xssFilters from 'xss-filters';
-import permissionsMixin from '../../../mixins/permissionsMixin';
-import common from '../../../shared/common';
+import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
+// import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+import ActionableListGroupItem from '../../components/ActionableListGroupItem';
+import SelectProjectModal from './SelectProjectModal';
 
 export default {
-  mixins: [permissionsMixin],
+  name: 'selectRoleModal',
+  props: {
+    type: String,
+  },
+  components: {
+    BInputGroupFormSelect,
+    // BInputGroupFormInput,
+    ActionableListGroupItem,
+    SelectProjectModal,
+  },
+  created() {
+    this.initialRepositoryType = this.type;
+    this.repositoryType = this.type;
+  },
+  mounted() {
+    this.loadRoles();
+  },
   data() {
     return {
+      identifier: null,
+      url: null,
+      selectedRole: null,
+      availableRoles: [],
+      initialRepositoryType: null,
+      internal: false,
+      repository_authentication: false,
+      username: null,
+      password: null,
+      enabled: true,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
       },
-      columns: [
-        {
-          field: 'state',
-          checkbox: true,
-          align: 'center',
-        },
-        {
-          title: this.$t('admin.role_name'),
-          field: 'name',
-          sortable: true,
-          formatter(value, row, index) {
-            return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
-          },
-        },
-      ],
-      data: [],
-      options: {
-        search: true,
-        showColumns: true,
-        showRefresh: true,
-        pagination: true,
-        silentSort: false,
-        sidePagination: 'client',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize: 10,
-        icons: {
-          refresh: 'fa-refresh',
-        },
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`,
-      },
     };
+  },
+  methods: {
+    createRepository: function () {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_REPOSITORY}`;
+      this.axios
+        .put(url, {
+          type: this.repositoryType,
+          identifier: this.identifier,
+          url: this.url,
+          internal: this.internal,
+          authenticationRequired: this.repository_authentication,
+          username: this.username,
+          password: this.password || null,
+          enabled: this.enabled,
+        })
+        .then((response) => {
+          this.$emit('refreshTable');
+          this.$toastr.s(this.$t('admin.repository_created'));
+          this.$root.$emit(
+            'bv::hide::modal',
+            'repositoryCreateRepositoryModal',
+          );
+        })
+        .catch((error) => {
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+          this.$root.$emit(
+            'bv::hide::modal',
+            'repositoryCreateRepositoryModal',
+          );
+        });
+      this.resetValues();
+    },
+    loadRoles: function () {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+      this.axios.get(url).then((response) => {
+        this.availableRoles = response.data.map((d) => ({
+          value: d.id,
+          text: d.name,
+        }));
+      });
+    },
+    resetValues: function () {
+      this.repositoryType = this.initialRepositoryType;
+      this.url = null;
+    },
   },
 };
 </script>

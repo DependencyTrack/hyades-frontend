@@ -36,6 +36,8 @@ import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import { Switch as cSwitch } from '@coreui/vue';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+import SelectRoleModal from './SelectRoleModal.vue';
+import RoleFormInputGroup from './RoleFormInputGroup.vue';
 
 export default {
   props: {
@@ -137,6 +139,11 @@ export default {
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
                       </div>
                     </b-form-group>
+                    <b-form-group :label="this.$t('admin.roles')">
+                    <div class="list-group">
+                      <role-form-input-group/>
+                    </div>
+                  </b-form-group>
                   </b-col>
                   <b-col sm="6">
                     <b-input-group-form-input id="input-managed-user-fullname" :label="$t('message.fullname')" input-group-size="mb-3"
@@ -166,6 +173,8 @@ export default {
               ActionableListGroupItem,
               SelectTeamModal,
               SelectPermissionModal,
+              SelectRoleModal,
+              RoleFormInputGroup,
               ChangePasswordModal,
               BInputGroupFormInput,
             },
