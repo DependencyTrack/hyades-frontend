@@ -126,6 +126,7 @@ import {
   compareVersions,
   loadUserPreferencesForBootstrapTable,
 } from '@/shared/utils';
+import ComponentOccurrenceListModal from '@/views/portfolio/projects/ComponentOccurrenceListModal.vue';
 import ProjectAddComponentModal from '@/views/portfolio/projects/ProjectAddComponentModal';
 import ProjectUploadBomModal from '@/views/portfolio/projects/ProjectUploadBomModal';
 import { Switch as cSwitch } from '@coreui/vue';
@@ -136,6 +137,8 @@ import permissionsMixin from '../../../mixins/permissionsMixin';
 import common from '../../../shared/common';
 import SeverityProgressBar from '../../components/SeverityProgressBar';
 import { get } from 'lodash-es';
+import i18n from '@/i18n';
+import bootstrapTableMixin from '@/mixins/bootstrapTableMixin';
 
 export default {
   components: {
@@ -143,7 +146,7 @@ export default {
     ProjectUploadBomModal,
     ProjectAddComponentModal,
   },
-  mixins: [permissionsMixin],
+  mixins: [bootstrapTableMixin, permissionsMixin],
   comments: {
     ProjectAddComponentModal,
     ProjectUploadBomModal,
@@ -372,6 +375,38 @@ export default {
           },
         },
         {
+          title: this.$t('message.occurrences'),
+          field: 'occurrenceCount',
+          sortable: true,
+          class: 'tight',
+          visible: false,
+          formatter: (value, row, index) => {
+            if (value) {
+              return this.vueFormatter({
+                i18n,
+                components: {
+                  ComponentOccurrenceListModal,
+                },
+                template: `
+                  <div>
+                    <b-link v-b-modal="\`componentOccurrenceListModal-${index}\`">{{ value }}</b-link>
+                    <component-occurrence-list-modal :component-uuid="componentUuid" :component-name="componentName" :index="index"/>
+                  </div>`,
+                data() {
+                  return {
+                    index: index,
+                    componentUuid: row.uuid,
+                    componentName: row.name,
+                    value: value,
+                  };
+                },
+              });
+            }
+
+            return `<span style="float:right" data-toggle="tooltip" data-placement="bottom" title="${this.$t('message.occurrences_none_hint')}"><i class="fa fa-question-circle" aria-hidden="true"></i></span> ${value}`;
+          },
+        },
+        {
           title: this.$t('message.risk_score'),
           field: 'lastInheritedRiskScore',
           sortable: true,
@@ -568,6 +603,7 @@ export default {
         this.$emit('total', '?');
       }
       this.$refs.table.hideLoading();
+      this.vueFormatterInit();
     },
     apiUrl: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/project/${this.uuid}`;
