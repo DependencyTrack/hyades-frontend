@@ -34,7 +34,8 @@ import ProjectRoleListGroupItem from './ProjectRoleListGroupItem.vue';
 import SelectTeamModal from './SelectTeamModal';
 import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
-import SelectProjectModal from './SelectProjectModal.vue';
+import SelectRoleModal from './SelectRoleModal.vue';
+import rolesMixin from '../../../mixins/rolesMixin';
 
 export default {
   props: {
@@ -110,44 +111,43 @@ export default {
           return this.vueFormatter({
             i18n,
             template: `
-                <b-row class="expanded-row">
-                  <b-col sm="6">
-                    <b-form-group :label="this.$t('admin.team_membership')">
-                      <div class="list-group">
-                        <span v-for="team in teams">
-                          <actionable-list-group-item :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
-                        </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTeamModal')"/>
+                  <b-row class="expanded-row">
+                    <b-col sm="6">
+                      <b-form-group :label="this.$t('admin.team_membership')">
+                        <div class="list-group">
+                          <span v-for="team in teams">
+                            <actionable-list-group-item :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
+                          </span>
+                          <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTeamModal')"/>
+                        </div>
+                      </b-form-group>
+                      <b-form-group :label="this.$t('admin.roles')">
+                        <div class="list-group">
+                          <span v-for="projectRole in projectRoles">
+                            <project-role-list-group-item :projectRole="projectRole" :delete-icon="true" v-on:removeClicked="removeRole(projectRole)"/>
+                          </span>
+                          <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectRoleModal')"/>
+                        </div>
+                      </b-form-group>
+                      <b-form-group :label="this.$t('admin.permissions')">
+                        <div class="list-group">
+                          <span v-for="permission in permissions">
+                            <actionable-list-group-item :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
+                          </span>
+                          <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
+                        </div>
+                      </b-form-group>
+                    </b-col>
+                    <b-col sm="6">
+                      <div style="text-align:right">
+                         <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
                       </div>
-                    </b-form-group>
-                    <b-form-group :label="this.$t('admin.roles')">
-                      <div class="list-group">
-                        <span v-for="mappedrole in mappedroles">
-                          <actionable-list-group-item :value="mappedrole.name" :delete-icon="true" v-on:actionClicked=""/>
-                        </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectRoleModal')"/>
-                      </div>
-                    </b-form-group>
-                    <b-form-group :label="this.$t('admin.permissions')">
-                      <div class="list-group">
-                        <span v-for="permission in permissions">
-                          <actionable-list-group-item :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
-                        </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
-                      </div>
-                    </b-form-group>
-                  </b-col>
-                  <b-col sm="6">
-                    <div style="text-align:right">
-                       <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
-                    </div>
-                  </b-col>
-                  <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
-                  <select-team-modal v-on:selection="updateTeamSelection" />
-                  <select-permission-modal v-on:selection="updatePermissionSelection" />
-                  <select-role-modal v-on:selection="selectRoleModal" />
-                </b-row>
-              `,
+                    </b-col>
+                    <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
+                    <select-team-modal v-on:selection="updateTeamSelection" />
+                    <select-permission-modal v-on:selection="updatePermissionSelection" />
+                  </b-row>
+                `,
             mixins: [permissionsMixin, rolesMixin],
             components: {
               ActionableListGroupItem,
@@ -155,7 +155,6 @@ export default {
               SelectRoleModal,
               SelectTeamModal,
               SelectPermissionModal,
-              SelectProjectModal,
             },
             data() {
               return {
@@ -170,12 +169,6 @@ export default {
               this.loadUserRoles(this.username);
             },
             methods: {
-              getUserObjectKey: function () {
-                return 'oidcUser';
-              },
-              getUserObject: function () {
-                return this.oidcUser;
-              },
               deleteUser: function () {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_USER_OIDC}`;
                 this.axios
@@ -221,21 +214,48 @@ export default {
                     });
                 }
               },
-              removeTeamMembership: function (teamUUID) {
-                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.oidcUser.username}/membership`;
-                const event = 'admin:oidcusers:rowUpdate';
-                this._removeTeamMembership(url, event, teamUUID);
-              },
-              updateRoleSelection: function (selection) {
-                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.oidcUser.username}/role`;
-                this._updateRoleSelection(url, selection);
+              removeTeamMembership: function (teamUuid) {
+                let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
+                this.axios
+                  .delete(url, { data: { uuid: teamUuid } })
+                  .then((response) => {
+                    this.syncVariables(response.data);
+                    EventBus.$emit(
+                      'admin:oidcusers:rowUpdate',
+                      index,
+                      this.oidcUser,
+                    );
+                    this.$toastr.s(this.$t('message.updated'));
+                  })
+                  .catch((error) => {
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                  });
               },
               removeRole: function (role) {
                 this.unassignRole(role, this.username);
               },
               updatePermissionSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
-                this._updatePermissionSelection(selections);
+                for (let i = 0; i < selections.length; i++) {
+                  let selection = selections[i];
+                  let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${selection.name}/user/${this.username}`;
+                  this.axios
+                    .post(url)
+                    .then((response) => {
+                      this.syncVariables(response.data);
+                      this.$toastr.s(this.$t('message.updated'));
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                      if (error.response.status === 304) {
+                        //this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                      } else {
+                        this.$toastr.w(
+                          this.$t('condition.unsuccessful_action'),
+                        );
+                      }
+                    });
+                }
               },
               removePermission: function (permission) {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${this.username}`;

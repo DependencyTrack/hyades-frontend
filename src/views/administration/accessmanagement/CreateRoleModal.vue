@@ -1,69 +1,111 @@
 <template>
-  <b-modal
-    id="createRoleModal"
-    size="md"
-    @hide="resetValues()"
-    hide-header-close
-    no-stacking
-    :title="$t('admin.create_role')"
-  >
-    <b-input-group-form-input
-      id="name-input"
-      input-group-size="mb-3"
-      type="text"
-      v-model="name"
-      lazy="true"
-      required="true"
-      feedback="true"
-      autofocus="false"
-      :label="$t('admin.role_name')"
-      :feedback-text="$t('admin.required_role_name')"
-    />
+    <b-modal
+      id="createRoleModal"
+      size="md"
+      @hide="resetValues()"
+      hide-header-close
+      no-stacking
+      :title="$t('admin.create_role')"
+    >
+      <b-input-group-form-input
+        id="name-input"
+        input-group-size="mb-3"
+        type="text"
+        v-model="name"
+        lazy="true"
+        required="true"
+        feedback="true"
+        autofocus="false"
+        :label="$t('admin.role_name')"
+        :feedback-text="$t('admin.required_role_name')"
+      />
 
-    <template v-slot:modal-footer="{ cancel }">
-      <b-button size="md" variant="secondary" @click="cancel()">{{
-        $t('message.close')
-      }}</b-button>
-      <b-button size="md" variant="primary" @click="createUser()">{{
-        $t('message.create')
-      }}</b-button>
-    </template>
-  </b-modal>
-</template>
+      <b-form-group :label="$t('admin.permissions')">
+        <div class="list-group">
+          <span v-for="permission in permissions" :key="permission.id">
+            <actionable-list-group-item
+              :value="permission.name"
+              :delete-icon="true"
+              @actionClicked="removePermission(permission)"
+            />
+          </span>
+          <actionable-list-group-item
+            :add-icon="true"
+            @actionClicked="showSelectPermissionModal"
+          />
+        </div>
+      </b-form-group>
 
-<script>
-import permissionsMixin from '../../../mixins/permissionsMixin';
-import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
-export default {
-  mixins: [permissionsMixin],
-  components: {
-    BInputGroupFormInput,
-  },
-  data() {
-    return {
-      name: null,
-    };
-  },
-  methods: {
-    createUser: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      this.axios
-        .put(url, {
-          name: this.name,
-        })
-        .then((response) => {
-          this.$emit('refreshTable');
-          this.$toastr.s(this.$t('admin.role_created'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-      this.$root.$emit('bv::hide::modal', 'createRoleModal');
-      this.resetValues();
+      <template v-slot:modal-footer="{ cancel }">
+        <b-button size="md" variant="secondary" @click="cancel()">
+          {{ $t('message.close') }}
+        </b-button>
+        <b-button size="md" variant="primary" @click="createUser()">
+          {{ $t('message.create') }}
+        </b-button>
+      </template>
+
+      <select-permission-modal @selection="updatePermissionSelection" />
+    </b-modal>
+  </template>
+
+  <script>
+  import permissionsMixin from '../../../mixins/permissionsMixin';
+  import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+  import ActionableListGroupItem from '../../components/ActionableListGroupItem';
+  import SelectPermissionModal from './SelectPermissionModal';
+
+  export default {
+    mixins: [permissionsMixin],
+    components: {
+      BInputGroupFormInput,
+      ActionableListGroupItem,
+      SelectPermissionModal
     },
-    resetValues: function () {
-      this.name = null;
+    data() {
+      return {
+        name: null,
+        permissions: []
+      };
     },
-  },
-};
-</script>
+    methods: {
+      createUser() {
+        let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+        this.axios
+          .put(url, {
+            name: this.name,
+            permissions: this.permissions
+          })
+          .then(response => {
+            this.$emit('refreshTable');
+            this.$toastr.s(this.$t('admin.role_created'));
+          })
+          .catch(error => {
+            this.$toastr.w(this.$t('condition.unsuccessful_action'));
+          });
+        this.$root.$emit('bv::hide::modal', 'createRoleModal');
+        this.resetValues();
+      },
+      resetValues() {
+        this.name = null;
+        this.permissions = [];
+      },
+      removePermission(permission) {
+        let index = this.permissions.indexOf(permission);
+        if (index > -1) {
+          this.permissions.splice(index, 1);
+        }
+      },
+      showSelectPermissionModal() {
+        this.$root.$emit('bv::show::modal', 'selectPermissionModal');
+      },
+      updatePermissionSelection(selections) {
+        this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
+        for (let i = 0; i < selections.length; i++) {
+          let selection = selections[i];
+          this.permissions.push(selection);
+        }
+      }
+    }
+  };
+  </script>
