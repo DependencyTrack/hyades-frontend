@@ -7,33 +7,33 @@
     no-stacking
     :title="$t('admin.assign_role')"
   >
-    <b-card no-body :header="header">
-      <b-card-body>
-        <b-form-group :label="this.$t('admin.project_access')">
-          <div class="list-group">
-            <span v-for="project in projects" :key="project.uuid">
-              <actionable-list-group-item
-                :value="projectLabel(project.name, project.version)"
-                :href="projectUri(project.uuid)"
-                :delete-icon="true"
-                v-on:actionClicked="removeProjectMapping(project.uuid)"
-              />
-            </span>
-            <actionable-list-group-item
-              :add-icon="true"
-              v-on:actionClicked="
-                $root.$emit('bv::show::modal', 'selectProjectModal')
-              "
-            />
-          </div>
-        </b-form-group>
-      </b-card-body>
-      <b-card-body>
+    <b-card no-body>
+      <b-card-body class="pb-0">
         <b-input-group-form-select
-          v-model="$selectedRole"
-          :options="availableRoles"
+          id="input-selected-project"
+          v-model="selectedProject"
+          :options="
+            availableProjects.map((project) => ({
+              value: project.uuid,
+              text: project.name,
+            }))
+          "
+          :label="$t('admin.project')"
+          required="true"
+        />
+      </b-card-body>
+      <b-card-body class="pb-0">
+        <b-input-group-form-select
+          id="input-selected-role"
+          v-model="selectedRole"
+          :options="
+            availableRoles.map((role) => ({
+              value: role.uuid,
+              text: role.name,
+            }))
+          "
           :label="$t('admin.role')"
-          rules="required"
+          required="true"
         />
       </b-card-body>
     </b-card>
@@ -41,7 +41,7 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
-      <b-button size="md" variant="primary" @click="createRole()">{{
+      <b-button size="md" variant="primary" @click="createRoleMapping()">{{
         $t('message.assign')
       }}</b-button>
     </template>
@@ -50,40 +50,32 @@
 
 <script>
 import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
-// import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
-import ActionableListGroupItem from '../../components/ActionableListGroupItem';
-import SelectProjectModal from './SelectProjectModal';
 
 export default {
   name: 'selectRoleModal',
-  props: {
-    type: String,
-  },
   components: {
     BInputGroupFormSelect,
-    // BInputGroupFormInput,
-    ActionableListGroupItem,
-    SelectProjectModal,
-  },
-  created() {
-    this.initialRepositoryType = this.type;
-    this.repositoryType = this.type;
   },
   mounted() {
     this.loadRoles();
+    this.loadProjects();
+  },
+  props: {
+    username: String,
+  },
+  created() {
+    this.initialRole = '';
+    this.initialProject = '';
   },
   data() {
     return {
-      identifier: null,
-      url: null,
-      selectedRole: null,
+      initialProject: '',
+      initialRole: '',
+      selectedProject: '',
+      selectedRole: '',
       availableRoles: [],
-      initialRepositoryType: null,
-      internal: false,
-      repository_authentication: false,
-      username: null,
-      password: null,
-      enabled: true,
+      availableProjects: [],
+      user: this.username,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
@@ -91,48 +83,49 @@ export default {
     };
   },
   methods: {
-    createRepository: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_REPOSITORY}`;
+    createRoleMapping: function () {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.user}/role`;
       this.axios
-        .put(url, {
-          type: this.repositoryType,
-          identifier: this.identifier,
-          url: this.url,
-          internal: this.internal,
-          authenticationRequired: this.repository_authentication,
-          username: this.username,
-          password: this.password || null,
-          enabled: this.enabled,
+        .post(url, {
+          roleUUID: this.selectedRole,
+          projectUUID: this.selectedProject,
         })
         .then((response) => {
           this.$emit('refreshTable');
-          this.$toastr.s(this.$t('admin.repository_created'));
-          this.$root.$emit(
-            'bv::hide::modal',
-            'repositoryCreateRepositoryModal',
-          );
+          this.$toastr.s(this.$t('admin.role_assigned'));
+          this.$root.$emit('bv::hide::modal', 'selectRoleModal');
+          this.$emit('refreshTable');
         })
         .catch((error) => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
-          this.$root.$emit(
-            'bv::hide::modal',
-            'repositoryCreateRepositoryModal',
-          );
+          this.$root.$emit('bv::hide::modal', 'selectRoleModal');
         });
-      this.resetValues();
     },
     loadRoles: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      this.axios.get(url).then((response) => {
-        this.availableRoles = response.data.map((d) => ({
-          value: d.id,
-          text: d.name,
-        }));
-      });
+      this.axios
+        .get(url)
+        .then((response) => {
+          this.availableRoles = response.data;
+        })
+        .catch((error) => {
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        });
+    },
+    loadProjects: function () {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_ACL_USER}/${this.user}`;
+      this.axios
+        .get(url)
+        .then((response) => {
+          this.availableProjects = response.data;
+        })
+        .catch((error) => {
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        });
     },
     resetValues: function () {
-      this.repositoryType = this.initialRepositoryType;
-      this.url = null;
+      this.selectedProject = this.initialProject;
+      this.selectedRole = this.initialRole;
     },
   },
 };
