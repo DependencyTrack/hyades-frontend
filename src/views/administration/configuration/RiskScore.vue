@@ -184,6 +184,7 @@ export default {
           propertyValue: this.customRiskScore.unassigned,
         },
       ]);
+      this.updateHistoricalRiskScore();
     },
   },
 };
