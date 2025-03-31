@@ -60,15 +60,11 @@ export default {
     BInputGroupFormSelect,
   },
   mounted() {
-    this.loadRoles();
+    this.loadAvailableRoles();
     this.loadProjects();
   },
   props: {
     username: String,
-  },
-  created() {
-    this.initialRole = '';
-    this.initialProject = '';
   },
   data() {
     return {
@@ -87,11 +83,15 @@ export default {
   },
   methods: {
     handleSelection: function() {
+      if(!this.selectedRole || !this.selectedProject) {
+        return;
+      }
+
       const selection = {role: this.selectedRole, project: this.selectedProject}
-      this.$root.$emit("bv::hide::modal", this.$children[0].id) //only one child of <template> so this is safe
+      this.$root.$emit("bv::hide::modal", this.$children[0].id) //or just 'selectRoleModal'
       this.$emit('selection', selection)
     },
-    loadRoles: function () {
+    loadAvailableRoles: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
       this.axios
         .get(url)

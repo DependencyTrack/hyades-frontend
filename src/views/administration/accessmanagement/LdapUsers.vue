@@ -26,7 +26,6 @@ import SelectTeamModal from './SelectTeamModal';
 import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import SelectRoleModal from './SelectRoleModal.vue';
-import rolesMixin from '../../../mixins/rolesMixin';
 import userManagementMixins from '../../../mixins/userManagementMixin';
 
 export default {

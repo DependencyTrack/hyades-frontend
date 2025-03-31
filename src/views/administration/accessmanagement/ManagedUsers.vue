@@ -29,7 +29,6 @@ import { Switch as cSwitch } from '@coreui/vue';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import SelectRoleModal from './SelectRoleModal.vue';
 import SelectProjectModal from './SelectProjectModal.vue';
-import rolesMixin from '../../../mixins/rolesMixin';
 import ProjectRoleListGroupItem from './ProjectRoleListGroupItem.vue';
 import userManagementMixin from '../../../mixins/userManagementMixin';
 
