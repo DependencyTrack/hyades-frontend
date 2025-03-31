@@ -3,6 +3,7 @@
     id="selectPermissionModal"
     size="lg"
     hide-header-close
+    no-stacking
     :title="$t('admin.select_permission')"
   >
     <bootstrap-table
@@ -16,12 +17,9 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.cancel')
       }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="$emit('selection', $refs.table.getSelections())"
-        >{{ $t('message.select') }}</b-button
-      >
+      <b-button size="md" variant="primary" @click="handleSelection">{{
+        $t('message.select')
+      }}</b-button>
     </template>
   </b-modal>
 </template>
@@ -76,6 +74,13 @@ export default {
         url: `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}`,
       },
     };
+  },
+  methods: {
+    handleSelection: function () {
+      const selections = this.$refs.table.getSelections();
+      this.$root.$emit('bv::hide::modal', this.$children[0].id);
+      this.$emit('selection', selections);
+    },
   },
 };
 </script>

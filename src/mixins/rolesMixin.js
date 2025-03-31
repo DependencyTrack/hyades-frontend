@@ -7,15 +7,6 @@ export default {
         projectRoles: [Object],
     };
   },
-  mounted() {
-    EventBus.$on('admin:ldapusers:rowUpdate', (index, row) => {
-      this.$refs.table.updateRow({ index: index, row: row });
-      this.$refs.table.expandRow(index);
-    });
-    EventBus.$on('admin:ldapusers:rowDeleted', (index, row) => {
-      this.refreshTable();
-    });
-  },
   methods: {
     loadUserRoles: function (username) {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/roles`;
@@ -50,4 +41,3 @@ export default {
     },
   },
 };
-

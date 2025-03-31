@@ -2,20 +2,11 @@
   <b-card no-body :header="header">
     <b-card-body>
       <div id="customToolbar">
-        <b-button
-          size="md"
-          variant="outline-primary"
-          v-b-modal.createLdapUserModal
-        >
+        <b-button size="md" variant="outline-primary" v-b-modal.createLdapUserModal>
           <span class="fa fa-plus"></span> {{ $t('admin.create_user') }}
         </b-button>
       </div>
-      <bootstrap-table
-        ref="table"
-        :columns="columns"
-        :data="data"
-        :options="options"
-      >
+      <bootstrap-table v-on:refreshTable="refreshTable" ref="table" :columns="columns" :data="data" :options="options">
       </bootstrap-table>
     </b-card-body>
     <create-ldap-user-modal v-on:refreshTable="refreshTable" />
@@ -36,6 +27,7 @@ import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import SelectRoleModal from './SelectRoleModal.vue';
 import rolesMixin from '../../../mixins/rolesMixin';
+import userManagementMixins from '../../../mixins/userManagementMixin';
 
 export default {
   props: {
@@ -84,8 +76,8 @@ export default {
           formatter(value, row, index) {
             return value
               ? xssFilters.inHTMLData(
-                  common.valueWithDefault(value.length, '0'),
-                )
+                common.valueWithDefault(value.length, '0'),
+              )
               : 0;
           },
         },
@@ -115,8 +107,8 @@ export default {
                   <b-col sm="6">
                     <b-form-group :label="this.$t('admin.team_membership')">
                       <div class="list-group">
-                        <span v-for="team in teams">
-                          <actionable-list-group-item :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
+                        <span v-for="team in ldapUser.teams">
+                          <actionable-list-group-item :tooltip="$t('admin.remove_team_membership')" :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTeamModal')"/>
                       </div>
@@ -131,8 +123,8 @@ export default {
                     </b-form-group>
                     <b-form-group :label="this.$t('admin.permissions')">
                       <div class="list-group">
-                        <span v-for="permission in permissions">
-                          <actionable-list-group-item :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
+                        <span v-for="permission in ldapUser.permissions">
+                          <actionable-list-group-item :tooltip="$t('admin.remove_permission')" :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
                       </div>
@@ -143,12 +135,12 @@ export default {
                        <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
                     </div>
                   </b-col>
-                  <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
                   <select-team-modal v-on:selection="updateTeamSelection" />
+                  <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
                   <select-permission-modal v-on:selection="updatePermissionSelection" />
                 </b-row>
               `,
-            mixins: [permissionsMixin, rolesMixin],
+            mixins: [permissionsMixin, userManagementMixins],
             components: {
               ActionableListGroupItem,
               ProjectRoleListGroupItem,
@@ -158,6 +150,8 @@ export default {
             },
             data() {
               return {
+                row,
+                index,
                 ldapUser: row,
                 username: row.username,
                 teams: row.teams,
@@ -166,121 +160,50 @@ export default {
               };
             },
             created() {
-              this.loadUserRoles(this.username);
+              this.loadUserRoles(this.ldapUser.username);
             },
             methods: {
+              getUserObjectKey: function () {
+                return "ldapUser"
+              },
+              getUserObject: function () {
+                return this.ldapUser
+              },
               deleteUser: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_USER_LDAP}`;
-                this.axios
-                  .delete(url, {
-                    data: {
-                      username: this.username,
-                    },
-                  })
-                  .then((response) => {
-                    EventBus.$emit('admin:ldapusers:rowDeleted', index);
-                    this.$toastr.s(this.$t('admin.user_deleted'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_LDAP}`;
+                const event = 'admin:ldapusers:rowDeleted'
+
+                this._deleteUser(url, event)
               },
               updateTeamSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectTeamModal');
-                for (let i = 0; i < selections.length; i++) {
-                  let selection = selections[i];
-                  let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
-                  this.axios
-                    .post(url, {
-                      uuid: selection.uuid,
-                    })
-                    .then((response) => {
-                      this.syncVariables(response.data);
-                      EventBus.$emit(
-                        'admin:ldapusers:rowUpdate',
-                        index,
-                        this.ldapUser,
-                      );
-                      this.$toastr.s(this.$t('message.updated'));
-                    })
-                    .catch((error) => {
-                      if (error.response.status === 304) {
-                        //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                      } else {
-                        this.$toastr.w(
-                          this.$t('condition.unsuccessful_action'),
-                        );
-                      }
-                    });
-                }
+                const event = 'admin:ldapusers:rowUpdate';;
+
+                this._updateTeamSelection(event, selections)
               },
-              removeTeamMembership: function (teamUuid) {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
-                this.axios
-                  .delete(url, { data: { uuid: teamUuid } })
-                  .then((response) => {
-                    this.syncVariables(response.data);
-                    EventBus.$emit(
-                      'admin:ldapusers:rowUpdate',
-                      index,
-                      this.ldapUser,
-                    );
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+              removeTeamMembership: function (teamUUID) {
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
+                const event = 'admin:ldapusers:rowUpdate';
+
+                this._removeTeamMembership(url, event, teamUUID);
+              },
+              updateRoleSelection: function (selection) {
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/role`;
+                this._updateRoleSelection(url, selection);
               },
               removeRole: function (role) {
-                this.unassignRole(role, this.username);
+                this._removeRole(role);
               },
               updatePermissionSelection: function (selections) {
-                this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
-                for (let i = 0; i < selections.length; i++) {
-                  let selection = selections[i];
-                  let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${selection.name}/user/${this.username}`;
-                  this.axios
-                    .post(url)
-                    .then((response) => {
-                      this.syncVariables(response.data);
-                      this.$toastr.s(this.$t('message.updated'));
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                      if (error.response.status === 304) {
-                        //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                      } else {
-                        this.$toastr.w(
-                          this.$t('condition.unsuccessful_action'),
-                        );
-                      }
-                    });
-                }
+                this._updatePermissionSelection(selections);
               },
               removePermission: function (permission) {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${this.username}`;
-                this.axios
-                  .delete(url)
-                  .then((response) => {
-                    this.syncVariables(response.data);
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+                this._removePermission(permission);
               },
-              syncVariables: function (ldapUser) {
-                this.ldapUser = ldapUser;
-                this.username = ldapUser.username;
-                this.loadUserRoles();
-                this.teams = ldapUser.teams;
-                this.permissions = ldapUser.permissions;
-              },
-              updateRoleSelection: function () {
-                this.$root.$emit('bv::hide::modal', 'selectRoleModal');
-                this.$toastr.s(this.$t('message.updated'));
-                this.loadUserRoles();
-                this.refreshTable();
+              syncVariables: function (userObj) {
+                Object.assign(this.ldapUser, userObj)
+                // Object.assign(this.ldapUser, ldapUser)
+                this.loadUserRoles(this.ldapUser.username); // mixin
               },
             },
           });

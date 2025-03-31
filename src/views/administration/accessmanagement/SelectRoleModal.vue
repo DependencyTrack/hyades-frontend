@@ -41,9 +41,12 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
-      <b-button size="md" variant="primary" @click="createRoleMapping()">{{
-        $t('message.assign')
-      }}</b-button>
+      <!-- emit selected role object back to parent -->
+      <b-button
+      size="md"
+      variant="primary"
+      @click="handleSelection"
+      >{{$t('message.assign')}}</b-button>
     </template>
   </b-modal>
 </template>
@@ -83,23 +86,10 @@ export default {
     };
   },
   methods: {
-    createRoleMapping: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.user}/role`;
-      this.axios
-        .post(url, {
-          roleUUID: this.selectedRole,
-          projectUUID: this.selectedProject,
-        })
-        .then((response) => {
-          this.$emit('refreshTable');
-          this.$toastr.s(this.$t('admin.role_assigned'));
-          this.$root.$emit('bv::hide::modal', 'selectRoleModal');
-          this.$emit('refreshTable');
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-          this.$root.$emit('bv::hide::modal', 'selectRoleModal');
-        });
+    handleSelection: function() {
+      const selection = {role: this.selectedRole, project: this.selectedProject}
+      this.$root.$emit("bv::hide::modal", this.$children[0].id) //only one child of <template> so this is safe
+      this.$emit('selection', selection)
     },
     loadRoles: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
