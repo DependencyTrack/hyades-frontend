@@ -310,7 +310,18 @@
     "welcome_message_desc": "Passen Sie die Willkommensnachricht an, die auf der Startseite von Dependency-Track angezeigt wird, bevor sich Benutzer anmelden.",
     "welcome_message_enable": "Willkommensnachricht aktivieren",
     "workflow_step_timeout": "Schritt-Timeout",
-    "workflows": "Workflows"
+    "workflows": "Workflows",
+    "select_role": "Rolle auswählen",
+    "role_assigned": "Rolle zugewiesen",
+    "remove_permission": "Erlaubnis entfernen",
+    "role_membership": "Rollenmitgliedschaft",
+    "remove_role": "Rolle entfernen",
+    "remove_team_membership": "Mitgliedschaft entfernen",
+    "project_membership": "Projektmitgliedschaft",
+    "edit_role": "Rolle bearbeiten",
+    "project": "Projekt",
+    "project_name": "Projektname",
+    "role": "Rolle"
   },
   "condition": {
     "forbidden": "Verboten (403)",

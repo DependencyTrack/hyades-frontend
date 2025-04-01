@@ -310,7 +310,18 @@
     "welcome_message_desc": "उपयोगकर्ताओं के साइन इन करने से पहले डिपेंडेंसी-ट्रैक के आरंभ पृष्ठ पर दिखाई देने वाले स्वागत संदेश को अनुकूलित करें।",
     "welcome_message_enable": "स्वागत संदेश सक्षम करें",
     "workflow_step_timeout": "चरण समयबाह्य",
-    "workflows": "वर्कफ़्लो"
+    "workflows": "वर्कफ़्लो",
+    "select_role": "भूमिका का चयन करें",
+    "role_assigned": "सौंपी गई भूमिका",
+    "remove_permission": "अनुमति निकालें",
+    "role_membership": "भूमिका सदस्यता",
+    "remove_role": "भूमिका को दूर करना",
+    "remove_team_membership": "सदस्यता निकालें",
+    "project_membership": "परियोजना सदस्यता",
+    "edit_role": "भूमिका संपादित करें",
+    "project": "परियोजना",
+    "project_name": "प्रोजेक्ट नाम",
+    "role": "भूमिका"
   },
   "condition": {
     "forbidden": "निषिद्ध (403)",

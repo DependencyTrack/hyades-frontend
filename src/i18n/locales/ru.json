@@ -310,7 +310,18 @@
     "welcome_message_desc": "Настройте приветственное сообщение, которое отображается на стартовой странице Dependency-Track перед входом пользователей.",
     "welcome_message_enable": "Включить приветственное сообщение",
     "workflow_step_timeout": "Тайм-аут шага",
-    "workflows": "Рабочие процессы"
+    "workflows": "Рабочие процессы",
+    "select_role": "Выберите роль",
+    "role_assigned": "Роль назначена",
+    "remove_permission": "Удалить разрешение",
+    "role_membership": "Ролевое членство",
+    "remove_role": "Удалить роль",
+    "remove_team_membership": "Удалить членство",
+    "project_membership": "Членство в проекте",
+    "edit_role": "Редактировать роль",
+    "project": "Проект",
+    "project_name": "Название проекта",
+    "role": "Роль"
   },
   "condition": {
     "forbidden": "Запрещено (403)",

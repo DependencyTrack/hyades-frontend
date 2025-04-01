@@ -310,7 +310,18 @@
     "welcome_message_desc": "Personnalisez le message de bienvenue qui apparaît sur la page de démarrage de Dependency-Track avant que les utilisateurs ne se connectent.",
     "welcome_message_enable": "Activer le message de bienvenue",
     "workflow_step_timeout": "Délai d'expiration de l'étape",
-    "workflows": "Flux de travail"
+    "workflows": "Flux de travail",
+    "select_role": "Sélectionner un rôle",
+    "role_assigned": "Rôle attribué",
+    "remove_permission": "Supprimer l'autorisation",
+    "role_membership": "Adhésion au rôle",
+    "remove_role": "Supprimer le rôle",
+    "remove_team_membership": "Supprimer",
+    "project_membership": "Adhésion au projet",
+    "edit_role": "Modifier le rôle",
+    "project": "Projet",
+    "project_name": "Nom du projet",
+    "role": "Rôle"
   },
   "condition": {
     "forbidden": "Interdit (403)",

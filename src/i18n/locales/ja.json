@@ -310,7 +310,18 @@
     "welcome_message_desc": "ユーザーがサインインする前に、Dependency-Track の開始ページに表示されるウェルカム メッセージをカスタマイズします。",
     "welcome_message_enable": "ウェルカムメッセージを有効にする",
     "workflow_step_timeout": "ステップタイムアウト",
-    "workflows": "ワークフロー"
+    "workflows": "ワークフロー",
+    "select_role": "役割を選択します",
+    "role_assigned": "割り当てられた役割",
+    "remove_permission": "許可を削除します",
+    "role_membership": "ロールメンバーシップ",
+    "remove_role": "役割を削除します",
+    "remove_team_membership": "メンバーシップを削除します",
+    "project_membership": "プロジェクトメンバーシップ",
+    "edit_role": "役割を編集します",
+    "project": "プロジェクト",
+    "project_name": "プロジェクト名",
+    "role": "役割"
   },
   "condition": {
     "forbidden": "禁止 (403)",

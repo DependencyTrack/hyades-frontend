@@ -310,7 +310,18 @@
     "welcome_message_desc": "自定义用户登录前 Dependency-Track 起始页上显示的欢迎消息。",
     "welcome_message_enable": "启用欢迎消息",
     "workflow_step_timeout": "步骤超时",
-    "workflows": "工作流程"
+    "workflows": "工作流程",
+    "select_role": "选择角色",
+    "role_assigned": "角色分配",
+    "remove_permission": "删除许可",
+    "role_membership": "角色会员资格",
+    "remove_role": "删除角色",
+    "remove_team_membership": "删除会员资格",
+    "project_membership": "项目会员资格",
+    "edit_role": "编辑角色",
+    "project": "项目",
+    "project_name": "项目名称",
+    "role": "角色"
   },
   "condition": {
     "forbidden": "禁止 (403)",

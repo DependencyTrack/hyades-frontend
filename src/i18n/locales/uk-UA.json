@@ -310,7 +310,18 @@
     "welcome_message_desc": "Налаштуйте вітальне повідомлення, яке з’являється на початковій сторінці Dependency-Track перед входом користувачів.",
     "welcome_message_enable": "Увімкнути вітальне повідомлення",
     "workflow_step_timeout": "Час очікування кроку",
-    "workflows": "Робочі процеси"
+    "workflows": "Робочі процеси",
+    "select_role": "Виберіть роль",
+    "role_assigned": "Роль призначена",
+    "remove_permission": "Видаліть дозвіл",
+    "role_membership": "Рольове членство",
+    "remove_role": "Видалити роль",
+    "remove_team_membership": "Видалити членство",
+    "project_membership": "Членство проекту",
+    "edit_role": "Редагувати роль",
+    "project": "Демонструвати",
+    "project_name": "Назва проекту",
+    "role": "Роль"
   },
   "condition": {
     "forbidden": "Заборонено (403)",
