@@ -492,20 +492,18 @@ export default {
               this.subject === 'EXPRESSION' &&
               error.response &&
               error.response.data &&
-              error.response.data.celErrors
+              error.response.data.errors
             ) {
-              this.editorMarkers = error.response.data.celErrors.map(
-                (celErr) => {
-                  return {
-                    startLineNumber: celErr.line,
-                    startColumn: celErr.column,
-                    endLineNumber: celErr.line,
-                    endColumn: celErr.column + 3, // Add a few columns to make it more visible
-                    message: celErr.message,
-                    severity: 8,
-                  };
-                },
-              );
+              this.editorMarkers = error.response.data.errors.map((celErr) => {
+                return {
+                  startLineNumber: celErr.line,
+                  startColumn: celErr.column,
+                  endLineNumber: celErr.line,
+                  endColumn: celErr.column + 3, // Add a few columns to make it more visible
+                  message: celErr.message,
+                  severity: 8,
+                };
+              });
             } else {
               this.$toastr.w(this.$t('condition.unsuccessful_action'));
             }
@@ -529,7 +527,25 @@ export default {
             this.$toastr.s(this.$t('message.updated'));
           })
           .catch((error) => {
-            this.$toastr.w(this.$t('condition.unsuccessful_action'));
+            if (
+              this.subject === 'EXPRESSION' &&
+              error.response &&
+              error.response.data &&
+              error.response.data.errors
+            ) {
+              this.editorMarkers = error.response.data.errors.map((celErr) => {
+                return {
+                  startLineNumber: celErr.line,
+                  startColumn: celErr.column,
+                  endLineNumber: celErr.line,
+                  endColumn: celErr.column + 3, // Add a few columns to make it more visible
+                  message: celErr.message,
+                  severity: 8,
+                };
+              });
+            } else {
+              this.$toastr.w(this.$t('condition.unsuccessful_action'));
+            }
           });
       }
     },
@@ -547,7 +563,7 @@ export default {
             this.$toastr.s(this.$t('message.condition_deleted'));
             this.$emit('conditionRemoved');
           })
-          .catch((error) => {
+          .catch(() => {
             this.$toastr.w(this.$t('condition.unsuccessful_action'));
           });
       } else {
