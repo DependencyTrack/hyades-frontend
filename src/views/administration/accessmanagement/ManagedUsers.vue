@@ -228,9 +228,6 @@ export default {
               getUserObject: function () {
                 return this.managedUser;
               },
-              openPermissionModal() {
-                this.$root.$emit('bv::show::modal', 'selectPermissionModal');
-              },
               updateUser: function () {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
                 this.axios
