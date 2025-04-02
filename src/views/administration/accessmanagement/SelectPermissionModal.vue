@@ -3,6 +3,7 @@
     id="selectPermissionModal"
     size="lg"
     hide-header-close
+    no-stacking
     :title="$t('admin.select_permission')"
   >
     <bootstrap-table
@@ -16,13 +17,9 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.cancel')
       }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        :disabled="selectionHasChanged"
-        @click="handleSelection"
-        >{{ $t('message.select') }}</b-button
-      >
+      <b-button size="md" variant="primary" @click="handleSelection">{{
+        $t('message.select')
+      }}</b-button>
     </template>
   </b-modal>
 </template>
@@ -32,16 +29,14 @@ import xssFilters from 'xss-filters';
 import common from '../../../shared/common';
 
 export default {
-  mixins: [],
   props: {
-    currentPermissions: {
+    selectedPermissions: {
       type: Array,
-      default: () => [],
+      required: true, // Pass the already selected permissions as a prop
     },
   },
   data() {
     return {
-      currentSelection: [],
       columns: [
         {
           field: 'state',
@@ -57,7 +52,7 @@ export default {
           },
         },
       ],
-      data: [], // retrieved list of addable permissions
+      data: [], // Permissions data
       options: {
         search: true,
         showColumns: true,
@@ -72,60 +67,51 @@ export default {
         icons: {
           refresh: 'fa-refresh',
         },
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}`,
-        onLoadSuccess: () => {
-          // when the addable permissions load
-          const mappedPermissions = this.currentPermissions.map(
-            (perm) => perm.name,
-          );
-          this.$refs.table.checkBy({
-            field: 'name',
-            values: mappedPermissions,
-          });
-        },
-        onCheck: this.updateCurrentSelection,
-        onUncheck: this.updateCurrentSelection,
-        onCheckAll: this.updateCurrentSelection,
-        onUncheckAll: this.updateCurrentSelection,
       },
     };
   },
-  computed: {
-    selectionHasChanged() {
-      if (
-        this.currentSelection.length === 0 &&
-        this.currentPermissions.length === 0
-      ) {
-        return true;
-      }
+  mounted() {
+    const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}`;
+    console.log('API URL:', url); // Debugging: Log the URL
+    console.log('API Object:', this.$api); // Debugging: Log the $api object
 
-      if (this.currentSelection.length !== this.currentPermissions.length) {
-        return false;
-      }
+    this.$http
+      .get(url)
+      .then((response) => {
+        const permissions = response.data;
 
-      const isEqual = this.currentSelection.every((sel) =>
-        this.currentPermissions.some((team) => team.name === sel.name),
-      );
+        // Debugging: Log the permissions fetched from the backend
+        console.log('Fetched Permissions:', permissions);
 
-      return (
-        isEqual &&
-        this.currentPermissions.every((team) =>
-          this.currentSelection.some((sel) => sel.name === team.name),
-        )
-      );
-    },
+        // Debugging: Log the selectedPermissions passed as a prop
+        console.log('Selected Permissions:', this.selectedPermissions);
+
+        // Mark permissions as checked if they are already selected
+        this.data = permissions.map((permission) => {
+          const isSelected = this.selectedPermissions.some(
+            (selected) => selected.id === permission.id,
+          );
+          return {
+            ...permission,
+            state: isSelected, // Pre-check if already selected
+          };
+        });
+        console.log('Processed Permissions:', this.data); // Debugging: Log the processed permissions
+      })
+      .catch((error) => {
+        console.error('Error fetching permissions:', error); // Debugging: Log any errors
+        this.$bvToast.toast(this.$t('message.error_fetching_permissions'), {
+          title: this.$t('message.error'),
+          variant: 'danger',
+          autoHideDelay: 5000,
+        });
+      });
   },
   methods: {
     handleSelection: function () {
+      const selections = this.$refs.table.getSelections(); // Get selected rows
       this.$root.$emit('bv::hide::modal', this.$children[0].id);
-      this.$emit('selection', this.currentSelection);
-    },
-    updateCurrentSelection() {
-      this.currentSelection = this.$refs.table.getSelections();
+      this.$emit('selection', selections); // Emit the selected permissions
     },
   },
 };

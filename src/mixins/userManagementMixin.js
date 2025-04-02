@@ -7,151 +7,178 @@ import EventBus from '../shared/eventbus';
  * @mixin
  */
 export default {
-  created: function () {
-    this._userManagementMixin_init();
-  },
-  data: () => ({ _userManagementMixin_ready: false }),
-  methods: {
-    // -- public methods --
-
-    // Loads the user roles for a specific user. return data if targetField is null
-    loadUserProjects: async function (username) {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/role`;
-      try {
-        const response = await this.axios.get(endpoint);
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
+    created: function () {
+        if (this.index == null || this.row == null) {
+            throw new Error("userManagementMixin requires 'index' and 'row' variables, which are typically provided by a detailFormatter function.")
+        }
     },
+    methods: {
 
-    // Loads the user roles for a specific user. return data if targetField is null
-    loadAvailableProjectRoles: async function () {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      try {
-        const response = await this.axios.get(endpoint);
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
+        getUserObjectKey: function () {
+            throw new Error('getUserObjectKey function must be implemented to use "userManagementMixin".')
+        },
 
-    // TODO: internal server error 500
-    _deleteUser: async function (endpoint) {
-      this._userManagementMixin_checkReady();
-      try {
-        await this.axios.delete(endpoint, {
-          data: {
-            // e.g { username: 'testuser' }
-            [this._identifierField]: this.row[this._identifierField],
-          },
-        });
-        this._successfulResponse_delete();
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
+        getUserObject: function () {
+            throw new Error('getUserObjectKey function must be implemented to use "userManagementMixin".')
+        },
 
-    _updateTeamSelection: async function (selections) {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER_MEMBERSHIP}`;
-      this._userManagementMixin_checkReady();
-      const requestBody = {
-        [this._identifierField]: this.row[this._identifierField],
-        teams: selections.map((team) => team.uuid),
-      };
-      try {
-        const response = await this.axios.put(endpoint, requestBody);
-        this._successfulResponse_update(response);
-      } catch (error) {
-        if (error.response?.status === 304) return;
-        this.handleError(error);
-      }
-    },
+        loadUserRoles: function (username) {
+            let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/roles`;
+            this.axios
+                .get(url)
+                .then((response) => {
+                    this.projectRoles = response.data;
+                })
+                .catch((error) => {
+                    console.error('Error loading user roles:', error);
+                    this.projectRoles = [];
+                });
+        },
 
-    _removeTeamMembership: async function (teamUUID) {
-      const username = this.row[this._identifierField];
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${username}/membership`;
+        // TODO: internal server error 500
+        _deleteUser: function (endpoint, updateEvent) {
+            const userObj = this.getUserObject();
 
-      this._userManagementMixin_checkReady();
-      try {
-        const response = await this.axios.delete(endpoint, {
-          data: { uuid: teamUUID },
-        });
-        this._successfulResponse_update(response);
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
+            this.axios
+                .delete(endpoint, {
+                    data: {
+                        username: userObj.username,
+                    },
+                })
+                .then((response) => {
+                    EventBus.$emit(updateEvent, this.index);
+                    this.$toastr.s(this.$t('admin.user_deleted'));
+                })
+                .catch((error) => {
+                    console.error(error)
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                });
+        },
 
-    // Updates the permissions for a user. (essentially adds/removes the user from the permission)
-    _updatePermissionSelection: async function (selections) {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER_PERMISSION}`;
-      this._userManagementMixin_checkReady();
-      const requestBody = {
-        [this._identifierField]: this.row[this._identifierField],
-        permissions: selections.map((selection) => selection.name),
-      };
+        // TODO: ask about batch selections
+        _updateTeamSelection: function (updateEvent, selections) {
+            const userObj = this.getUserObject()
+            const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${userObj.username}/membership`
 
-      try {
-        const response = await this.axios.put(endpoint, requestBody);
-        this._successfulResponse_update(response);
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
+            // remove selected permissions that are already applied
+            const filterCallback = (selection) => {
+                return !(userObj.teams.some((team) => team.uuid === selection.uuid))
+            }
+            const mapCallback = async (selection) => (
+                await this.axios.post(endpoint, { uuid: selection.uuid })
+            )
+            const request_promises = selections.filter(filterCallback).map(mapCallback)
 
-    // Removes a user from a permission. (essentially removes the user from the permission)
-    _removePermission: async function (permission) {
-      this._userManagementMixin_checkReady();
-      const username = this.row[this._identifierField];
-      const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${username}`;
-      try {
-        const response = await this.axios.delete(url);
-        this._successfulResponse_update(response);
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
+            // asynchronously process requests
+            Promise
+                .all(request_promises)
+                .then((_) => {
+                    this.syncVariables({ teams: selections })
 
-    _handleProjectRole: async function (action, projectRole, callbacks = null) {
-      this._userManagementMixin_checkReady();
-      const { role, project } = projectRole;
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER_ROLE}`;
-      const requestBody = {
-        [this._identifierField]: this.row[this._identifierField],
-        role,
-        project,
-      };
+                    //eg ("admin:ldapusers:rowUpdate", index, this.ldapUser)
+                    EventBus.$emit(updateEvent, this.index, userObj);
+                    this.$toastr.s(this.$t('message.updated'));
+                })
+                .catch(error => {
+                    console.error(error)
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                })
+        },
 
-      try {
-        let response;
-        let successMessage;
-        switch (action) {
-          case 'add':
-          case 'update':
-            response = await this.axios.put(endpoint, requestBody);
-            successMessage =
-              action === 'add'
-                ? this.$t('admin.role_assigned')
-                : this.$t('admin.role_updated');
-            break;
-          case 'remove':
-            response = await this.axios.delete(endpoint, { data: requestBody });
-            successMessage = this.$t('admin.role_deleted');
-            break;
-          default:
-            throw new Error(`Invalid action: ${action}`);
+        _removeTeamMembership: function (endpoint, updateEvent, teamUUID) {
+
+            const userObj = this.getUserObject()
+            this.axios
+                .delete(endpoint, { data: { uuid: teamUUID } })
+                .then((response) => {
+                    this.syncVariables(response.data);
+                    EventBus.$emit(updateEvent, this.index, userObj);
+                    this.$toastr.s(this.$t('message.updated'));
+                })
+                .catch((error) => {
+                    console.error(error)
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                });
+        },
+
+        // updateEvent not needed here since we don't need to update the row at the moment, this may change later
+        _updateRoleSelection: function (endpoint, selection) {
+            this.axios
+                .post(endpoint, {
+                    roleUUID: selection.role,
+                    projectUUID: selection.project,
+                })
+                .then((response) => {
+                    this.$toastr.s(this.$t('admin.role_assigned'));
+                    this.syncVariables(response.data)
+                })
+                .catch((error) => {
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                    console.error(error)
+                })
+        },
+
+        // endpoint doesn't change across ldap, managed or oidc
+        _removeRole: function (projectRole) {
+            const username = this[this.getUserObjectKey()].username
+            const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${username}/role`;
+
+            this.axios
+                .delete(url, {
+                    data: {
+                        roleUUID: projectRole.role.uuid,
+                        projectUUID: projectRole.project.uuid,
+                    },
+                })
+                .then((response) => {
+                    this.syncVariables(response.data);
+                    this.$toastr.s(this.$t('message.updated'));
+                })
+                .catch((error) => {
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                });
+        },
+        _updatePermissionSelection: function (selections) {
+            const userObj = this.getUserObject();
+            console.log('User Object:', userObj); // Debugging: Log the user object
+
+            if (!selections || selections.length === 0) {
+                console.warn('No permissions selected:', selections);
+                return;
+            }
+
+            // Define the URL for updating permissions
+            const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${userObj.username}/permissions`;
+
+            // Send the updated permissions to the backend
+            this.axios
+                .post(url, { permissions: selections })
+                .then(() => {
+                    // Update the managedUser's permissions in the UI
+                    this.managedUser.permissions = selections;
+                    this.$toastr.s(this.$t('message.updated'));
+                })
+                .catch((error) => {
+                    console.error(error);
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                });
+        },
+        _removePermission: function (permission) {
+            const userObj = this.getUserObject()
+            const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${userObj.username} `;
+            this.axios
+                .delete(url)
+                .then((response) => {
+                    this.syncVariables(response.data);
+                    this.$toastr.s(this.$t('message.updated'));
+                })
+                .catch((error) => {
+                    console.error(error)
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                });
         }
 
-        this.$toastr.s(successMessage);
-        callbacks?.success?.(response);
-      } catch (error) {
-        this.handleError(error);
-        callbacks?.error?.(error);
-      }
-    },
-
-    // -- utility methods --
+    }
 
     handleError: function (error, toastMessageKey) {
       const messageKey = toastMessageKey ?? 'condition.unsuccessful_action';
