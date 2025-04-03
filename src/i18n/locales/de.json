@@ -181,6 +181,7 @@
     "new_api_key": "Dies ist der neu erzeugte API -Schlüssel. \nBitte beachten Sie, dass es nur einmal angezeigt wird und später nicht abgerufen werden kann.",
     "new_api_key_title": "Neuer API -Schlüssel",
     "nixpkgs": "Nixpkgs",
+    "no_unassigned_projects": "Keine nicht zugewiesenen Projekte",
     "notification_level": "Level",
     "notifications": "Benachrichtigungen",
     "npm": "NPM",
