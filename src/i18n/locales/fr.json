@@ -181,6 +181,7 @@
     "new_api_key": "Il s'agit de la clé API nouvellement générée. \nVeuillez noter qu'il ne sera affiché qu'une seule fois et ne peut pas être récupéré plus tard.",
     "new_api_key_title": "Nouvelle clé API",
     "nixpkgs": "Nixpkgs",
+    "no_unassigned_projects": "Pas de projets non attribués",
     "notification_level": "Niveau d'alerte",
     "notifications": "Notifications",
     "npm": "NPM",

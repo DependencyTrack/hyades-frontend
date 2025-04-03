@@ -181,6 +181,7 @@
     "new_api_key": "これは、新しく生成されたAPIキーです。\nそれは一度しか表示されず、後で取得することはできないことに注意してください。",
     "new_api_key_title": "新しいAPIキー",
     "nixpkgs": "Nixpkgs",
+    "no_unassigned_projects": "割り当てられていないプロジェクトはありません",
     "notification_level": "通知レベル",
     "notifications": "通知",
     "npm": "NPM",
