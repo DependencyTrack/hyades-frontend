@@ -5,12 +5,13 @@
         <b-button
           size="md"
           variant="outline-primary"
-          v-b-modal.createManagedUserModal
+          v-b-modal.createLdapUserModal
         >
           <span class="fa fa-plus"></span> {{ $t('admin.create_user') }}
         </b-button>
       </div>
       <bootstrap-table
+        v-on:refreshTable="refreshTable"
         ref="table"
         :columns="columns"
         :data="data"
@@ -18,7 +19,7 @@
       >
       </bootstrap-table>
     </b-card-body>
-    <create-managed-user-modal v-on:refreshTable="refreshTable" />
+    <create-ldap-user-modal v-on:refreshTable="refreshTable" />
   </b-card>
 </template>
 
@@ -26,21 +27,16 @@
 import xssFilters from 'xss-filters';
 import common from '../../../shared/common';
 import i18n from '../../../i18n';
-import CreateManagedUserModal from './CreateManagedUserModal';
+import CreateLdapUserModal from './CreateLdapUserModal';
 import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../shared/eventbus';
 import ActionableListGroupItem from '../../components/ActionableListGroupItem';
-import ChangePasswordModal from './ChangePasswordModal';
+import ProjectRoleListGroupItem from './ProjectRoleListGroupItem.vue';
 import SelectTeamModal from './SelectTeamModal';
 import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
-import { Switch as cSwitch } from '@coreui/vue';
-import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import SelectRoleModal from './SelectRoleModal.vue';
-import SelectProjectModal from './SelectProjectModal.vue';
-import rolesMixin from '../../../mixins/rolesMixin';
-import ProjectRoleListGroupItem from './ProjectRoleListGroupItem.vue';
-import userManagementMixin from '../../../mixins/userManagementMixin';
+import userManagementMixins from '../../../mixins/userManagementMixin';
 
 export default {
   props: {
@@ -48,23 +44,20 @@ export default {
   },
   mixins: [bootstrapTableMixin],
   components: {
-    CreateManagedUserModal,
+    CreateLdapUserModal,
   },
   mounted() {
-    EventBus.$on('admin:managedusers:rowUpdate', (index, row) => {
-      this.$refs.table.updateRow({
-        index: index,
-        row: row,
-      });
+    EventBus.$on('admin:ldapusers:rowUpdate', (index, row) => {
+      this.$refs.table.updateRow({ index: index, row: row });
       this.$refs.table.expandRow(index);
     });
-    EventBus.$on('admin:managedusers:rowDeleted', (index, row) => {
+    EventBus.$on('admin:ldapusers:rowDeleted', (index, row) => {
       this.refreshTable();
     });
   },
   beforeDestroy() {
-    EventBus.$off('admin:managedusers:rowUpdate');
-    EventBus.$off('admin:managedusers:rowDeleted');
+    EventBus.$off('admin:ldapusers:rowUpdate');
+    EventBus.$off('admin:ldapusers:rowDeleted');
   },
   data() {
     return {
@@ -78,16 +71,8 @@ export default {
           },
         },
         {
-          title: this.$t('message.fullname'),
-          field: 'fullname',
-          sortable: false,
-          formatter(value, row, index) {
-            return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
-          },
-        },
-        {
-          title: this.$t('message.email'),
-          field: 'email',
+          title: this.$t('admin.distinguished_name'),
+          field: 'dn',
           sortable: false,
           formatter(value, row, index) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
@@ -131,7 +116,7 @@ export default {
                   <b-col sm="6">
                     <b-form-group :label="this.$t('admin.team_membership')">
                       <div class="list-group">
-                        <span v-for="team in teams">
+                        <span v-for="team in ldapUser.teams">
                           <actionable-list-group-item :tooltip="$t('admin.remove_team_membership')" :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTeamModal')"/>
@@ -147,138 +132,76 @@ export default {
                     </b-form-group>
                     <b-form-group :label="this.$t('admin.permissions')">
                       <div class="list-group">
-                        <span v-for="permission in managedUser.permissions">
+                        <span v-for="permission in ldapUser.permissions">
                           <actionable-list-group-item :tooltip="$t('admin.remove_permission')" :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
                         </span>
-                        <actionable-list-group-item :add-icon="true"  v-on:actionClicked="openPermissionModal"/>
+                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
                       </div>
                     </b-form-group>
                   </b-col>
                   <b-col sm="6">
-                    <b-input-group-form-input id="input-managed-user-fullname" :label="$t('message.fullname')" input-group-size="mb-3"
-                                              required="true" type="text" v-model="fullname" lazy="true"
-                                              v-debounce:750ms="updateUser" :debounce-events="'keyup'" />
-                    <b-input-group-form-input id="input-managed-user-email" :label="$t('message.email')" input-group-size="mb-3"
-                                              required="true" type="text" v-model="email" lazy="true"
-                                              v-debounce:750ms="updateUser" :debounce-events="'keyup'" />
-                    <c-switch id="forcePasswordChange" color="primary" v-model="forcePasswordChange" label v-bind="labelIcon" />{{$t('admin.change_password_next_login')}}
-                    <br/>
-                    <c-switch id="nonExpiryPassword" color="primary" v-model="nonExpiryPassword" label v-bind="labelIcon" />{{$t('admin.password_never_expires')}}
-                    <br/>
-                    <c-switch id="suspended" color="primary" v-model="suspended" label v-bind="labelIcon" />{{$t('admin.suspended')}}
                     <div style="text-align:right">
-                       <b-button variant="outline-primary" @click="$root.$emit('bv::show::modal', 'changePasswordModal')">{{ $t('admin.change_password') }}</b-button>
                        <b-button variant="outline-danger" @click="deleteUser">{{ $t('admin.delete_user') }}</b-button>
                     </div>
                   </b-col>
                   <select-team-modal v-on:selection="updateTeamSelection" />
                   <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
-                  <select-permission-modal :currentPermissions="managedUser.permissions" v-on:selection="updatePermissionSelection" />
-                  <change-password-modal :managed-user="managedUser" />
+                  <select-permission-modal v-on:selection="updatePermissionSelection" />
                 </b-row>
               `,
-            mixins: [permissionsMixin, userManagementMixin],
+            mixins: [permissionsMixin, userManagementMixins],
             components: {
-              cSwitch,
               ActionableListGroupItem,
+              ProjectRoleListGroupItem,
+              SelectRoleModal,
               SelectTeamModal,
               SelectPermissionModal,
-              SelectProjectModal,
-              SelectRoleModal,
-              ChangePasswordModal,
-              BInputGroupFormInput,
-              ProjectRoleListGroupItem,
             },
             data() {
               return {
-                index,
                 row,
-                managedUser: row,
+                index,
+                ldapUser: row,
                 username: row.username,
                 teams: row.teams,
                 permissions: row.permissions,
-                fullname: row.fullname,
-                email: row.email,
-                forcePasswordChange: row.forcePasswordChange,
-                nonExpiryPassword: row.nonExpiryPassword,
-                suspended: row.suspended,
                 projectRoles: [],
-                labelIcon: {
-                  dataOn: '\u2713',
-                  dataOff: '\u2715',
-                },
               };
             },
             created() {
-              this.loadUserRoles(this.managedUser.username);
-            },
-            watch: {
-              forcePasswordChange() {
-                this.updateUser();
-              },
-              nonExpiryPassword() {
-                this.updateUser();
-              },
-              suspended() {
-                this.updateUser();
-              },
+              this.loadUserRoles(this.ldapUser.username);
             },
             methods: {
               getUserObjectKey: function () {
-                return 'managedUser';
+                return 'ldapUser';
               },
               getUserObject: function () {
-                return this.managedUser;
-              },
-              updateUser: function () {
-                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
-                this.axios
-                  .post(url, {
-                    username: this.username,
-                    fullname: this.fullname,
-                    email: this.email,
-                    newPassword: null,
-                    confirmPassword: null,
-                    forcePasswordChange: this.forcePasswordChange,
-                    nonExpiryPassword: this.nonExpiryPassword,
-                    suspended: this.suspended,
-                  })
-                  .then((response) => {
-                    this.manageduser = response.data;
-                    EventBus.$emit(
-                      'admin:managedusers:rowUpdate',
-                      index,
-                      this.manageduser,
-                    );
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+                return this.ldapUser;
               },
               deleteUser: function () {
-                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
-                const event = 'admin:managedusers:rowDeleted';
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_LDAP}`;
+                const event = 'admin:ldapusers:rowDeleted';
+
                 this._deleteUser(url, event);
               },
               updateTeamSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectTeamModal');
-                // const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
-                const event = 'admin:managedusers:rowUpdate';
+                const event = 'admin:ldapusers:rowUpdate';
+
                 this._updateTeamSelection(event, selections);
               },
               removeTeamMembership: function (teamUUID) {
                 const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
-                const event = 'admin:managedusers:rowUpdate';
+                const event = 'admin:ldapusers:rowUpdate';
+
                 this._removeTeamMembership(url, event, teamUUID);
               },
               updateRoleSelection: function (selection) {
-                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.managedUser.username}/role`;
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/role`;
                 this._updateRoleSelection(url, selection);
               },
-              removeRole: function (projectRole) {
-                this._removeRole(projectRole);
+              removeRole: function (role) {
+                this._removeRole(role);
               },
               updatePermissionSelection: function (selections) {
                 this._updatePermissionSelection(selections);
@@ -286,9 +209,10 @@ export default {
               removePermission: function (permission) {
                 this._removePermission(permission);
               },
-              syncVariables: function (managedUser) {
-                Object.assign(this.managedUser, managedUser);
-                this.loadUserRoles(this.managedUser.username);
+              syncVariables: function (userObj) {
+                Object.assign(this.ldapUser, userObj);
+                // Object.assign(this.ldapUser, ldapUser)
+                this.loadUserRoles(this.ldapUser.username); // mixin
               },
             },
           });
@@ -299,7 +223,7 @@ export default {
           res.total = xhr.getResponseHeader('X-Total-Count');
           return res;
         },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`,
+        url: `${this.$api.BASE_URL}/${this.$api.URL_USER_LDAP}`,
       },
     };
   },

@@ -15,7 +15,6 @@ export default {
     }
   },
   methods: {
-    // this was done to keep the flow of the project. Theres definitely a better way but it work
     getUserObjectKey: function () {
       throw new Error(
         'getUserObjectKey function must be implemented to use "userManagementMixin".',
@@ -24,7 +23,7 @@ export default {
 
     getUserObject: function () {
       throw new Error(
-        'getUserObject function must be implemented to use "userManagementMixin".',
+        'getUserObjectKey function must be implemented to use "userManagementMixin".',
       );
     },
 
@@ -78,7 +77,7 @@ export default {
 
       // asynchronously process requests
       Promise.all(request_promises)
-        .then(() => {
+        .then((_) => {
           this.syncVariables({ teams: selections });
 
           //eg ("admin:ldapusers:rowUpdate", index, this.ldapUser)
@@ -143,8 +142,7 @@ export default {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
-    // TODO: update once batch operations are implemented, Account for 304
-    _updatePermissionSelection: async function (selections) {
+    _updatePermissionSelection: function (selections) {
       const userObj = this.getUserObject();
 
       const currentPermissions = userObj.permissions;
@@ -177,7 +175,7 @@ export default {
       return Promise.all([mappedAdd, mappedRemove])
         .then(() => {
           // sync variables from selections to avoid missing permissions
-          this.syncVariables({ permissions: newPermissions });
+          this.syncVariables({ permissions: selections });
           this.$toastr.s(this.$t('message.updated'));
         })
         .catch((error) => {
@@ -186,7 +184,7 @@ export default {
         });
     },
 
-    _removePermission: async function (permission) {
+    _removePermission: function (permission) {
       const userObj = this.getUserObject();
       const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${userObj.username}`;
       return this.axios

@@ -4,6 +4,7 @@
     size="md"
     @hide="resetValues()"
     hide-header-close
+    no-stacking
     :title="$t('admin.create_role')"
   >
     <b-input-group-form-input
@@ -39,12 +40,7 @@
       <b-button size="md" variant="secondary" @click="cancel()">
         {{ $t('message.close') }}
       </b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="createRole()"
-        :disabled="!name"
-      >
+      <b-button size="md" variant="primary" @click="createUser()">
         {{ $t('message.create') }}
       </b-button>
     </template>
@@ -73,22 +69,18 @@ export default {
     };
   },
   methods: {
-    createRole() {
+    createUser() {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      const requestBody = {
-        name: this.name,
-        permissions: this.permissions.map((permission) => permission.name),
-      };
       this.axios
         .put(url, {
           name: this.name,
-          permissions: this.permissions.map((perm) => perm.name),
+          permissions: this.permissions,
         })
-        .then(() => {
+        .then((response) => {
           this.$emit('refreshTable');
           this.$toastr.s(this.$t('admin.role_created'));
         })
-        .catch(() => {
+        .catch((error) => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
       this.$root.$emit('bv::hide::modal', 'createRoleModal');
@@ -108,7 +100,11 @@ export default {
       this.$root.$emit('bv::show::modal', 'selectPermissionModal');
     },
     updatePermissionSelection(selections) {
-      this.permissions = selections;
+      this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
+      for (let i = 0; i < selections.length; i++) {
+        let selection = selections[i];
+        this.permissions.push(selection);
+      }
     },
   },
 };

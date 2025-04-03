@@ -2,6 +2,7 @@
   <b-modal
     id="selectRoleModal"
     @hide="resetValues()"
+    @show="loadProjects()"
     size="md"
     hide-header-close
     no-stacking
@@ -59,7 +60,6 @@ export default {
   },
   mounted() {
     this.loadAvailableRoles();
-    this.loadProjects();
   },
   props: {
     username: String,
@@ -104,17 +104,30 @@ export default {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
-    loadProjects: function () {
-      const url = `${this.$api.BASE_URL}/${this.$api.URL_ACL_USER}/${this.user}`;
-      this.axios
-        .get(url)
-        .then((response) => {
+    loadProjects: async function () {
+      try {
+        const response = await this.axios.get(
+          `${this.$api.BASE_URL}/${this.$api.URL_ACL_USER}/${this.user}`,
+        );
+
+        if (response.status === 204) {
+          this.availableProjects = [
+            {
+              uuid: null,
+              name: this.$t('admin.no_unassigned_projects'),
+            },
+          ];
+          this.selectedProject = this.$t('admin.no_unassigned_projects');
+          this.selectedRole = null;
+          console.log('No projects available.');
+        } else if (response.status === 200 && Array.isArray(response.data)) {
           this.availableProjects = response.data;
-        })
-        .catch((error) => {
-          console.error(error);
+        } else {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+        }
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
     resetValues: function () {
       this.selectedProject = this.initialProject;
