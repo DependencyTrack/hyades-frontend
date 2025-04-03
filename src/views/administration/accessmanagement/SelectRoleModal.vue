@@ -42,11 +42,9 @@
         $t('message.close')
       }}</b-button>
       <!-- emit selected role object back to parent -->
-      <b-button
-      size="md"
-      variant="primary"
-      @click="handleSelection"
-      >{{$t('message.assign')}}</b-button>
+      <b-button size="md" variant="primary" @click="handleSelection">{{
+        $t('message.assign')
+      }}</b-button>
     </template>
   </b-modal>
 </template>
@@ -82,34 +80,39 @@ export default {
     };
   },
   methods: {
-    handleSelection: function() {
-      if(!this.selectedRole || !this.selectedProject) {
+    handleSelection: function () {
+      if (!this.selectedRole || !this.selectedProject) {
         return;
       }
 
-      const selection = {role: this.selectedRole, project: this.selectedProject}
-      this.$root.$emit("bv::hide::modal", this.$children[0].id) //or just 'selectRoleModal'
-      this.$emit('selection', selection)
+      const selection = {
+        role: this.selectedRole,
+        project: this.selectedProject,
+      };
+      this.$root.$emit('bv::hide::modal', this.$children[0].id); //or just 'selectRoleModal'
+      this.$emit('selection', selection);
     },
     loadAvailableRoles: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
       this.axios
         .get(url)
         .then((response) => {
           this.availableRoles = response.data;
         })
         .catch((error) => {
+          console.error(error);
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
     loadProjects: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ACL_USER}/${this.user}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_ACL_USER}/${this.user}`;
       this.axios
         .get(url)
         .then((response) => {
           this.availableProjects = response.data;
         })
         .catch((error) => {
+          console.error(error);
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },

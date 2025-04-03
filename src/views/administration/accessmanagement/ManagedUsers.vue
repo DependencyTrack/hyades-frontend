@@ -171,7 +171,7 @@ export default {
                   </b-col>
                   <select-team-modal v-on:selection="updateTeamSelection" />
                   <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
-                  <select-permission-modal v-on:selection="updatePermissionSelection" id="selectPermissionModal":selected-permissions="managedUser.permissions" />
+                  <select-permission-modal :currentPermissions="managedUser.permissions" v-on:selection="updatePermissionSelection" />
                   <change-password-modal :managed-user="managedUser" />
                 </b-row>
               `,
