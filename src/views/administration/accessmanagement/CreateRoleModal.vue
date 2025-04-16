@@ -40,7 +40,7 @@
       <b-button size="md" variant="secondary" @click="cancel()">
         {{ $t('message.close') }}
       </b-button>
-      <b-button size="md" variant="primary" @click="createUser()">
+      <b-button size="md" variant="primary" @click="createRole()">
         {{ $t('message.create') }}
       </b-button>
     </template>
@@ -69,7 +69,7 @@ export default {
     };
   },
   methods: {
-    createUser() {
+    createRole() {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
       this.axios
         .put(url, {

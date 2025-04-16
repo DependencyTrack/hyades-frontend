@@ -2,12 +2,12 @@
   <b-card no-body :header="header">
     <b-card-body>
       <c-switch
-        id="enabled"
+        id="isGitlabEnabled"
         color="primary"
-        v-model="enabled"
+        v-model="isGitlabEnabled"
         label
         v-bind="labelIcon"
-      />{{ $t('admin.integration_gitlab_enable') }}
+      />{{ $t('admin.gitlab_sync_enable') }}
       <br />
       <c-switch
         id="includeArchived"
@@ -90,7 +90,7 @@ export default {
   },
   data() {
     return {
-      enabled: false,
+      isGitlabEnabled: false,
       includeArchived: false,
       topics: [],
       newTopic: '',
@@ -119,11 +119,6 @@ export default {
         this.updateConfigProperties([
           {
             groupName: 'integrations',
-            propertyName: 'gitlab.enabled',
-            propertyValue: this.enabled,
-          },
-          {
-            groupName: 'integrations',
             propertyName: 'gitlab.include.archived',
             propertyValue: this.includeArchived,
           },
@@ -137,6 +132,24 @@ export default {
         console.error('Error updating configuration properties:', error);
       }
     },
+    setGitlabState: function () {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_INTEGRATION}/gitlab/${this.isGitlabEnabled}`;
+      this.axios
+        .post(url)
+        .then(() => {
+          console.log('GitLab state updated successfully');
+          this.$toastr.s(this.$t('admin.configuration_saved'));
+        })
+        .catch((error) => {
+          console.error('Error updating GitLab state:', error);
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        });
+    },
+  },
+  watch: {
+    isGitlabEnabled() {
+      this.setGitlabState();
+    },
   },
   created() {
     this.axios.get(this.configUrl).then((response) => {
@@ -147,7 +160,7 @@ export default {
         );
       });
       if (configItems.length > 0) {
-        this.enabled = common.toBoolean(configItems[0].propertyValue);
+        this.isGitlabEnabled = common.toBoolean(configItems[0].propertyValue);
       }
       const configItemsincludeArchived = response.data.filter((item) => {
         return (

@@ -120,7 +120,6 @@
     "github": "GitHub",
     "github_advisories": "GitHub Advisories",
     "gitlab": "GitLab",
-    "gitlab_project_sync": "GitLabプロジェクト同期",
     "go_modules": "Go Modules",
     "group": "グループ",
     "hackage": "Hackage",
