@@ -277,8 +277,7 @@ export default {
     },
   },
   mounted() {
-    const daysBack = 90;
-    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/days/${daysBack}`;
+    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/days`;
     this.axios.get(url).then((response) => {
       this.$refs.chartProjectVulnerabilities.render(response.data);
       this.$refs.chartPolicyViolationsState.render(response.data);

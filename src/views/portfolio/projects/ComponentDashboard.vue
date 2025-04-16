@@ -221,9 +221,8 @@ export default {
     },
   },
   mounted() {
-    const daysBack = 90;
     let uuid = this.$route.params.uuid;
-    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/component/${uuid}/days/${daysBack}`;
+    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/component/${uuid}/days`;
     this.axios.get(url).then((response) => {
       this.$refs.chartComponentVulnerabilities.render(response.data);
       this.$refs.chartPolicyViolationsState.render(response.data);

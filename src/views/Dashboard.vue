@@ -821,7 +821,7 @@ export default {
   mounted() {
     if (this.isPermitted(this.PERMISSIONS.VIEW_PORTFOLIO)) {
       const daysBack = 90;
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${daysBack}/days`;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/days`;
       this.axios.get(url).then((response) => {
         this.$refs.portfolioWidgetRow.render(response.data);
         this.$refs.chartPortfolioVulnerabilities.render(response.data);
