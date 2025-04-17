@@ -22,7 +22,20 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="7" class="d-none d-md-block"> </b-col>
+        <b-col sm="5"> </b-col>
+        <b-col sm="2">
+          <b-form-group>
+            <b-input-group :append="$t('admin.days')">
+              <b-link
+              class="font-weight-bold"
+              style="margin-right: 8px;margin-top: 6px;"
+              v-on:click="fetchMetrics"
+              ><i class="fa fa-refresh"></i
+          ></b-link>
+                <b-form-input type="number" v-model="metricDays"></b-form-input>
+              </b-input-group>
+          </b-form-group>
+        </b-col>
       </b-row>
       <chart-portfolio-vulnerabilities
         ref="chartPortfolioVulnerabilities"
@@ -604,6 +617,7 @@ export default {
   },
   data() {
     return {
+      metricDays: this.metricDays,
       totalProjects: 0,
       vulnerableProjects: 0,
       vulnerableProjectsPercent: 0,
@@ -817,22 +831,41 @@ export default {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
+    fetchMetrics() {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${this.metricDays}/days`;
+      this.axios.get(url).then((response) => {
+            this.$refs.portfolioWidgetRow.render(response.data);
+            this.$refs.chartPortfolioVulnerabilities.render(response.data);
+            this.$refs.chartProjectVulnerabilities.render(response.data);
+            this.$refs.chartAuditingFindingsProgress.render(response.data);
+            this.$refs.chartAuditingViolationsProgress.render(response.data);
+            this.$refs.chartPolicyViolationsState.render(response.data);
+            this.$refs.chartPolicyViolationsClassification.render(response.data);
+            this.$refs.chartComponentVulnerabilities.render(response.data);
+            this.extractStats(response.data);
+          });
+    },
+  },
+  watch: {
+    metricDays() {
+      if (localStorage) {
+        localStorage.setItem(
+          'portfolioMetricDays',
+          this.metricDays
+        );
+      }
+    }
+  },
+  beforeMount() {
+    this.metricDays =
+      localStorage &&
+      localStorage.getItem('portfolioMetricDays') !== null
+        ? localStorage.getItem('portfolioMetricDays')
+        : 30;
   },
   mounted() {
     if (this.isPermitted(this.PERMISSIONS.VIEW_PORTFOLIO)) {
-      const daysBack = 90;
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/days`;
-      this.axios.get(url).then((response) => {
-        this.$refs.portfolioWidgetRow.render(response.data);
-        this.$refs.chartPortfolioVulnerabilities.render(response.data);
-        this.$refs.chartProjectVulnerabilities.render(response.data);
-        this.$refs.chartAuditingFindingsProgress.render(response.data);
-        this.$refs.chartAuditingViolationsProgress.render(response.data);
-        this.$refs.chartPolicyViolationsState.render(response.data);
-        this.$refs.chartPolicyViolationsClassification.render(response.data);
-        this.$refs.chartComponentVulnerabilities.render(response.data);
-        this.extractStats(response.data);
-      });
+      this.fetchMetrics()
     }
   },
 };

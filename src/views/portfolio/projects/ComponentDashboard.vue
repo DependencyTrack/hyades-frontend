@@ -20,7 +20,20 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="7" class="d-none d-md-block"> </b-col>
+        <b-col sm="5"> </b-col>
+        <b-col sm="2">
+          <b-form-group>
+            <b-input-group :append="$t('admin.days')">
+              <b-link
+              class="font-weight-bold"
+              style="margin-right: 8px;margin-top: 6px;"
+              v-on:click="fetchMetrics">
+                <i class="fa fa-refresh"></i>
+              </b-link>
+              <b-form-input type="number" v-model="metricDays"></b-form-input>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
       </b-row>
       <chart-portfolio-vulnerabilities
         ref="chartComponentVulnerabilities"
@@ -160,6 +173,7 @@ export default {
   },
   data() {
     return {
+      metricDays: this.metricDays,
       currentCritical: 0,
       currentHigh: 0,
       currentMedium: 0,
@@ -219,16 +233,36 @@ export default {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
+    fetchMetrics() {
+      let uuid = this.$route.params.uuid;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/component/${uuid}/days/${this.metricDays}`;
+      this.axios.get(url).then((response) => {
+        this.$refs.chartComponentVulnerabilities.render(response.data);
+        this.$refs.chartPolicyViolationsState.render(response.data);
+        this.$refs.chartPolicyViolationBreakdown.render(response.data);
+        this.extractStats(response.data);
+      });
+    },
+  },
+  watch: {
+    metricDays() {
+      if (localStorage) {
+        localStorage.setItem(
+          'componentMetricDays',
+          this.metricDays
+        );
+      }
+    }
+  },
+  beforeMount() {
+    this.metricDays =
+      localStorage &&
+      localStorage.getItem('componentMetricDays') !== null
+        ? localStorage.getItem('componentMetricDays')
+        : 30;
   },
   mounted() {
-    let uuid = this.$route.params.uuid;
-    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/component/${uuid}/days`;
-    this.axios.get(url).then((response) => {
-      this.$refs.chartComponentVulnerabilities.render(response.data);
-      this.$refs.chartPolicyViolationsState.render(response.data);
-      this.$refs.chartPolicyViolationBreakdown.render(response.data);
-      this.extractStats(response.data);
-    });
+    this.fetchMetrics();
   },
 };
 </script>
