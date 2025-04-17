@@ -22,7 +22,7 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="6" class="d-none d-md-block"/>
+        <b-col sm="6" class="d-none d-md-block" />
         <b-col sm="1">
           <b-form-group id="portfolio-metric-days">
             <b-form-select
@@ -839,39 +839,35 @@ export default {
     fetchMetrics() {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${this.metricDays}/days`;
       this.axios.get(url).then((response) => {
-            this.$refs.portfolioWidgetRow.render(response.data);
-            this.$refs.chartPortfolioVulnerabilities.render(response.data);
-            this.$refs.chartProjectVulnerabilities.render(response.data);
-            this.$refs.chartAuditingFindingsProgress.render(response.data);
-            this.$refs.chartAuditingViolationsProgress.render(response.data);
-            this.$refs.chartPolicyViolationsState.render(response.data);
-            this.$refs.chartPolicyViolationsClassification.render(response.data);
-            this.$refs.chartComponentVulnerabilities.render(response.data);
-            this.extractStats(response.data);
-          });
+        this.$refs.portfolioWidgetRow.render(response.data);
+        this.$refs.chartPortfolioVulnerabilities.render(response.data);
+        this.$refs.chartProjectVulnerabilities.render(response.data);
+        this.$refs.chartAuditingFindingsProgress.render(response.data);
+        this.$refs.chartAuditingViolationsProgress.render(response.data);
+        this.$refs.chartPolicyViolationsState.render(response.data);
+        this.$refs.chartPolicyViolationsClassification.render(response.data);
+        this.$refs.chartComponentVulnerabilities.render(response.data);
+        this.extractStats(response.data);
+      });
     },
   },
   watch: {
     metricDays() {
       if (localStorage) {
-        localStorage.setItem(
-          'portfolioMetricDays',
-          this.metricDays
-        );
-      };
+        localStorage.setItem('portfolioMetricDays', this.metricDays);
+      }
       this.fetchMetrics();
-    }
+    },
   },
   beforeMount() {
     this.metricDays =
-      localStorage &&
-      localStorage.getItem('portfolioMetricDays') !== null
+      localStorage && localStorage.getItem('portfolioMetricDays') !== null
         ? localStorage.getItem('portfolioMetricDays')
         : 30;
   },
   mounted() {
     if (this.isPermitted(this.PERMISSIONS.VIEW_PORTFOLIO)) {
-      this.fetchMetrics()
+      this.fetchMetrics();
     }
   },
 };

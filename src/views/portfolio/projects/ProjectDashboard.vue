@@ -30,7 +30,7 @@
             </tr>
           </table>
         </b-col>
-        <b-col sm="6" class="d-none d-md-block"/>
+        <b-col sm="6" class="d-none d-md-block" />
         <b-col sm="1">
           <b-form-group id="project-metric-days">
             <b-form-select
@@ -308,8 +308,7 @@ export default {
   },
   beforeMount() {
     this.metricDays =
-      localStorage &&
-      localStorage.getItem('projectMetricDays') !== null
+      localStorage && localStorage.getItem('projectMetricDays') !== null
         ? localStorage.getItem('projectMetricDays')
         : 30;
   },
@@ -331,13 +330,10 @@ export default {
     },
     metricDays() {
       if (localStorage) {
-        localStorage.setItem(
-          'projectMetricDays',
-          this.metricDays
-        );
+        localStorage.setItem('projectMetricDays', this.metricDays);
       }
       this.fetchMetrics();
-    }
+    },
   },
 };
 </script>

@@ -20,7 +20,7 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="6" class="d-none d-md-block"/>
+        <b-col sm="6" class="d-none d-md-block" />
         <b-col sm="1">
           <b-form-group id="component-metric-days">
             <b-form-select
@@ -252,18 +252,14 @@ export default {
   watch: {
     metricDays() {
       if (localStorage) {
-        localStorage.setItem(
-          'componentMetricDays',
-          this.metricDays
-        );
+        localStorage.setItem('componentMetricDays', this.metricDays);
       }
       this.fetchMetrics();
-    }
+    },
   },
   beforeMount() {
     this.metricDays =
-      localStorage &&
-      localStorage.getItem('componentMetricDays') !== null
+      localStorage && localStorage.getItem('componentMetricDays') !== null
         ? localStorage.getItem('componentMetricDays')
         : 30;
   },

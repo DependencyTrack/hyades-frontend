@@ -92,8 +92,7 @@ export default {
   },
   beforeMount() {
     var metricDays =
-      localStorage &&
-      localStorage.getItem('portfolioMetricDays') !== null
+      localStorage && localStorage.getItem('portfolioMetricDays') !== null
         ? localStorage.getItem('portfolioMetricDays')
         : 30;
     if (this.fetch) {
