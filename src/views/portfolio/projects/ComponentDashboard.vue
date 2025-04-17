@@ -20,18 +20,15 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="5"> </b-col>
-        <b-col sm="2">
-          <b-form-group>
-            <b-input-group :append="$t('admin.days')">
-              <b-link
-              class="font-weight-bold"
-              style="margin-right: 8px;margin-top: 6px;"
-              v-on:click="fetchMetrics">
-                <i class="fa fa-refresh"></i>
-              </b-link>
-              <b-form-input type="number" v-model="metricDays"></b-form-input>
-            </b-input-group>
+        <b-col sm="6" class="d-none d-md-block"/>
+        <b-col sm="1">
+          <b-form-group id="component-metric-days">
+            <b-form-select
+              id="metric-days-input"
+              v-model="metricDays"
+              class="required"
+              :options="options"
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -188,6 +185,14 @@ export default {
       vulnerabilities: 0,
       suppressed: 0,
       lastMeasurement: '',
+      options: [
+        { value: 5, text: '5' },
+        { value: 10, text: '10' },
+        { value: 20, text: '20' },
+        { value: 30, text: '30', selected: true },
+        { value: 60, text: '60' },
+        { value: 90, text: '90' },
+      ],
     };
   },
   methods: {
@@ -252,6 +257,7 @@ export default {
           this.metricDays
         );
       }
+      this.fetchMetrics();
     }
   },
   beforeMount() {
