@@ -22,7 +22,17 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="7" class="d-none d-md-block"> </b-col>
+        <b-col sm="6" class="d-none d-md-block" />
+        <b-col sm="1">
+          <b-form-group id="portfolio-metric-days">
+            <b-form-select
+              id="metric-days-input"
+              v-model="metricDays"
+              class="required"
+              :options="options"
+            />
+          </b-form-group>
+        </b-col>
       </b-row>
       <chart-portfolio-vulnerabilities
         ref="chartPortfolioVulnerabilities"
@@ -604,6 +614,7 @@ export default {
   },
   data() {
     return {
+      metricDays: this.metricDays,
       totalProjects: 0,
       vulnerableProjects: 0,
       vulnerableProjectsPercent: 0,
@@ -653,6 +664,14 @@ export default {
       unassigned: 0,
       unassignedPercent: 0,
       lastMeasurement: '',
+      options: [
+        { value: 5, text: '5' },
+        { value: 10, text: '10' },
+        { value: 20, text: '20' },
+        { value: 30, text: '30', selected: true },
+        { value: 60, text: '60' },
+        { value: 90, text: '90' },
+      ],
     };
   },
   methods: {
@@ -817,11 +836,8 @@ export default {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
-  },
-  mounted() {
-    if (this.isPermitted(this.PERMISSIONS.VIEW_PORTFOLIO)) {
-      const daysBack = 90;
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${daysBack}/days`;
+    fetchMetrics() {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${this.metricDays}/days`;
       this.axios.get(url).then((response) => {
         this.$refs.portfolioWidgetRow.render(response.data);
         this.$refs.chartPortfolioVulnerabilities.render(response.data);
@@ -833,6 +849,25 @@ export default {
         this.$refs.chartComponentVulnerabilities.render(response.data);
         this.extractStats(response.data);
       });
+    },
+  },
+  watch: {
+    metricDays() {
+      if (localStorage) {
+        localStorage.setItem('portfolioMetricDays', this.metricDays);
+      }
+      this.fetchMetrics();
+    },
+  },
+  beforeMount() {
+    this.metricDays =
+      localStorage && localStorage.getItem('portfolioMetricDays') !== null
+        ? localStorage.getItem('portfolioMetricDays')
+        : 30;
+  },
+  mounted() {
+    if (this.isPermitted(this.PERMISSIONS.VIEW_PORTFOLIO)) {
+      this.fetchMetrics();
     }
   },
 };

@@ -91,9 +91,12 @@ export default {
     };
   },
   beforeMount() {
+    var metricDays =
+      localStorage && localStorage.getItem('portfolioMetricDays') !== null
+        ? localStorage.getItem('portfolioMetricDays')
+        : 30;
     if (this.fetch) {
-      const daysBack = 90;
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${daysBack}/days`;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${metricDays}/days`;
       this.axios.get(url).then((response) => {
         this.render(response.data);
       });
