@@ -83,8 +83,7 @@ const FortifySsc = () =>
   import('@/views/administration/integrations/FortifySsc');
 const DefectDojo = () =>
   import('@/views/administration/integrations/DefectDojo');
-const GitLabProjectSync = () =>
-  import('@/views/administration/integrations/GitLabProjectSync');
+const GitLab = () => import('@/views/administration/integrations/GitLab');
 const KennaSecurity = () =>
   import('@/views/administration/integrations/KennaSecurity');
 
@@ -993,8 +992,8 @@ function configRoutes() {
               },
             },
             {
-              path: 'integrations/gitlabprojectsync',
-              component: GitLabProjectSync,
+              path: 'integrations/gitlab',
+              component: GitLab,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
