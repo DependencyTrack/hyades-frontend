@@ -68,6 +68,7 @@
     "create_template": "Criar modelo",
     "create_user": "Criar usuário",
     "days": "Dias",
+    "days_of_metrics": "Dias de métricas",
     "default": "Padrão",
     "default_language": "Idioma padrão",
     "default_language_desc": "Idioma padrão, que é usado por todos, quando não especificam um. \nO idioma do navegador será usado quando estiver desabilitado.",

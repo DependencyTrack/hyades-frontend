@@ -30,7 +30,22 @@
             </tr>
           </table>
         </b-col>
-        <b-col sm="7" class="d-none d-md-block"> </b-col>
+        <b-col sm="5" class="d-none d-md-block" />
+        <b-col sm="2">
+          <div style="float: right">
+            <b-form-group id="project-metric-days" style="margin-bottom: 3%">
+              <b-form-select
+                id="metric-days-input"
+                v-model="metricDays"
+                class="required"
+                :options="options"
+              />
+            </b-form-group>
+            <div class="small text-muted">
+              {{ $t('admin.days_of_metrics') }}
+            </div>
+          </div>
+        </b-col>
       </b-row>
       <chart-portfolio-vulnerabilities
         ref="chartProjectVulnerabilities"
@@ -216,6 +231,7 @@ export default {
   },
   data() {
     return {
+      metricDays: this.metricDays,
       currentCritical: 0,
       currentHigh: 0,
       currentMedium: 0,
@@ -231,6 +247,14 @@ export default {
       suppressed: 0,
       lastMeasurement: 'n/a',
       lastBomImport: 'n/a',
+      options: [
+        { value: 5, text: '5' },
+        { value: 10, text: '10' },
+        { value: 20, text: '20' },
+        { value: 30, text: '30', selected: true },
+        { value: 60, text: '60' },
+        { value: 90, text: '90' },
+      ],
     };
   },
   methods: {
@@ -275,18 +299,26 @@ export default {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
+    fetchMetrics() {
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/days/${this.metricDays}`;
+      this.axios.get(url).then((response) => {
+        this.$refs.chartProjectVulnerabilities.render(response.data);
+        this.$refs.chartPolicyViolationsState.render(response.data);
+        this.$refs.chartPolicyViolationBreakdown.render(response.data);
+        this.$refs.chartAuditingFindingsProgress.render(response.data);
+        this.$refs.chartComponentVulnerabilities.render(response.data);
+        this.extractStats(response.data);
+      });
+    },
+  },
+  beforeMount() {
+    this.metricDays =
+      localStorage && localStorage.getItem('projectMetricDays') !== null
+        ? localStorage.getItem('projectMetricDays')
+        : 30;
   },
   mounted() {
-    const daysBack = 90;
-    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/days/${daysBack}`;
-    this.axios.get(url).then((response) => {
-      this.$refs.chartProjectVulnerabilities.render(response.data);
-      this.$refs.chartPolicyViolationsState.render(response.data);
-      this.$refs.chartPolicyViolationBreakdown.render(response.data);
-      this.$refs.chartAuditingFindingsProgress.render(response.data);
-      this.$refs.chartComponentVulnerabilities.render(response.data);
-      this.extractStats(response.data);
-    });
+    this.fetchMetrics();
   },
   watch: {
     project(newProject) {
@@ -300,6 +332,12 @@ export default {
       } else {
         this.lastBomImport = 'n/a';
       }
+    },
+    metricDays() {
+      if (localStorage) {
+        localStorage.setItem('projectMetricDays', this.metricDays);
+      }
+      this.fetchMetrics();
     },
   },
 };

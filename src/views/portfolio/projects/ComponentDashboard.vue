@@ -20,7 +20,22 @@
             ></b-link>
           </div>
         </b-col>
-        <b-col sm="7" class="d-none d-md-block"> </b-col>
+        <b-col sm="5" class="d-none d-md-block" />
+        <b-col sm="2">
+          <div style="float: right">
+            <b-form-group id="component-metric-days" style="margin-bottom: 3%">
+              <b-form-select
+                id="metric-days-input"
+                v-model="metricDays"
+                class="required"
+                :options="options"
+              />
+            </b-form-group>
+            <div class="small text-muted">
+              {{ $t('admin.days_of_metrics') }}
+            </div>
+          </div>
+        </b-col>
       </b-row>
       <chart-portfolio-vulnerabilities
         ref="chartComponentVulnerabilities"
@@ -160,6 +175,7 @@ export default {
   },
   data() {
     return {
+      metricDays: this.metricDays,
       currentCritical: 0,
       currentHigh: 0,
       currentMedium: 0,
@@ -174,6 +190,14 @@ export default {
       vulnerabilities: 0,
       suppressed: 0,
       lastMeasurement: '',
+      options: [
+        { value: 5, text: '5' },
+        { value: 10, text: '10' },
+        { value: 20, text: '20' },
+        { value: 30, text: '30', selected: true },
+        { value: 60, text: '60' },
+        { value: 90, text: '90' },
+      ],
     };
   },
   methods: {
@@ -219,17 +243,33 @@ export default {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
+    fetchMetrics() {
+      let uuid = this.$route.params.uuid;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/component/${uuid}/days/${this.metricDays}`;
+      this.axios.get(url).then((response) => {
+        this.$refs.chartComponentVulnerabilities.render(response.data);
+        this.$refs.chartPolicyViolationsState.render(response.data);
+        this.$refs.chartPolicyViolationBreakdown.render(response.data);
+        this.extractStats(response.data);
+      });
+    },
+  },
+  watch: {
+    metricDays() {
+      if (localStorage) {
+        localStorage.setItem('componentMetricDays', this.metricDays);
+      }
+      this.fetchMetrics();
+    },
+  },
+  beforeMount() {
+    this.metricDays =
+      localStorage && localStorage.getItem('componentMetricDays') !== null
+        ? localStorage.getItem('componentMetricDays')
+        : 30;
   },
   mounted() {
-    const daysBack = 90;
-    let uuid = this.$route.params.uuid;
-    let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/component/${uuid}/days/${daysBack}`;
-    this.axios.get(url).then((response) => {
-      this.$refs.chartComponentVulnerabilities.render(response.data);
-      this.$refs.chartPolicyViolationsState.render(response.data);
-      this.$refs.chartPolicyViolationBreakdown.render(response.data);
-      this.extractStats(response.data);
-    });
+    this.fetchMetrics();
   },
 };
 </script>
