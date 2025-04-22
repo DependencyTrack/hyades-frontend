@@ -68,6 +68,7 @@
     "create_template": "Utwórz szablon",
     "create_user": "Stwórz użytkownika",
     "days": "Dni",
+    "days_of_metrics": "Dni metryk",
     "default": "Domyślny",
     "default_language": "Domyślny język",
     "default_language_desc": "Domyślny język, którego używają wszyscy, jeśli go nie określili. \nJeśli ta opcja jest wyłączona, używany będzie język z przeglądarki.",

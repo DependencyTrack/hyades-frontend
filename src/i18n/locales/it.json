@@ -68,6 +68,7 @@
     "create_template": "Crea modello",
     "create_user": "Creare un utente",
     "days": "Giorni",
+    "days_of_metrics": "Giorni di metriche",
     "default": "Predefinito",
     "default_language": "Lingua predefinita",
     "default_language_desc": "Lingua predefinita, utilizzata da tutti quando non ne è stata specificata una. \nQuando questa opzione è disabilitata, verrà utilizzata la lingua del browser.",

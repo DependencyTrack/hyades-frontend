@@ -30,16 +30,21 @@
             </tr>
           </table>
         </b-col>
-        <b-col sm="6" class="d-none d-md-block" />
-        <b-col sm="1">
-          <b-form-group id="project-metric-days">
-            <b-form-select
-              id="metric-days-input"
-              v-model="metricDays"
-              class="required"
-              :options="options"
-            />
-          </b-form-group>
+        <b-col sm="5" class="d-none d-md-block" />
+        <b-col sm="2">
+          <div style="float: right;">
+            <b-form-group id="project-metric-days" style="margin-bottom: 3%;">
+              <b-form-select
+                id="metric-days-input"
+                v-model="metricDays"
+                class="required"
+                :options="options"
+              />
+            </b-form-group>
+            <div class="small text-muted">
+              {{ $t('admin.days_of_metrics') }}
+            </div>
+          </div>
         </b-col>
       </b-row>
       <chart-portfolio-vulnerabilities

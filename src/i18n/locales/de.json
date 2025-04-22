@@ -68,6 +68,7 @@
     "create_template": "Vorlage erstellen",
     "create_user": "Benutzer erstellen",
     "days": "Tage",
+    "days_of_metrics": "Tage der Metriken",
     "default": "Standard",
     "default_language": "Standardsprache",
     "default_language_desc": "Standardsprache, die für alle verwendet wird, wenn sie keine angegeben haben. \nWenn dies deaktiviert ist, wird die Sprache des Browsers verwendet.",
