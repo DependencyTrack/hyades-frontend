@@ -24,8 +24,8 @@
         </b-col>
         <b-col sm="5" class="d-none d-md-block" />
         <b-col sm="2">
-          <div style="float: right;">
-            <b-form-group id="portfolio-metric-days" style="margin-bottom: 3%;">
+          <div style="float: right">
+            <b-form-group id="portfolio-metric-days" style="margin-bottom: 3%">
               <b-form-select
                 id="metric-days-input"
                 v-model="metricDays"
