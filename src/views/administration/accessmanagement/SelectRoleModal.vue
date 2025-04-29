@@ -2,7 +2,7 @@
   <b-modal
     id="selectRoleModal"
     @hide="resetValues()"
-    @show="loadProjects()"
+    @show="handleModalShow()"
     size="md"
     hide-header-close
     no-stacking
@@ -58,16 +58,17 @@ export default {
   components: {
     BInputGroupFormSelect,
   },
-  mounted() {
-    this.loadAvailableRoles();
-  },
   props: {
     username: String,
+    currentProject: {
+      type: Object,
+      required: false,
+    },
   },
   data() {
     return {
-      initialProject: '',
-      initialRole: '',
+      initialProject: 'asdf',
+      initialRole: 'asdf',
       selectedProject: '',
       selectedRole: '',
       availableRoles: [],
@@ -84,7 +85,6 @@ export default {
       if (!this.selectedRole || !this.selectedProject) {
         return;
       }
-
       const selection = {
         role: this.selectedRole,
         project: this.selectedProject,
@@ -92,6 +92,14 @@ export default {
       this.$root.$emit('bv::hide::modal', this.$children[0].id); //or just 'selectRoleModal'
       this.$emit('selection', selection);
     },
+
+    handleModalShow: function () {
+      this.loadProjects();
+      this.initialProject = this.selectedProject;
+      this.initialRole = this.selectedRole;
+      this.loadAvailableRoles();
+    },
+
     loadAvailableRoles: function () {
       const url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
       this.axios
@@ -100,7 +108,7 @@ export default {
           this.availableRoles = response.data;
         })
         .catch((error) => {
-          console.error(error);
+          // console.error(error);
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
@@ -127,6 +135,11 @@ export default {
         }
       } catch (error) {
         this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
+
+      if (this.currentProject) {
+        this.selectedProject = this.currentProject.project;
+        this.selectedRole = this.currentProject.role;
       }
     },
     resetValues: function () {

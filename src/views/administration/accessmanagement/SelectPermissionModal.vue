@@ -17,9 +17,13 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.cancel')
       }}</b-button>
-      <b-button size="md" variant="primary" @click="handleSelection">{{
-        $t('message.select')
-      }}</b-button>
+      <b-button
+        size="md"
+        variant="primary"
+        :disabled="selectionHasChanged"
+        @click="handleSelection"
+        >{{ $t('message.select') }}</b-button
+      >
     </template>
   </b-modal>
 </template>
@@ -38,6 +42,7 @@ export default {
   },
   data() {
     return {
+      currentSelection: [],
       columns: [
         {
           field: 'state',
@@ -48,7 +53,7 @@ export default {
           title: this.$t('message.name'),
           field: 'name',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -73,7 +78,6 @@ export default {
           return res;
         },
         url: `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}`,
-        // must use function arrow notation to access 'this'
         onLoadSuccess: () => {
           // when the addable permissions load
           const mappedPermissions = this.currentPermissions.map(
@@ -84,14 +88,46 @@ export default {
             values: mappedPermissions,
           });
         },
+        onCheck: this.updateCurrentSelection,
+        onUncheck: this.updateCurrentSelection,
+        onCheckAll: this.updateCurrentSelection,
+        onUncheckAll: this.updateCurrentSelection,
       },
     };
   },
+  computed: {
+    selectionHasChanged() {
+      if (
+        this.currentSelection.length === 0 &&
+        this.currentPermissions.length === 0
+      ) {
+        return true;
+      }
+
+      if (this.currentSelection.length !== this.currentPermissions.length) {
+        return false;
+      }
+
+      const isEqual = this.currentSelection.every((sel) =>
+        this.currentPermissions.some((team) => team.name === sel.name),
+      );
+
+      return (
+        isEqual &&
+        this.currentPermissions.every((team) =>
+          this.currentSelection.some((sel) => sel.name === team.name),
+        )
+      );
+    },
+  },
   methods: {
     handleSelection: function () {
-      const selections = this.$refs.table.getSelections();
+      const cs = this.currentSelection;
       this.$root.$emit('bv::hide::modal', this.$children[0].id);
-      this.$emit('selection', selections);
+      this.$emit('selection', cs);
+    },
+    updateCurrentSelection() {
+      this.currentSelection = this.$refs.table.getSelections();
     },
   },
 };

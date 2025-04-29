@@ -49,6 +49,8 @@
   "URL_TAG": "api/v1/tag",
   "URL_TEAM": "api/v1/team",
   "URL_USER": "api/v1/user",
+  "URL_USER_MEMBERSHIP": "api/v1/user/membership",
+  "URL_USER_PERMISSION": "api/v1/permission/user",
   "URL_USER_LDAP": "api/v1/user/ldap",
   "URL_USER_MANAGED": "api/v1/user/managed",
   "URL_USER_OIDC": "api/v1/user/oidc",

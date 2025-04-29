@@ -8,6 +8,7 @@
           class="action-icon"
           v-b-tooltip.hover
           :title="$t('admin.edit_role')"
+          @click="$emit('editClicked')"
         >
           <span class="fa fa-edit"></span>
         </b-button>

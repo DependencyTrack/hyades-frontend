@@ -2,26 +2,16 @@ import EventBus from '../shared/eventbus';
 
 export default {
   created: function () {
-    if (this.index == null || this.row == null) {
-      throw new Error(
-        "userManagementMixin requires 'index' and 'row' variables, which are typically provided by a detailFormatter function.",
-      );
-    }
+    this._userManagementMixin_init();
+  },
+  data: function () {
+    return {
+      _userManagementMixin_ready: false,
+    };
   },
   methods: {
-    getUserObjectKey: function () {
-      throw new Error(
-        'getUserObjectKey function must be implemented to use "userManagementMixin".',
-      );
-    },
-
-    getUserObject: function () {
-      throw new Error(
-        'getUserObject function must be implemented to use "userManagementMixin".',
-      );
-    },
-
     loadUserRoles: function (username) {
+      this._userManagementMixin_checkReady();
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/roles`;
       this.axios
         .get(url)
@@ -35,90 +25,63 @@ export default {
     },
 
     // TODO: internal server error 500
-    _deleteUser: function (endpoint, updateEvent) {
-      const userObj = this.getUserObject();
+    _deleteUser: function (endpoint) {
+      this._userManagementMixin_checkReady();
 
       this.axios
         .delete(endpoint, {
           data: {
-            username: userObj.username,
+            username: this.row[this.identifierField],
           },
         })
-        .then(() => {
-          EventBus.$emit(updateEvent, this.index);
-          this.$toastr.s(this.$t('admin.user_deleted'));
-        })
-        .catch((error) => {
-          console.error(error);
+        .then(this._successfulResponseDelete)
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
 
-    // TODO: implement batch selections when apiserver support is implemented
-    _updateTeamSelection: function (updateEvent, selections) {
-      const userObj = this.getUserObject();
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${userObj.username}/membership`;
-
-      // remove selected permissions that are already applied
-      const filterCallback = (selection) => {
-        return !userObj.teams.some((team) => team.uuid === selection.uuid);
+    _updateTeamSelection: function (endpoint, selections) {
+      this._userManagementMixin_checkReady();
+      const requestBody = {
+        [this.identifierField]: this.row[this.identifierField],
+        teams: selections.map((team) => team.uuid),
       };
-      const mapCallback = async (selection) =>
-        await this.axios.post(endpoint, { uuid: selection.uuid });
-      const request_promises = selections
-        .filter(filterCallback)
-        .map(mapCallback);
-
-      // asynchronously process requests
-      Promise.all(request_promises)
-        .then((_) => {
-          this.syncVariables({ teams: selections });
-
-          //eg ("admin:ldapusers:rowUpdate", index, this.ldapUser)
-          EventBus.$emit(updateEvent, this.index, userObj);
-          this.$toastr.s(this.$t('message.updated'));
-        })
+      this.axios
+        .put(endpoint, requestBody)
+        .then(this._successfulResponseUpdate)
         .catch((error) => {
-          console.error(error);
+          if (error.response && error.response.status === 304) return;
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
 
-    _removeTeamMembership: function (endpoint, updateEvent, teamUUID) {
-      const userObj = this.getUserObject();
+    _removeTeamMembership: function (endpoint, teamUUID) {
+      this._userManagementMixin_checkReady();
       this.axios
         .delete(endpoint, { data: { uuid: teamUUID } })
-        .then((response) => {
-          this.syncVariables(response.data);
-          EventBus.$emit(updateEvent, this.index, userObj);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          console.error(error);
+        .then(this._successfulResponseUpdate)
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
 
-    // updateEvent not needed here since we don't need to update the row at the moment, this may change later
     _updateRoleSelection: function (endpoint, selection) {
+      this._userManagementMixin_checkReady();
       this.axios
         .post(endpoint, {
           roleUUID: selection.role,
           projectUUID: selection.project,
         })
-        .then((response) => {
-          this.$toastr.s(this.$t('admin.role_assigned'));
-          this.syncVariables(response.data);
-        })
-        .catch((error) => {
+        .then(this._successfulResponseUpdate)
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
-          console.error(error);
         });
     },
 
-    // endpoint doesn't change across ldap, managed or oidc
     _removeRole: function (projectRole) {
-      const username = this[this.getUserObjectKey()].username;
+      this._userManagementMixin_checkReady();
+      // const username = this[this.getUserObjectKey()].username;
+      const username = this.row[this.identifierField];
       const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${username}/role`;
 
       this.axios
@@ -128,69 +91,82 @@ export default {
             projectUUID: projectRole.project.uuid,
           },
         })
-        .then((response) => {
-          this.syncVariables(response.data);
-          this.$toastr.s(this.$t('message.updated'));
-        })
+        .then(this._successfulResponseUpdate)
         .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
-    _updatePermissionSelection: function (selections) {
-      const userObj = this.getUserObject();
 
-      const currentPermissions = userObj.permissions;
-      const newPermissions = selections; // could be more or less selected
+    _updatePermissionSelection: async function (endpoint, selections) {
+      this._userManagementMixin_checkReady();
+      const requestBody = {
+        [this.identifierField]: this.row[this.identifierField],
+        permissions: selections.map((selection) => selection.name),
+      };
 
-      // relative complement
-      // add = (newPermissions - currentPermissions); remove = (currentPermissions - newPermissions),
-      const permissionsToAdd = newPermissions.filter(
-        (newPerm) =>
-          !currentPermissions.some(
-            (currentPerm) => currentPerm.name === newPerm.name,
-          ),
-      );
-      const permissionsToRemove = currentPermissions.filter(
-        (currentPerm) =>
-          !newPermissions.some((newPerm) => newPerm.name === currentPerm.name),
-      );
-
-      const mappedAdd = permissionsToAdd.map(async (permission) => {
-        const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${userObj.username}`;
-        return await this.axios.post(url);
-      });
-      const mappedRemove = permissionsToRemove.map(async (permission) => {
-        const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${userObj.username}`;
-        // return await this._removePermission(permission);
-        return await this.axios.delete(url);
-      });
-
-      // response data isn't reliable as promises can resolve too fast and at different times
-      return Promise.all([mappedAdd, mappedRemove])
-        .then(() => {
-          // sync variables from selections to avoid missing permissions
-          this.syncVariables({ permissions: selections });
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          console.error(error);
+      return this.axios
+        .put(endpoint, requestBody)
+        .then(this._successfulResponseUpdate)
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
 
-    _removePermission: function (permission) {
-      const userObj = this.getUserObject();
-      const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${userObj.username}`;
+    _removePermission: async function (permission) {
+      this._userManagementMixin_checkReady();
+      const username = this.row[this.identifierField];
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${username}`;
       return this.axios
         .delete(url)
-        .then((response) => {
-          this.syncVariables(response.data);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          console.error(error);
+        .then(this._successfulResponseUpdate)
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
+    },
+
+    // -- utility methods --
+    _successfulResponseUpdate: function (response) {
+      if (this.rowEvents && this.rowEvents.update)
+        EventBus.$emit(this.rowEvents.update, this.index, response.data);
+      this.$toastr.s(this.$t('message.updated'));
+    },
+
+    _successfulResponseDelete: function () {
+      if (this.rowEvents && this.rowEvents.delete)
+        EventBus.$emit(this.rowEvents.delete, this.index);
+      this.$toastr.s(this.$t('admin.user_deleted'));
+    },
+
+    _userManagementMixin_checkReady: function () {
+      if (!this._userManagementMixin_ready) {
+        throw new Error('userManagementMixin is not ready. Init failed');
+      }
+    },
+
+    _userManagementMixin_init: function () {
+      if (this.index == null || this.row == null) {
+        throw new Error(
+          "userManagementMixin requires 'index' and 'row' variables, which are typically provided by a detailFormatter function.",
+        );
+      }
+
+      if (this.identifierField == null) {
+        throw new Error(
+          "userManagementMixin requires 'identifierField' variable.",
+        );
+      }
+
+      const rowEventsReady =
+        this.rowEvents != null &&
+        this.rowEvents.update != null &&
+        this.rowEvents.delete != null;
+      if (!rowEventsReady) {
+        console.warn(
+          "userManagementMixin: 'rowEvents' object is either undefined or missing properties 'update' or 'delete'. Changes may not reflect properly until refresh.",
+        );
+      }
+
+      this._userManagementMixin_ready = true;
     },
   },
 };
