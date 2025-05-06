@@ -10,6 +10,14 @@
       />{{ $t('admin.gitlab_sync_enable') }}
       <br />
       <c-switch
+        id="sbomEnabled"
+        color="primary"
+        v-model="sbomEnabled"
+        label
+        v-bind="labelIcon"
+      />{{ $t('admin.integration_sbom_enabled') }}
+      <br />
+      <c-switch
         id="includeArchived"
         color="primary"
         v-model="includeArchived"
@@ -34,13 +42,30 @@
         v-model="gitlabUrl"
         lazy="true"
       />
+      <br />
+      <c-switch
+        id="autoCreateProjects"
+        color="primary"
+        v-model="autoCreateProjects"
+        label
+        v-bind="labelIcon"
+      />{{ $t('admin.integration_auto_create_enabled') }}
+      <br />
+      <b-validated-input-group-form-input
+        id="audience"
+        label="Audience"
+        input-group-size="mb-3"
+        v-model="audience"
+        lazy="true"
+      />
+      <br />
     </b-card-body>
     <b-card-footer>
       <b-row>
         <b-col>
           <h5>Topics</h5>
           <div class="mb-2">
-            <ul style="width: 700px; list-style-type: none; padding: 0">
+            <ul style="width: 100%; list-style-type: none; padding: 0">
               <li v-for="(topic, index) in topics" :key="index">
                 <actionable-list-group-item
                   :value="topic"
@@ -97,6 +122,7 @@ import axios from 'axios';
 import common from '../../../shared/common';
 import configPropertyMixin from '../mixins/configPropertyMixin';
 import ActionableListGroupItem from '../../components/ActionableListGroupItem';
+import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
 
 export default {
   mixins: [configPropertyMixin],
@@ -114,6 +140,9 @@ export default {
       includeArchived: false,
       gitlabAppId: '',
       gitlabUrl: '',
+      sbomEnabled: true,
+      autoCreateProjects: false,
+      audience: '',
       topics: [],
       newTopic: '',
     };
@@ -141,8 +170,23 @@ export default {
         this.updateConfigProperties([
           {
             groupName: 'integrations',
+            propertyName: 'sbom.push.enabled',
+            propertyValue: this.sbomEnabled,
+          },
+          {
+            groupName: 'integrations',
             propertyName: 'gitlab.include.archived',
             propertyValue: this.includeArchived,
+          },
+          {
+            groupName: 'integrations',
+            propertyName: 'gitlab.autocreate.projects',
+            propertyValue: this.autoCreateProjects,
+          },
+          {
+            groupName: 'integrations',
+            propertyName: 'gitlab.audience',
+            propertyValue: this.audience,
           },
           {
             groupName: 'integrations',
@@ -185,53 +229,39 @@ export default {
   },
   created() {
     this.axios.get(this.configUrl).then((response) => {
-      const configItems = response.data.filter((item) => {
-        return (
-          item.groupName === 'integrations' &&
-          item.propertyName === 'gitlab.enabled'
-        );
+      let configItems = response.data.filter((item) => {
+        return item.groupName === 'integrations';
       });
-      if (configItems.length > 0) {
-        this.isGitlabEnabled = common.toBoolean(configItems[0].propertyValue);
+      for (let i = 0; i < configItems.length; i++) {
+        let item = configItems[i];
+        switch (item.propertyName) {
+          case 'gitlab.enabled':
+            this.isGitlabEnabled = common.toBoolean(item.propertyValue);
+            break;
+          case 'sbom.push.enabled':
+            this.sbomEnabled = common.toBoolean(item.propertyValue);
+            break;
+          case 'gitlab.include.archived':
+            this.includeArchived = common.toBoolean(item.propertyValue);
+            break;
+          case 'gitlab.autocreate.projects':
+            this.autoCreateProjects = common.toBoolean(item.propertyValue);
+            break; 
+          case 'gitlab.audience':
+            this.audience = item.propertyValue;
+            break;
+          case 'gitlab.topics':
+            this.topics = JSON.parse(item.propertyValue);
+            break; 
+          case 'gitlab.app.id':
+            this.gitlabAppId = configItemsAppId[0].propertyValue;
+            break;
+          case 'gitlab.url':
+            this.gitlabUrl = configItemsAppId[0].propertyValue;
+            break;
+        }
       }
-      const configItemsincludeArchived = response.data.filter((item) => {
-        return (
-          item.groupName === 'integrations' &&
-          item.propertyName === 'gitlab.include.archived'
-        );
-      });
-      if (configItemsincludeArchived.length > 0) {
-        this.includeArchived = common.toBoolean(
-          configItemsincludeArchived[0].propertyValue,
-        );
-      }
-      const configItemstopics = response.data.filter((item) => {
-        return (
-          item.groupName === 'integrations' &&
-          item.propertyName === 'gitlab.topics'
-        );
-      });
-      if (configItemstopics.length > 0) {
-        this.topics = JSON.parse(configItemstopics[0].propertyValue);
-      }
-      const configItemsAppId = response.data.filter((item) => {
-        return (
-          item.groupName === 'integrations' &&
-          item.propertyName === 'gitlab.app.id'
-        );
-      });
-      if (configItemsAppId.length > 0) {
-        this.gitlabAppId = configItemsAppId[0].propertyValue;
-      }
-      const configItemsUrl = response.data.filter((item) => {
-        return (
-          item.groupName === 'integrations' &&
-          item.propertyName === 'gitlab.url'
-        );
-      });
-      if (configItemsUrl.length > 0) {
-        this.gitlabUrl = configItemsUrl[0].propertyValue;
-      }
+      
       this.isInitialized = true;
     });
   },
