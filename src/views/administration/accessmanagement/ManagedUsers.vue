@@ -36,6 +36,10 @@ import SelectPermissionModal from './SelectPermissionModal';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import { Switch as cSwitch } from '@coreui/vue';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+import SelectRoleModal from './SelectRoleModal.vue';
+import SelectProjectModal from './SelectProjectModal.vue';
+import ProjectRoleListGroupItem from './ProjectRoleListGroupItem.vue';
+import userManagementMixin from '../../../mixins/userManagementMixin';
 
 export default {
   props: {
@@ -47,7 +51,10 @@ export default {
   },
   mounted() {
     EventBus.$on('admin:managedusers:rowUpdate', (index, row) => {
-      this.$refs.table.updateRow({ index: index, row: row });
+      this.$refs.table.updateRow({
+        index: index,
+        row: row,
+      });
       this.$refs.table.expandRow(index);
     });
     EventBus.$on('admin:managedusers:rowDeleted', (index, row) => {
@@ -124,17 +131,25 @@ export default {
                     <b-form-group :label="this.$t('admin.team_membership')">
                       <div class="list-group">
                         <span v-for="team in teams">
-                          <actionable-list-group-item :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
+                          <actionable-list-group-item :tooltip="$t('admin.remove_team_membership')" :value="team.name" :delete-icon="true" v-on:actionClicked="removeTeamMembership(team.uuid)"/>
                         </span>
                         <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectTeamModal')"/>
                       </div>
                     </b-form-group>
+                    <b-form-group :label="this.$t('admin.roles')">
+                      <div class="list-group">
+                        <span v-for="projectRole in projectRoles">
+                          <project-role-list-group-item :projectRole="projectRole" :delete-icon="true" v-on:removeClicked="removeRole(projectRole)"/>
+                        </span>
+                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectRoleModal')"/>
+                      </div>
+                    </b-form-group>
                     <b-form-group :label="this.$t('admin.permissions')">
                       <div class="list-group">
-                        <span v-for="permission in permissions">
-                          <actionable-list-group-item :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
+                        <span v-for="permission in managedUser.permissions">
+                          <actionable-list-group-item :tooltip="$t('admin.remove_permission')" :value="permission.name" :delete-icon="true" v-on:actionClicked="removePermission(permission)"/>
                         </span>
-                        <actionable-list-group-item :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectPermissionModal')"/>
+                        <actionable-list-group-item :add-icon="true"  v-on:actionClicked="openPermissionModal"/>
                       </div>
                     </b-form-group>
                   </b-col>
@@ -156,21 +171,27 @@ export default {
                     </div>
                   </b-col>
                   <select-team-modal v-on:selection="updateTeamSelection" />
-                  <select-permission-modal v-on:selection="updatePermissionSelection" />
+                  <select-role-modal v-on:selection="updateRoleSelection" :username="username" />
+                  <select-permission-modal :currentPermissions="managedUser.permissions" v-on:selection="updatePermissionSelection" />
                   <change-password-modal :managed-user="managedUser" />
                 </b-row>
               `,
-            mixins: [permissionsMixin],
+            mixins: [permissionsMixin, userManagementMixin],
             components: {
               cSwitch,
               ActionableListGroupItem,
               SelectTeamModal,
               SelectPermissionModal,
+              SelectProjectModal,
+              SelectRoleModal,
               ChangePasswordModal,
               BInputGroupFormInput,
+              ProjectRoleListGroupItem,
             },
             data() {
               return {
+                index,
+                row,
                 managedUser: row,
                 username: row.username,
                 teams: row.teams,
@@ -180,11 +201,15 @@ export default {
                 forcePasswordChange: row.forcePasswordChange,
                 nonExpiryPassword: row.nonExpiryPassword,
                 suspended: row.suspended,
+                projectRoles: [],
                 labelIcon: {
                   dataOn: '\u2713',
                   dataOff: '\u2715',
                 },
               };
+            },
+            created() {
+              this.loadUserRoles(this.managedUser.username);
             },
             watch: {
               forcePasswordChange() {
@@ -198,8 +223,17 @@ export default {
               },
             },
             methods: {
+              getUserObjectKey: function () {
+                return 'managedUser';
+              },
+              getUserObject: function () {
+                return this.managedUser;
+              },
+              openPermissionModal() {
+                this.$root.$emit('bv::show::modal', 'selectPermissionModal');
+              },
               updateUser: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
                 this.axios
                   .post(url, {
                     username: this.username,
@@ -221,121 +255,42 @@ export default {
                     this.$toastr.s(this.$t('message.updated'));
                   })
                   .catch((error) => {
+                    console.error(error);
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
               deleteUser: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
-                this.axios
-                  .delete(url, {
-                    data: {
-                      username: this.username,
-                    },
-                  })
-                  .then((response) => {
-                    EventBus.$emit('admin:managedusers:rowDeleted', index);
-                    this.$toastr.s(this.$t('admin.user_deleted'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
+                const event = 'admin:managedusers:rowDeleted';
+                this._deleteUser(url, event);
               },
               updateTeamSelection: function (selections) {
                 this.$root.$emit('bv::hide::modal', 'selectTeamModal');
-                for (let i = 0; i < selections.length; i++) {
-                  let selection = selections[i];
-                  let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
-                  this.axios
-                    .post(url, {
-                      uuid: selection.uuid,
-                    })
-                    .then((response) => {
-                      this.syncVariables(response.data);
-                      EventBus.$emit(
-                        'admin:managedusers:rowUpdate',
-                        index,
-                        this.manageduser,
-                      );
-                      this.$toastr.s(this.$t('message.updated'));
-                    })
-                    .catch((error) => {
-                      if (error.response.status === 304) {
-                        //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                      } else {
-                        this.$toastr.w(
-                          this.$t('condition.unsuccessful_action'),
-                        );
-                      }
-                    });
-                }
+                // const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
+                const event = 'admin:managedusers:rowUpdate';
+                this._updateTeamSelection(event, selections);
               },
-              removeTeamMembership: function (teamUuid) {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
-                this.axios
-                  .delete(url, { data: { uuid: teamUuid } })
-                  .then((response) => {
-                    this.syncVariables(response.data);
-                    EventBus.$emit(
-                      'admin:managedusers:rowUpdate',
-                      index,
-                      this.manageduser,
-                    );
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+              removeTeamMembership: function (teamUUID) {
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.username}/membership`;
+                const event = 'admin:managedusers:rowUpdate';
+                this._removeTeamMembership(url, event, teamUUID);
+              },
+              updateRoleSelection: function (selection) {
+                const url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${this.managedUser.username}/role`;
+                this._updateRoleSelection(url, selection);
+              },
+              removeRole: function (projectRole) {
+                this._removeRole(projectRole);
               },
               updatePermissionSelection: function (selections) {
-                this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
-                let updatePromise = Promise.resolve();
-                for (let i = 0; i < selections.length; i++) {
-                  let selection = selections[i];
-                  let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${selection.name}/user/${this.username}`;
-                  updatePromise = updatePromise.then((response) => {
-                    if (response && response.data) {
-                      this.syncVariables(response.data);
-                    }
-                    return this.axios.post(url);
-                  });
-                }
-                updatePromise
-                  .then((response) => {
-                    if (response && response.data) {
-                      this.syncVariables(response.data);
-                    }
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    if (error.response.status === 304) {
-                      //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                    } else {
-                      this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                    }
-                  });
+                this._updatePermissionSelection(selections);
               },
               removePermission: function (permission) {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/user/${this.username}`;
-                this.axios
-                  .delete(url)
-                  .then((response) => {
-                    this.syncVariables(response.data);
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch(() => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+                this._removePermission(permission);
               },
               syncVariables: function (managedUser) {
-                this.manageduser = managedUser;
-                this.username = managedUser.username;
-                this.teams = managedUser.teams;
-                this.permissions = managedUser.permissions;
-                this.fullname = managedUser.fullname;
-                this.email = managedUser.email;
-                this.forcePasswordChange = managedUser.forcePasswordChange;
-                this.nonExpiryPassword = managedUser.nonExpiryPassword;
-                this.suspended = managedUser.suspended;
+                Object.assign(this.managedUser, managedUser);
+                this.loadUserRoles(this.managedUser.username);
               },
             },
           });
