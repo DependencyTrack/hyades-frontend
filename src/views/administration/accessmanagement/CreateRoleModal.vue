@@ -81,12 +81,15 @@ export default {
         permissions: this.permissions.map((permission) => permission.name),
       };
       this.axios
-        .put(url, requestBody)
-        .then((response) => {
+        .put(url, {
+          name: this.name,
+          permissions: this.permissions.map((perm) => perm.name),
+        })
+        .then(() => {
           this.$emit('refreshTable');
           this.$toastr.s(this.$t('admin.role_created'));
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
       this.$root.$emit('bv::hide::modal', 'createRoleModal');

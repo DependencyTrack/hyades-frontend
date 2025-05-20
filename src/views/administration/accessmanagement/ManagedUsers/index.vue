@@ -31,6 +31,7 @@ import UserDetails from './UserDetails.vue';
 import CreateManagedUserModal from '../CreateManagedUserModal.vue';
 
 export default {
+  name: 'ManagedUsersView',
   props: {
     header: String,
   },
@@ -40,10 +41,7 @@ export default {
   },
   mounted() {
     EventBus.$on(this.rowEvents.update, (index, row) => {
-      this.$refs.table.updateRow({
-        index: index,
-        row: row,
-      });
+      this.$refs.table.updateRow({ index, row });
       this.$refs.table.expandRow(index);
     });
     EventBus.$on(this.rowEvents.delete, () => {

@@ -32,6 +32,7 @@ import UserDetails from './UserDetails.vue';
 import i18n from '../../../../i18n';
 
 export default {
+  name: 'OidcUsersView',
   i18n,
   props: {
     header: String,
@@ -63,14 +64,6 @@ export default {
         {
           title: this.$t('message.username'),
           field: 'username',
-          sortable: false,
-          formatter(value) {
-            return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
-          },
-        },
-        {
-          title: this.$t('admin.subject_identifier'),
-          field: 'subjectIdentifier',
           sortable: false,
           formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));

@@ -24,9 +24,10 @@ import common from '../../../../shared/common';
 import CreateTeamModal from '../CreateTeamModal';
 import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../../shared/eventbus';
-import UserDetail from './UserDetails.vue';
+import TeamDetails from './TeamDetails.vue';
 
 export default {
+  name: 'TeamsView',
   props: {
     header: String,
   },
@@ -58,7 +59,7 @@ export default {
           title: this.$t('admin.team_name'),
           field: 'name',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -66,7 +67,7 @@ export default {
           title: this.$t('admin.api_keys'),
           field: 'apiKeys',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return value
               ? xssFilters.inHTMLData(
                   common.valueWithDefault(value.length, '0'),
@@ -78,7 +79,7 @@ export default {
           title: this.$t('admin.members'),
           field: 'members',
           sortable: false,
-          formatter(value, row, _index) {
+          formatter(value, row) {
             let count = 0;
             if (row.managedUsers) {
               count += row.managedUsers.length;
@@ -113,7 +114,7 @@ export default {
         detailFormatter: (index, row) => {
           return this.vueFormatter({
             render: () => (
-              <UserDetail row={row} index={index} rowEvents={this.rowEvents} />
+              <TeamDetails row={row} index={index} rowEvents={this.rowEvents} />
             ),
           });
         },

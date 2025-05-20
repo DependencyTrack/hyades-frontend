@@ -122,9 +122,8 @@ export default {
   },
   methods: {
     handleSelection: function () {
-      const cs = this.currentSelection;
       this.$root.$emit('bv::hide::modal', this.$children[0].id);
-      this.$emit('selection', cs);
+      this.$emit('selection', this.currentSelection);
     },
     updateCurrentSelection() {
       this.currentSelection = this.$refs.table.getSelections();
