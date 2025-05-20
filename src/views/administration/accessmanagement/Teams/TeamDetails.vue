@@ -1,141 +1,149 @@
 <template>
-  <b-row class="expanded-row">
-    <b-col sm="6">
-      <b-input-group-form-input
-        id="input-team-name"
-        :label="$t('admin.team_name')"
-        input-group-size="mb-3"
-        required="true"
-        type="text"
-        v-model="name"
-        lazy="true"
-        autofocus="true"
-        v-debounce:750ms="updateTeam"
-        :debounce-events="'keyup'"
-      />
-      <b-form-group :label="this.$t('admin.api_keys')">
-        <div class="list-group">
-          <span v-for="key in sortedApiKeys">
-            <api-key-list-group-item
-              :team-uuid="team.uuid"
-              :api-key="apiKeys[key]"
-              :delete-icon="true"
-              v-on:removeClicked="removeApiKey(apiKeys[key])"
-              v-on:regenerateClicked="regenerateApiKey(apiKeys[key])"
-            />
-          </span>
-          <actionable-list-group-item
-            :add-icon="true"
-            v-on:actionClicked="createApiKey()"
-            :tooltip="$t('admin.new_api_key_title')"
-          />
-        </div>
-      </b-form-group>
-      <b-form-group :label="this.$t('admin.permissions')">
-        <div class="list-group">
-          <span v-for="permission in permissions">
+  <div>
+    <b-row class="expanded-row">
+      <b-col sm="6">
+        <b-input-group-form-input
+          id="input-team-name"
+          :label="$t('admin.team_name')"
+          input-group-size="mb-3"
+          required="true"
+          type="text"
+          v-model="name"
+          lazy="true"
+          autofocus="true"
+          v-debounce:750ms="updateTeam"
+          :debounce-events="'keyup'"
+        />
+        <b-form-group :label="this.$t('admin.api_keys')">
+          <div class="list-group">
+            <span
+              v-for="key in sortedApiKeys"
+              :key="`${key}-${apiKeys[key].created}`"
+            >
+              <api-key-list-group-item
+                :team-uuid="team.uuid"
+                :api-key="apiKeys[key]"
+                :delete-icon="true"
+                v-on:removeClicked="removeApiKey(apiKeys[key])"
+                v-on:regenerateClicked="regenerateApiKey(apiKeys[key])"
+              />
+            </span>
             <actionable-list-group-item
-              :value="permission.name"
-              :delete-icon="true"
-              v-on:actionClicked="removePermission(permission)"
+              :add-icon="true"
+              v-on:actionClicked="createApiKey()"
+              :tooltip="$t('admin.new_api_key_title')"
             />
-          </span>
-          <actionable-list-group-item
-            :add-icon="true"
-            v-on:actionClicked="
-              $root.$emit('bv::show::modal', 'selectPermissionModal')
-            "
-          />
-        </div>
-      </b-form-group>
-      <b-form-group :label="this.$t('admin.mapped_ldap_groups')">
-        <div class="list-group">
-          <span v-for="ldapGroup in ldapGroups">
+          </div>
+        </b-form-group>
+        <b-form-group :label="this.$t('admin.permissions')">
+          <div class="list-group">
+            <span v-for="permission in permissions" :key="permission.name">
+              <actionable-list-group-item
+                :value="permission.name"
+                :delete-icon="true"
+                v-on:actionClicked="removePermission(permission)"
+              />
+            </span>
             <actionable-list-group-item
-              :value="ldapGroup.dn"
-              :delete-icon="true"
-              v-on:actionClicked="removeLdapGroupMapping(ldapGroup.uuid)"
+              :add-icon="true"
+              v-on:actionClicked="
+                $root.$emit('bv::show::modal', 'selectPermissionModal')
+              "
             />
-          </span>
-          <actionable-list-group-item
-            :add-icon="true"
-            v-on:actionClicked="
-              $root.$emit('bv::show::modal', 'selectLdapGroupModal')
-            "
-          />
-        </div>
-      </b-form-group>
-      <b-form-group :label="this.$t('admin.mapped_oidc_groups')">
-        <div class="list-group">
-          <span v-for="mappedOidcGroup in mappedOidcGroups">
+          </div>
+        </b-form-group>
+        <b-form-group :label="this.$t('admin.mapped_ldap_groups')">
+          <div class="list-group">
+            <span v-for="ldapGroup in ldapGroups" :key="ldapGroup.uuid">
+              <actionable-list-group-item
+                :value="ldapGroup.dn"
+                :delete-icon="true"
+                v-on:actionClicked="removeLdapGroupMapping(ldapGroup.uuid)"
+              />
+            </span>
             <actionable-list-group-item
-              :value="mappedOidcGroup.group.name"
-              :delete-icon="true"
-              v-on:actionClicked="removeOidcGroupMapping(mappedOidcGroup.uuid)"
+              :add-icon="true"
+              v-on:actionClicked="
+                $root.$emit('bv::show::modal', 'selectLdapGroupModal')
+              "
             />
-          </span>
-          <actionable-list-group-item
-            :add-icon="true"
-            v-on:actionClicked="
-              $root.$emit('bv::show::modal', 'selectOidcGroupModal')
-            "
-          />
-        </div>
-      </b-form-group>
-    </b-col>
-    <b-col sm="6">
-      <b-form-group
-        v-if="managedUsers && managedUsers.length > 0"
-        :label="this.$t('admin.managed_users')"
-      >
-        <div class="list-group">
-          <span v-for="managedUser in managedUsers">
+          </div>
+        </b-form-group>
+        <b-form-group :label="this.$t('admin.mapped_oidc_groups')">
+          <div class="list-group">
+            <span v-for="oidcGroup in mappedOidcGroups" :key="oidcGroup.uuid">
+              <actionable-list-group-item
+                :value="oidcGroup.group.name"
+                :delete-icon="true"
+                v-on:actionClicked="removeOidcGroupMapping(oidcGroup)"
+              />
+            </span>
             <actionable-list-group-item
-              :value="managedUser.username"
-              :delete-icon="true"
-              v-on:actionClicked="removeUser(managedUser)"
+              :add-icon="true"
+              v-on:actionClicked="
+                $root.$emit('bv::show::modal', 'selectOidcGroupModal')
+              "
             />
-          </span>
+          </div>
+        </b-form-group>
+      </b-col>
+      <b-col sm="6">
+        <b-form-group
+          v-if="managedUsers && managedUsers.length > 0"
+          :label="this.$t('admin.managed_users')"
+        >
+          <div class="list-group">
+            <span v-for="user in managedUsers" :key="user.username">
+              <actionable-list-group-item
+                :value="user.username"
+                :delete-icon="true"
+                v-on:actionClicked="removeUser(user, 'managedUsers')"
+              />
+            </span>
+          </div>
+        </b-form-group>
+        <b-form-group
+          v-if="ldapUsers && ldapUsers.length > 0"
+          :label="this.$t('admin.ldap_users')"
+        >
+          <div class="list-group">
+            <span v-for="user in ldapUsers" :key="user.username">
+              <actionable-list-group-item
+                :value="user.username"
+                :delete-icon="true"
+                v-on:actionClicked="removeUser(user, 'ldapUsers')"
+              />
+            </span>
+          </div>
+        </b-form-group>
+        <b-form-group
+          v-if="oidcUsers && oidcUsers.length > 0"
+          :label="this.$t('admin.oidc_users')"
+        >
+          <div class="list-group">
+            <span v-for="user in oidcUsers" :key="user.username">
+              <actionable-list-group-item
+                :value="user.username"
+                :delete-icon="true"
+                v-on:actionClicked="removeUser(user, 'oidcUsers')"
+              />
+            </span>
+          </div>
+        </b-form-group>
+        <div style="text-align: right">
+          <b-button variant="outline-danger" @click="deleteTeam">{{
+            $t('admin.delete_team')
+          }}</b-button>
         </div>
-      </b-form-group>
-      <b-form-group
-        v-if="ldapUsers && ldapUsers.length > 0"
-        :label="this.$t('admin.ldap_users')"
-      >
-        <div class="list-group">
-          <span v-for="ldapUser in ldapUsers">
-            <actionable-list-group-item
-              :value="ldapUser.username"
-              :delete-icon="true"
-              v-on:actionClicked="removeUser(ldapUser)"
-            />
-          </span>
-        </div>
-      </b-form-group>
-      <b-form-group
-        v-if="oidcUsers && oidcUsers.length > 0"
-        :label="this.$t('admin.oidc_users')"
-      >
-        <div class="list-group">
-          <span v-for="oidcUser in oidcUsers">
-            <actionable-list-group-item
-              :value="oidcUser.username"
-              :delete-icon="true"
-              v-on:actionClicked="removeUser(oidcUser)"
-            />
-          </span>
-        </div>
-      </b-form-group>
-      <div style="text-align: right">
-        <b-button variant="outline-danger" @click="deleteTeam">{{
-          $t('admin.delete_team')
-        }}</b-button>
-      </div>
-    </b-col>
-    <select-permission-modal v-on:selection="updatePermissionSelection" />
+      </b-col>
+    </b-row>
+    <select-permission-modal
+      :currentPermissions="permissions"
+      v-on:selection="updatePermissionSelection"
+    />
     <select-ldap-group-modal v-on:selection="updateLdapGroupSelection" />
     <select-oidc-group-modal v-on:selection="updateOidcGroupSelection" />
-  </b-row>
+  </div>
 </template>
 
 <script>
@@ -147,15 +155,13 @@ import SelectOidcGroupModal from '../SelectOidcGroupModal';
 import SelectPermissionModal from '../SelectPermissionModal';
 import permissionsMixin from '../../../../mixins/permissionsMixin';
 import BInputGroupFormInput from '../../../../forms/BInputGroupFormInput';
-
-import { Switch as cSwitch } from '@coreui/vue';
 import i18n from '../../../../i18n';
+import _ from 'lodash';
 
 export default {
   i18n,
   mixins: [permissionsMixin],
   components: {
-    cSwitch,
     ActionableListGroupItem,
     ApiKeyListGroupItem,
     SelectLdapGroupModal,
@@ -183,58 +189,71 @@ export default {
         dataOn: '\u2713',
         dataOff: '\u2715',
       },
+      storageIdentifier: `TeamDetail:${this.row.uuid}`,
     };
+  },
+  beforeMount() {
+    console.log('initializing team details');
+    console.log(this.row.apiKeys);
+    console.log(this.apiKeys);
+    const modified = sessionStorage.getItem(this.storageIdentifier);
+    if (modified) {
+      sessionStorage.removeItem(this.storageIdentifier);
+      this.reloadTeam();
+    }
+  },
+  watch: {
+    team: {
+      handler(newValue) {
+        console.log(`team %O`, newValue);
+        this.name = newValue.name;
+        this.apiKeys = this.apiKeysToDict(newValue.apiKeys ?? []);
+        this.permissions = newValue.permissions;
+        this.ldapGroups = newValue.mappedLdapGroups;
+        this.mappedOidcGroups = newValue.mappedOidcGroups;
+        this.managedUsers = newValue.managedUsers;
+        this.ldapUsers = newValue.ldapUsers;
+        this.oidcUsers = newValue.oidcUsers;
+      },
+      deep: true,
+    },
   },
   computed: {
     sortedApiKeys() {
-      return Object.keys(this.apiKeys).sort((a, b) => {
-        return (
-          new Date(this.apiKeys[a].created) - new Date(this.apiKeys[b].created)
-        );
-      });
+      return Object.keys(this.apiKeys).sort(
+        (a, b) =>
+          new Date(this.apiKeys[a].created) - new Date(this.apiKeys[b].created),
+      );
     },
   },
   methods: {
     apiKeysToDict: function (apiKeys) {
-      const dict = {};
-      apiKeys.forEach((item) => {
-        dict[item.publicId] = item;
-      });
-      return dict;
+      return Object.fromEntries(apiKeys.map((item) => [item.publicId, item]));
     },
-    updateTeam: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`;
-      this.axios
-        .post(url, {
-          uuid: this.team.uuid,
-          name: this.name,
-        })
-        .then((response) => {
-          this.team = response.data;
-          EventBus.$emit(this.rowEvents.update, this.index, this.team);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    updateTeam: async function () {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`;
+      const requestBody = { uuid: this.team.uuid, name: this.name };
+      try {
+        const response = await this.axios.post(endpoint, requestBody);
+        this.team = response.data;
+        EventBus.$emit(this.rowEvents.update, this.index, this.team);
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    deleteTeam: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`;
-      this.axios
-        .delete(url, {
-          data: {
-            uuid: this.team.uuid,
-          },
-        })
-        .then((response) => {
-          EventBus.$emit(this.rowEvents.delete, this.index);
-          this.$toastr.s(this.$t('admin.team_deleted'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    deleteTeam: async function () {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`;
+      const requestBody = { data: { uuid: this.team.uuid } };
+      try {
+        await this.axios.delete(endpoint, requestBody);
+        EventBus.$emit(this.rowEvents.delete, this.index);
+        this.$toastr.s(this.$t('admin.team_deleted'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    popup: function (title, message, key) {
+    popup: async function (title, message, key) {
       const h = this.$createElement;
       const titleVNode = h('div', {
         domProps: { innerHTML: title },
@@ -250,7 +269,7 @@ export default {
           key,
         ),
       ]);
-      this.$bvModal.msgBoxOk([messageVNode], {
+      return this.$bvModal.msgBoxOk([messageVNode], {
         title: [titleVNode],
         buttonSize: 'sm',
         centered: true,
@@ -259,237 +278,228 @@ export default {
         bodyClass: 'd-flex flex-column align-items-center',
       });
     },
-    createApiKey() {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/${this.team.uuid}/key`;
-      this.axios
-        .put(url)
-        .then((response) => {
-          if (!this.apiKeys) {
-            this.apiKeys = {};
-          }
-          this.$set(this.apiKeys, response.data.publicId, response.data);
-          this.popup(
-            this.$t('admin.new_api_key_title'),
-            this.$t('admin.new_api_key'),
-            response.data.key,
-          );
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          console.error(error);
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    async createApiKey() {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/${this.team.uuid}/key`;
+      try {
+        const response = await this.axios.put(endpoint);
+        this.$toastr.s(this.$t('message.updated'));
+        await this.popup(
+          this.$t('admin.new_api_key_title'),
+          this.$t('admin.new_api_key'),
+          response.data.key,
+        );
+        this.syncVariables('addKey', response.data);
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    regenerateApiKey: function (apiKey) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/key/${apiKey.publicId}`;
-      this.axios
-        .post(url)
-        .then((response) => {
-          this.$delete(this.apiKeys, apiKey.publicId);
-          this.$set(this.apiKeys, response.data.publicId, response.data);
-          this.popup(
-            this.$t('admin.regenerate_api_key_title'),
-            this.$t('admin.regenerate_api_key'),
-            response.data.key,
-          );
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          console.error(error);
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    async regenerateApiKey(apiKey) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/key/${apiKey.publicId}`;
+      try {
+        const response = await this.axios.post(endpoint);
+        this.$toastr.s(this.$t('message.updated'));
+        await this.popup(
+          this.$t('admin.regenerate_api_key_title'),
+          this.$t('admin.regenerate_api_key'),
+          response.data.key,
+        );
+        this.syncVariables('replaceKey', { old: apiKey, new: response.data });
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    removeApiKey: function (apiKey) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/key/${apiKey.publicId}`;
-      this.axios
-        .delete(url)
-        .then((response) => {
-          this.$delete(this.apiKeys, apiKey.publicId);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          console.error(error);
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    removeApiKey: async function (apiKey) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/key/${apiKey.publicId}`;
+      try {
+        await this.axios.delete(endpoint);
+        this.syncVariables('removeKey', apiKey);
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    updateLdapGroupSelection: function (selections) {
+    updateLdapGroupSelection: async function (selections) {
       this.$root.$emit('bv::hide::modal', 'selectLdapGroupModal');
-      for (let i = 0; i < selections.length; i++) {
-        let selection = selections[i];
-        let url = `${this.$api.BASE_URL}/${this.$api.URL_LDAP_MAPPING}`;
-        this.axios
-          .put(url, {
-            team: this.team.uuid,
-            dn: selection.dn,
-          })
-          .then((response) => {
-            if (this.ldapGroups === undefined || this.ldapGroups === null) {
-              this.ldapGroups = [];
-            }
-            this.ldapGroups.push(response.data);
-            this.ldapGroups.sort();
-            this.$toastr.s(this.$t('message.updated'));
-          })
-          .catch((error) => {
-            if (error.response.status === 304) {
-              //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            } else {
-              this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            }
-          });
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_LDAP_MAPPING}`;
+      try {
+        const responses = await Promise.all(
+          selections.map((selection) =>
+            this.axios.put(endpoint, {
+              team: this.team.uuid,
+              dn: selection.dn,
+            }),
+          ),
+        );
+        responses.forEach((response) => {
+          this.syncVariables('addLdapMapping', response.data);
+        });
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        if (error.response && error.response.status === 304) {
+          // Optionally handle 304
+        } else {
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        }
       }
     },
-    removeLdapGroupMapping: function (mappingUuid) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_LDAP_MAPPING}/${mappingUuid}`;
-      this.axios
-        .delete(url)
-        .then((response) => {
-          let k = [];
-          for (let i = 0; i < this.ldapGroups.length; i++) {
-            if (this.ldapGroups[i].uuid !== mappingUuid) {
-              k.push(this.ldapGroups[i]);
-            }
-          }
-          this.ldapGroups = k;
-          this.team.mappedLdapGroups = this.ldapGroups;
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    removeLdapGroupMapping: async function (mapping) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_LDAP_MAPPING}/${mapping}`;
+      try {
+        await this.axios.delete(endpoint);
+        this.syncVariables('removeLdapMapping', mapping);
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    updateOidcGroupSelection: function (selections) {
+    updateOidcGroupSelection: async function (selections) {
       this.$root.$emit('bv::hide::modal', 'selectOidcGroupModal');
-      for (let i = 0; i < selections.length; i++) {
-        let selection = selections[i];
-        let url = `${this.$api.BASE_URL}/${this.$api.URL_OIDC_MAPPING}`;
-        this.axios
-          .put(url, {
-            team: this.team.uuid,
-            group: selection.uuid,
-          })
-          .then((response) => {
-            if (
-              this.mappedOidcGroups === undefined ||
-              this.mappedOidcGroups === null
-            ) {
-              this.mappedOidcGroups = [];
-            }
-            this.mappedOidcGroups.push(response.data);
-            this.mappedOidcGroups.sort();
-            this.$toastr.s(this.$t('message.updated'));
-          })
-          .catch((error) => {
-            if (error.response.status === 304) {
-              //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            } else {
-              this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            }
-          });
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_OIDC_MAPPING}`;
+      try {
+        const responses = await Promise.all(
+          selections.map((selection) => {
+            const requestBody = { team: this.team.uuid, group: selection.uuid };
+            return this.axios.put(endpoint, requestBody);
+          }),
+        );
+        responses.forEach((response) => {
+          this.syncVariables('addOidcMapping', response.data);
+        });
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
       }
     },
-    removeOidcGroupMapping: function (mappingUuid) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_OIDC_MAPPING}/${mappingUuid}`;
-      this.axios
-        .delete(url)
-        .then((response) => {
-          let k = [];
-          for (let i = 0; i < this.mappedOidcGroups.length; i++) {
-            if (this.mappedOidcGroups[i].uuid !== mappingUuid) {
-              k.push(this.mappedOidcGroups[i]);
-            }
-          }
-          this.mappedOidcGroups = k;
-          this.team.mappedOidcGroups = this.mappedOidcGroups;
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-    },
-    updatePermissionSelection: function (selections) {
-      this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
-      for (let i = 0; i < selections.length; i++) {
-        let selection = selections[i];
-        let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${selection.name}/team/${this.team.uuid}`;
-        this.axios
-          .post(url)
-          .then((response) => {
-            this.syncVariables(response.data);
-            this.$toastr.s(this.$t('message.updated'));
-          })
-          .catch((error) => {
-            if (error.response.status === 304) {
-              //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            } else {
-              this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            }
-          });
+    removeOidcGroupMapping: async function (mapping) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_OIDC_MAPPING}/${mapping.uuid}`;
+      try {
+        await this.axios.delete(endpoint);
+        this.syncVariables('removeOidcMapping', mapping);
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
       }
     },
-    removePermission: function (permission) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/team/${this.team.uuid}`;
-      this.axios
-        .delete(url)
-        .then((response) => {
-          this.syncVariables(response.data);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-    },
-    removeUser: function (user) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${user.username}/membership`;
-      this.axios
-        .delete(url, {
-          data: {
-            uuid: this.team.uuid,
-          },
-        })
-        .then((response) => {
-          if (this.managedUsers) {
-            let k = [];
-            for (let i = 0; i < this.managedUsers.length; i++) {
-              if (this.managedUsers[i].username !== user.username) {
-                k.push(this.managedUsers[i]);
-              }
-            }
-            this.managedUsers = k;
-          }
-          if (this.ldapUsers) {
-            let k = [];
-            for (let i = 0; i < this.ldapUsers.length; i++) {
-              if (this.ldapUsers[i].username !== user.username) {
-                k.push(this.ldapUsers[i]);
-              }
-            }
-            this.ldapUsers = k;
-          }
-          if (this.oidcUsers) {
-            let k = [];
-            for (let i = 0; i < this.oidcUsers.length; i++) {
-              if (this.oidcUsers[i].username !== user.username) {
-                k.push(this.oidcUsers[i]);
-              }
-            }
-            this.oidcUsers = k;
-          }
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-    },
-    syncVariables: function (team) {
-      this.team = team;
-      if (team.apiKeys) {
-        // Some API server responses don't include API keys.
-        // Take care to not wipe existing API keys from the UI in those cases.
-        this.apiKeys = this.apiKeysToDict(team.apiKeys);
+    updatePermissionSelection: async function (selections) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM_PERMISSION}`;
+      const requestBody = {
+        team: this.team.uuid,
+        permissions: selections.map((selection) => selection.name),
+      };
+
+      try {
+        const response = await this.axios.put(endpoint, requestBody);
+        this.syncVariables('team', response.data);
+        this.$toastr.s(this.$t('admin.permissions_updated'));
+      } catch (error) {
+        console.error(error);
+        if (error.response.status === 304) return;
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
       }
-      this.permissions = team.permissions;
-      //this.ldapGroups = team.mappedLdapGroups;
+    },
+    removePermission: async function (permission) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/team/${this.team.uuid}`;
+      try {
+        const response = await this.axios.delete(endpoint);
+        this.syncVariables('team', response.data);
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
+    },
+    removeUser: async function (user, group) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER}/${user.username}/membership`;
+      const requestBody = { data: { uuid: this.team.uuid } };
+      try {
+        await this.axios.delete(endpoint, requestBody);
+        this.syncVariables('removeUser', { user, group });
+        this.$toastr.s(this.$t('message.updated'));
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
+    },
+    reloadTeam: async function () {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/${this.team.uuid}`;
+      try {
+        const response = await this.axios.get(endpoint);
+        response.data.permissions = response.data.permissions ?? [];
+        response.data.apiKeys = response.data.apiKeys ?? [];
+        EventBus.$emit(this.rowEvents.update, this.index, response.data);
+      } catch (error) {
+        console.error(error);
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
+    },
+    syncVariables: function (type = 'team', data = null) {
+      // arr acts as the existing property on the team instance,
+      // updater specifies how it should be modified
+      const updateTeamArray = (prop, updater) => {
+        const arr = this.team[prop] ?? [];
+        const result = updater(arr);
+        this.$set(this.team, prop, result);
+      };
+
+      // operations that should be done on the team instance
+      const handlers = {
+        team: () => {
+          data.permissions = data.permissions ?? [];
+          data.apiKeys = data.apiKeys ?? [];
+          this.team = data;
+        },
+        addKey: () => {
+          updateTeamArray('apiKeys', (arr) => [...arr, _.omit(data, 'key')]);
+        },
+        removeKey: () => {
+          updateTeamArray('apiKeys', (arr) =>
+            arr.filter((key) => key.publicId !== data.publicId),
+          );
+        },
+        replaceKey: () => {
+          const updater = (arr) =>
+            arr.map((key) =>
+              key.publicId === data.old.publicId
+                ? _.omit(data.new, 'key')
+                : key,
+            );
+          updateTeamArray('apiKeys', updater);
+        },
+        addLdapMapping: () => {
+          updateTeamArray('mappedLdapGroups', (arr) => [...arr, data].sort());
+        },
+        removeLdapMapping: () => {
+          updateTeamArray('mappedLdapGroups', (arr) =>
+            arr.filter((mapping) => mapping.dn !== data),
+          );
+        },
+        addOidcMapping: () => {
+          updateTeamArray('mappedOidcGroups', (arr) => [...arr, data].sort());
+        },
+        removeOidcMapping: () => {
+          updateTeamArray('mappedOidcGroups', (arr) =>
+            arr.filter((mapping) => mapping.uuid !== data.uuid),
+          );
+        },
+        removeUser: () => {
+          const { user, group } = data;
+          updateTeamArray(group, (arr) =>
+            arr.filter((u) => u.username !== user.username),
+          );
+        },
+      };
+
+      if (!type || typeof handlers[type] !== 'function') {
+        console.error('Unknown or missing type for syncVariables', type);
+        return;
+      }
+
+      handlers[type]();
+      sessionStorage.setItem(this.storageIdentifier, new Date().toString());
     },
   },
 };

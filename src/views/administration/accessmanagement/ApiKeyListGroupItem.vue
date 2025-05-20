@@ -1,7 +1,7 @@
 <template>
   <b-list-group-item class="flex-column align-items-start">
     <div class="d-flex w-100 justify-content-between">
-      <span class="text-monospace">{{ apiKey.maskedKey }}</span>
+      <span class="text-monospace key-ellipsis">{{ apiKey.maskedKey }}</span>
       <div class="d-flex">
         <div v-show="apiKey.legacy">
           <span
@@ -99,6 +99,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.key-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .list-group-item .form-group {
   padding-top: 0;
   padding-bottom: 0;
