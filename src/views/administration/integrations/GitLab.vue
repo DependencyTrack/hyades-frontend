@@ -7,7 +7,7 @@
         v-model="isGitlabEnabled"
         label
         v-bind="labelIcon"
-      />{{ $t('admin.gitlab_sync_enable') }}
+      />{{ $t('admin.integration_gitlab_enable') }}
       <br />
       <c-switch
         id="sbomEnabled"
@@ -15,7 +15,7 @@
         v-model="sbomEnabled"
         label
         v-bind="labelIcon"
-      />{{ $t('admin.integration_sbom_enabled') }}
+      />{{ $t('admin.integration_gitlab_sbom_enable') }}
       <br />
       <c-switch
         id="includeArchived"
@@ -117,8 +117,6 @@
 <script>
 import { Switch as cSwitch } from '@coreui/vue';
 
-import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
-import axios from 'axios';
 import common from '../../../shared/common';
 import configPropertyMixin from '../mixins/configPropertyMixin';
 import ActionableListGroupItem from '../../components/ActionableListGroupItem';
@@ -232,8 +230,7 @@ export default {
       let configItems = response.data.filter((item) => {
         return item.groupName === 'integrations';
       });
-      for (let i = 0; i < configItems.length; i++) {
-        let item = configItems[i];
+      for (let item of configItems) {
         switch (item.propertyName) {
           case 'gitlab.enabled':
             this.isGitlabEnabled = common.toBoolean(item.propertyValue);
@@ -246,13 +243,13 @@ export default {
             break;
           case 'gitlab.autocreate.projects':
             this.autoCreateProjects = common.toBoolean(item.propertyValue);
-            break; 
+            break;
           case 'gitlab.audience':
             this.audience = item.propertyValue;
             break;
           case 'gitlab.topics':
             this.topics = JSON.parse(item.propertyValue);
-            break; 
+            break;
           case 'gitlab.app.id':
             this.gitlabAppId = configItemsAppId[0].propertyValue;
             break;
@@ -261,7 +258,7 @@ export default {
             break;
         }
       }
-      
+
       this.isInitialized = true;
     });
   },
