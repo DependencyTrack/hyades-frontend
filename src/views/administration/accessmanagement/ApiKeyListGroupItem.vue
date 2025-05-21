@@ -99,12 +99,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.key-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .list-group-item .form-group {
   padding-top: 0;
   padding-bottom: 0;

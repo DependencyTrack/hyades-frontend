@@ -197,6 +197,7 @@
     "perform_identification": "識別を実行する",
     "perform_test": "テストを実行する",
     "permissions": "権限",
+    "permissions_updated": "権限が更新されました",
     "personal_access_token": "パーソナルアクセストークン",
     "portfolio_access_control": "ポートフォリオアクセス制御",
     "preview": "プレビュー",

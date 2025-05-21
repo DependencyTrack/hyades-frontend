@@ -3,7 +3,6 @@
     id="selectPermissionModal"
     size="lg"
     hide-header-close
-    no-stacking
     :title="$t('admin.select_permission')"
   >
     <bootstrap-table

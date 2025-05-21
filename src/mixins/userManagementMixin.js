@@ -10,11 +10,7 @@ export default {
   created: function () {
     this._userManagementMixin_init();
   },
-  data: function () {
-    return {
-      _userManagementMixin_ready: false,
-    };
-  },
+  data: { _userManagementMixin_ready: false },
   methods: {
     // -- public methods --
 
@@ -157,12 +153,10 @@ export default {
 
     // -- utility methods --
 
-    handleError: function (
-      error,
-      toastMessageKey = 'condition.unsuccessful_action',
-    ) {
+    handleError: function (error, toastMessageKey) {
+      const messageKey = toastMessageKey ?? 'condition.unsuccessful_action';
       console.error(error);
-      this.$toastr.w(this.$t(toastMessageKey));
+      this.$toastr.w(this.$t(messageKey));
     },
     _successfulResponse_update: function (response) {
       if (this.rowEvents && this.rowEvents.update)

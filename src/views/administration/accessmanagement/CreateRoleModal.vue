@@ -4,7 +4,6 @@
     size="md"
     @hide="resetValues()"
     hide-header-close
-    no-stacking
     :title="$t('admin.create_role')"
   >
     <b-input-group-form-input
