@@ -27,6 +27,7 @@
             @input="onRoleSelection"
             :deselect-label="$t('admin.multiselect_remove_role')"
             :placeholder="$t('admin.select_role')"
+            :open-direction="isLastRow(data.index, false) ? 'top' : 'auto'"
             label="name"
             track-by="uuid"
             class="multiselect"
@@ -62,6 +63,7 @@
                 :options="availableRoles"
                 :id="index"
                 :disabled="prototype.disabled"
+                :open-direction="isLastRow(index, true) ? 'top' : 'auto'"
                 @input="onRolePrototypeSelection"
                 label="name"
                 track-by="uuid"
@@ -211,11 +213,18 @@ export default {
       const project = this.projectRolesPrototype[id].project.uuid;
       this.projectRolesPrototype[id].loading = true;
       this.projectRolesPrototype[id].disabled = true;
-      const error = () => {
+      const error = (error) => {
+        if (error?.response?.status === 304) {
+          this.$toastr.w(this.$t('admin.role_already_assigned'));
+        }
+
         this.projectRolesPrototype[id].disabled = false;
         this.projectRolesPrototype[id].loading = false;
         this.projectRolesPrototype[id].role = null;
       };
+
+      // changes reflect when projectRoles is updated by parent
+      // we just need to delete the prototype then signal the parent
       const success = () => {
         this.removeProjectPrototype(project);
       };
@@ -228,17 +237,29 @@ export default {
       const project = this.projectRoles[id].project.uuid;
       this.projectRolesCurrent[id].loading = true;
       this.projectRolesCurrent[id].disabled = true;
-      const error = () => {
+      const abortRoleChange = () => {
         this.projectRolesCurrent[id].disabled = false;
         this.projectRolesCurrent[id].loading = false;
-        this.projectRolesCurrent[id].role = this.projectRoles[id].role;
+        this.projectRolesCurrent[id].role = this.projectRoles[id].role; // set to original
       };
-      const success = () => {
+      const roleChange = () => {
         this.projectRolesCurrent[id].disabled = false;
         this.projectRolesCurrent[id].loading = false;
       };
 
-      this.$emit('updateProjectRole', { role, project }, { success, error });
+      const error = (error) => {
+        if (error?.response?.status === 304) {
+          this.$toastr.e(this.$t('admin.role_already_assigned'));
+          roleChange();
+        }
+        abortRoleChange();
+      };
+
+      this.$emit(
+        'updateProjectRole',
+        { role, project },
+        { success: roleChange, error },
+      );
     },
 
     // Remove project role
@@ -252,6 +273,17 @@ export default {
 
     showProjectModal() {
       this.$root.$emit('bv::show::modal', 'selectProjectModal');
+    },
+
+    // Partially mitigates issue where multiselect dropdown opens in the wrong direction
+    isLastRow(index, isPrototype) {
+      if (isPrototype) {
+        return index === this.projectRolesPrototype.length - 1;
+      }
+      return (
+        index === this.projectRolesCurrent.length - 1 &&
+        !this.projectRolesPrototype.length
+      );
     },
   },
 };

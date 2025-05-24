@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Nicht zugewiesen (Standard: 5)",
     "risk_score_weighting_description": "Sie können die Gewichtung jedes Schweregrads anpassen, um die Risikobewertung anzupassen.",
     "role": "Rolle",
+    "role_already_assigned": "Der Benutzer hat diese Rolle bereits zugewiesen.",
     "role_assigned": "Rolle zugewiesen",
     "role_created": "Rolle erstellt",
     "role_deleted": "Rolle gelöscht",

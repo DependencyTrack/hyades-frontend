@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "未分配（默认值：5）",
     "risk_score_weighting_description": "您可以自定义每个严重性的权重来自定义风险评分。",
     "role": "角色",
+    "role_already_assigned": "用户已经分配了此角色。",
     "role_assigned": "角色分配",
     "role_created": "角色已创建",
     "role_deleted": "角色已删除",

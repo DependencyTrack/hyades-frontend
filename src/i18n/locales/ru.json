@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Не назначено (по умолчанию: 5)",
     "risk_score_weighting_description": "Вы можете настроить вес каждой серьезности, чтобы настроить оценку риска.",
     "role": "Роль",
+    "role_already_assigned": "У пользователя уже есть эта роль.",
     "role_assigned": "Роль назначена",
     "role_created": "Роль создана",
     "role_deleted": "Роль удалена",

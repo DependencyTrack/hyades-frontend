@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Не призначено (за замовчуванням: 5)",
     "risk_score_weighting_description": "Ви можете налаштувати зважування кожного рівня серйозності, щоб налаштувати оцінку ризику.",
     "role": "Роль",
+    "role_already_assigned": "У користувача вже призначений ця роль.",
     "role_assigned": "Роль призначена",
     "role_created": "Роль створено",
     "role_deleted": "Роль видалено",

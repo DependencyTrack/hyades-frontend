@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "未割り当て (デフォルト: 5)",
     "risk_score_weighting_description": "各重大度の重み付けをカスタマイズして、リスク スコアをカスタマイズできます。",
     "role": "役割",
+    "role_already_assigned": "ユーザーはすでにこの役割を割り当てています。",
     "role_assigned": "割り当てられた役割",
     "role_created": "ロールを作成しました",
     "role_deleted": "ロールを削除しました",

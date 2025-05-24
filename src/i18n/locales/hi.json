@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "असाइन नहीं किया गया (डिफ़ॉल्ट: 5)",
     "risk_score_weighting_description": "आप जोखिम स्कोर को अनुकूलित करने के लिए प्रत्येक गंभीरता के भार को अनुकूलित कर सकते हैं।",
     "role": "भूमिका",
+    "role_already_assigned": "उपयोगकर्ता के पास पहले से ही यह भूमिका है।",
     "role_assigned": "सौंपी गई भूमिका",
     "role_created": "भूमिका बनाई गई",
     "role_deleted": "भूमिका हटा दी गई",

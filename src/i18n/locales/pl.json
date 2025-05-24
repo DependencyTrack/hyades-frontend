@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Nieprzypisane (domyślnie: 5)",
     "risk_score_weighting_description": "Możesz dostosować wagę każdej wagi, aby dostosować ocenę ryzyka.",
     "role": "Rola",
+    "role_already_assigned": "Użytkownik ma już przypisaną tę rolę.",
     "role_assigned": "Przypisana rola",
     "role_created": "Rola utworzona",
     "role_deleted": "Rola usunięta",

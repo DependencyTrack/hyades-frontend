@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Non assegnato (impostazione predefinita: 5)",
     "risk_score_weighting_description": "È possibile personalizzare la ponderazione di ciascuna gravità per personalizzare il punteggio di rischio.",
     "role": "Ruolo",
+    "role_already_assigned": "L'utente ha già questo ruolo assegnato.",
     "role_assigned": "Ruolo assegnato",
     "role_created": "Ruolo creato",
     "role_deleted": "Ruolo eliminato",

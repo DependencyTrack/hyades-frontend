@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Unassigned (default: 5)",
     "risk_score_weighting_description": "You can customize the weighting of each severity to customize the risk score.",
     "role": "Role",
+    "role_already_assigned": "The user already has this role assigned.",
     "role_assigned": "Role Assigned",
     "role_created": "Role Created",
     "role_deleted": "Role Deleted",

@@ -247,6 +247,7 @@
     "risk_score_weight_unassigned": "Não atribuído (padrão: 5)",
     "risk_score_weighting_description": "Você pode personalizar a ponderação de cada gravidade para personalizar a pontuação de risco.",
     "role": "Papel",
+    "role_already_assigned": "O usuário já possui essa função atribuída.",
     "role_assigned": "Função atribuída",
     "role_created": "Função criada",
     "role_deleted": "Função excluída",
