@@ -24,9 +24,13 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
-      <b-button size="md" variant="primary" @click="createUser()">{{
-        $t('message.create')
-      }}</b-button>
+      <b-button
+        size="md"
+        variant="primary"
+        :disabled="!(username?.length > 0)"
+        @click="createUser()"
+        >{{ $t('message.create') }}</b-button
+      >
     </template>
   </b-modal>
 </template>
