@@ -16,7 +16,7 @@ export default {
 
     // Loads the user roles for a specific user. return data if targetField is null
     loadUserProjects: async function (username) {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/roles`;
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/role`;
       try {
         const response = await this.axios.get(endpoint);
         return response.data;

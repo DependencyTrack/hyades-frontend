@@ -90,13 +90,9 @@ export default {
         });
     },
     deleteRole: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${this.role.uuid}`;
       this.axios
-        .delete(url, {
-          data: {
-            uuid: this.role.uuid,
-          },
-        })
+        .delete(url)
         .then(() => {
           EventBus.$emit(this.rowEvents.delete, this.index);
           this.$toastr.s(this.$t('admin.role_deleted'));
