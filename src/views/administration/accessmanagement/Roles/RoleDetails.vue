@@ -38,7 +38,10 @@
         }}</b-button>
       </div>
     </b-col>
-    <select-permission-modal v-on:selection="updatePermissionSelection" />
+    <select-permission-modal
+      :currentPermissions="permissions"
+      v-on:selection="updatePermissionSelection"
+    />
   </b-row>
 </template>
 <script>
