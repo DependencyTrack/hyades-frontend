@@ -5,13 +5,6 @@
         <b-button size="md" variant="outline-primary" v-b-modal.createRoleModal>
           <span class="fa fa-plus"></span> {{ $t('admin.create_role') }}
         </b-button>
-        <c-switch
-          id="isAclEnabled"
-          color="primary"
-          v-model="isAclEnabled"
-          label
-          v-bind="labelIcon"
-        />{{ $t('admin.enable_acl') }}
       </div>
       <bootstrap-table
         ref="table"
@@ -31,7 +24,6 @@ import common from '../../../../shared/common';
 import CreateRoleModal from '../CreateRoleModal';
 import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../../shared/eventbus';
-import { Switch as cSwitch } from '@coreui/vue';
 import configPropertyMixin from '../../mixins/configPropertyMixin';
 import RoleDetails from './RoleDetails.vue';
 
@@ -42,7 +34,6 @@ export default {
   },
   mixins: [bootstrapTableMixin, configPropertyMixin],
   components: {
-    cSwitch,
     CreateRoleModal,
   },
   mounted() {
@@ -60,7 +51,6 @@ export default {
   },
   data() {
     return {
-      isAclEnabled: false,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
@@ -127,35 +117,6 @@ export default {
         silent: true,
       });
     },
-    updateProperties: function () {
-      this.updateConfigProperties([
-        {
-          groupName: 'access-management',
-          propertyName: 'acl.enabled',
-          propertyValue: this.isAclEnabled,
-        },
-      ]);
-    },
-  },
-  watch: {
-    isAclEnabled() {
-      this.updateProperties();
-    },
-  },
-  created() {
-    this.axios.get(this.configUrl).then((response) => {
-      let configItems = response.data.filter(function (item) {
-        return item.groupName === 'access-management';
-      });
-      for (let i = 0; i < configItems.length; i++) {
-        let item = configItems[i];
-        switch (item.propertyName) {
-          case 'acl.enabled':
-            this.isAclEnabled = common.toBoolean(item.propertyValue);
-            break;
-        }
-      }
-    });
   },
 };
 </script>
