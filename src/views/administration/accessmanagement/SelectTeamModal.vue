@@ -20,7 +20,8 @@
       <b-button
         size="md"
         variant="primary"
-        @click="$emit('selection', $refs.table.getSelections())"
+        :disabled="selectionHasChanged"
+        @click="handleSelection"
         >{{ $t('message.select') }}</b-button
       >
     </template>
@@ -33,9 +34,16 @@ import permissionsMixin from '../../../mixins/permissionsMixin';
 import common from '../../../shared/common';
 
 export default {
+  props: {
+    currentTeams: {
+      type: Array,
+      default: () => [],
+    },
+  },
   mixins: [permissionsMixin],
   data() {
     return {
+      currentSelection: [],
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
@@ -50,7 +58,7 @@ export default {
           title: this.$t('admin.team_name'),
           field: 'name',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -74,8 +82,54 @@ export default {
           return res;
         },
         url: `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`,
+        onLoadSuccess: () => {
+          const preSelected = this.currentTeams.map((team) => team.name);
+          this.$refs.table.checkBy({
+            field: 'name',
+            values: preSelected,
+          });
+        },
+        onCheck: this.updateCurrentSelection,
+        onUncheck: this.updateCurrentSelection,
+        onCheckAll: this.updateCurrentSelection,
+        onUncheckAll: this.updateCurrentSelection,
       },
     };
+  },
+  computed: {
+    selectionHasChanged() {
+      if (
+        this.currentSelection.length === 0 &&
+        this.currentTeams.length === 0
+      ) {
+        return true;
+      }
+
+      if (this.currentSelection.length !== this.currentTeams.length) {
+        return false;
+      }
+
+      const isEqual = this.currentSelection.every((sel) =>
+        this.currentTeams.some((team) => team.name === sel.name),
+      );
+
+      return (
+        isEqual &&
+        this.currentTeams.every((team) =>
+          this.currentSelection.some((sel) => sel.name === team.name),
+        )
+      );
+    },
+  },
+  methods: {
+    handleSelection: function () {
+      // this.$root.$emit('bv::hide::modal', this.$children[0].id);
+      this.$bvModal.hide('selectTeamModal');
+      this.$emit('selection', this.currentSelection);
+    },
+    updateCurrentSelection() {
+      this.currentSelection = this.$refs.table.getSelections();
+    },
   },
 };
 </script>

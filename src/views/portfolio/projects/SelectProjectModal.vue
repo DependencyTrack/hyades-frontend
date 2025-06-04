@@ -18,12 +18,9 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.cancel')
       }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="$emit('selection', $refs.table.getSelections())"
-        >{{ $t('message.select') }}</b-button
-      >
+      <b-button size="md" variant="primary" @click="handleSelection">{{
+        $t('message.select')
+      }}</b-button>
     </template>
   </b-modal>
 </template>
@@ -35,15 +32,25 @@ import common from '../../../shared/common';
 
 export default {
   mixins: [permissionsMixin],
+  props: {
+    // Current projects should be a list of UUIDs since names can be duplicate
+    username: { type: String, default: null },
+  },
   methods: {
     apiUrl: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}`;
-      if (this.showInactiveProjects === undefined) {
-        url += '?excludeInactive=true';
-      } else {
-        url += '?excludeInactive=' + !this.showInactiveProjects;
+      let endpoint = '';
+      if (this.username) {
+        endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ACL_USER}/${this.username}`;
+        return endpoint;
       }
-      return url;
+
+      endpoint = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}`;
+      if (this.showInactiveProjects === undefined) {
+        endpoint += '?excludeInactive=true';
+      } else {
+        endpoint += '?excludeInactive=' + !this.showInactiveProjects;
+      }
+      return endpoint;
     },
     refreshTable: function () {
       this.$refs.table.refresh({
@@ -51,6 +58,10 @@ export default {
         pageNumber: 1,
         silent: true,
       });
+    },
+    handleSelection: function () {
+      this.$root.$emit('bv::hide::modal', this.$children[0].id);
+      this.$emit('selection', this.$refs.table.getSelections());
     },
   },
   watch: {
@@ -75,7 +86,7 @@ export default {
           title: this.$t('message.project_name'),
           field: 'name',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -83,14 +94,14 @@ export default {
           title: this.$t('message.version'),
           field: 'version',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
         {
           title: this.$t('message.active'),
           field: 'active',
-          formatter(value, row, index) {
+          formatter(value) {
             return value === true ? '<i class="fa fa-check-square-o" />' : '';
           },
           align: 'center',
@@ -113,7 +124,8 @@ export default {
           refresh: 'fa-refresh',
         },
         toolbar: '#projectsToolbar',
-        responseHandler: function (res, xhr) {
+        responseHandler: (res, xhr) => {
+          // console.log(this.currentProjects);
           res.total = xhr.getResponseHeader('X-Total-Count');
           return res;
         },

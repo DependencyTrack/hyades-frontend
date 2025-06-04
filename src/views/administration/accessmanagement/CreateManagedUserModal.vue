@@ -93,9 +93,13 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
-      <b-button size="md" variant="primary" @click="createUser()">{{
-        $t('message.create')
-      }}</b-button>
+      <b-button
+        size="md"
+        variant="primary"
+        :disabled="!createReady"
+        @click="createUser()"
+        >{{ $t('message.create') }}</b-button
+      >
     </template>
   </b-modal>
 </template>
@@ -125,6 +129,17 @@ export default {
         dataOff: '\u2715',
       },
     };
+  },
+  computed: {
+    createReady: function () {
+      return (
+        this.username?.length > 0 &&
+        this.fullname?.length > 0 &&
+        this.email?.length > 0 &&
+        this.password?.length > 0 &&
+        this.confirmPassword?.length > 0
+      );
+    },
   },
   methods: {
     verifyPasswordState: function () {
