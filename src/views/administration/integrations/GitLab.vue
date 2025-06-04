@@ -202,6 +202,7 @@ export default {
             propertyValue: this.gitlabUrl,
           },
         ]);
+        this.setGitlabState();
       } catch (error) {
         console.error('Error updating configuration properties:', error);
       }
@@ -218,11 +219,6 @@ export default {
           console.error('Error updating GitLab state:', error);
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
-    },
-  },
-  watch: {
-    isGitlabEnabled() {
-      this.setGitlabState();
     },
   },
   created() {
@@ -251,15 +247,13 @@ export default {
             this.topics = JSON.parse(item.propertyValue);
             break;
           case 'gitlab.app.id':
-            this.gitlabAppId = configItemsAppId[0].propertyValue;
+            this.gitlabAppId = item.propertyValue;
             break;
           case 'gitlab.url':
-            this.gitlabUrl = configItemsAppId[0].propertyValue;
+            this.gitlabUrl = item.propertyValue;
             break;
         }
       }
-
-      this.isInitialized = true;
     });
   },
 };
