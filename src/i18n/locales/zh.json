@@ -122,6 +122,7 @@
     "gitlab": "GitLab",
     "gitlab_application_id": "GitLab 应用程序 ID",
     "gitlab_url": "GitLab URL",
+    "gitlab_jwks_path": "GitLab JWKS 路径",
     "go_modules": "Go Modules",
     "group": "组",
     "hackage": "Hackage",
