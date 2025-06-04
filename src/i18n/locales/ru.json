@@ -122,6 +122,7 @@
     "gitlab": "GitLab",
     "gitlab_application_id": "Идентификатор приложения GitLab",
     "gitlab_url": "URL GitLab",
+    "gitlab_jwks_path": "Путь JWKS GitLab",
     "go_modules": "Go Modules",
     "group": "Группа",
     "hackage": "Hackage",

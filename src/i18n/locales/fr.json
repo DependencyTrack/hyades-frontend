@@ -121,7 +121,7 @@
     "github_advisories": "GitHub Advisories",
     "gitlab": "GitLab",
     "gitlab_application_id": "ID de l'application GitLab",
-    "gitlab_url": "URL de base de GitLab",
+    "gitlab_jwks_path": "Chemin JWKS de GitLab",
     "go_modules": "Modules Go",
     "group": "Groupe",
     "hackage": "Hackage",
