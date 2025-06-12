@@ -148,7 +148,7 @@ export default {
       gitlabAppId: '',
       gitlabUrl: '',
       gitlabJwksPath: '/oauth/discovery/keys',
-      sbomEnabled: true,
+      sbomEnabled: false,
       autoCreateProjects: false,
       audience: '',
       topics: [],
