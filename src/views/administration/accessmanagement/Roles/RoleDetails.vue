@@ -44,6 +44,7 @@
     />
   </b-row>
 </template>
+
 <script>
 import ActionableListGroupItem from '../../../components/ActionableListGroupItem';
 import permissionsMixin from '../../../../mixins/permissionsMixin';
@@ -76,70 +77,59 @@ export default {
     };
   },
   methods: {
-    updateRole: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      this.axios
-        .post(url, {
-          uuid: this.role.uuid,
-          name: this.name,
-        })
-        .then((response) => {
-          // this.role = response.data;
-          EventBus.$emit(this.rowEvents.update, this.index, response.data);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch(() => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-    },
-    deleteRole: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${this.role.uuid}`;
-      this.axios
-        .delete(url)
-        .then(() => {
-          EventBus.$emit(this.rowEvents.delete, this.index);
-          this.$toastr.s(this.$t('admin.role_deleted'));
-        })
-        .catch(() => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-    },
-    updatePermissionSelection: function (selections) {
-      this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
-      for (let i = 0; i < selections.length; i++) {
-        let selection = selections[i];
-        let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${selection.name}/role/${this.role.uuid}`;
-        this.axios
-          .post(url)
-          .then((response) => {
-            this.syncVariables(response.data);
-            this.$toastr.s(this.$t('message.updated'));
-          })
-          .catch((error) => {
-            if (error.response.status === 304) {
-              //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            } else {
-              this.$toastr.w(this.$t('condition.unsuccessful_action'));
-            }
-          });
+    updateRole: async function () {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+      const requestBody = { uuid: this.role.uuid, name: this.name };
+
+      try {
+        const response = await this.axios.post(endpoint, requestBody);
+        EventBus.$emit(this.rowEvents.update, this.index, response.data);
+        this.$toastr.s(this.$t('admin.role_updated'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
       }
     },
-    removePermission: function (permission) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/role/${this.role.uuid}`;
-      this.axios
-        .delete(url)
-        .then((response) => {
-          // this.syncVariables(response.data);
-          EventBus.$emit(this.rowEvents.delete, this.index, response.data);
-          this.$toastr.s(this.$t('message.updated'));
-        })
-        .catch(() => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
+    deleteRole: async function () {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+      const requestBody = { data: { uuid: this.role.uuid } };
+
+      try {
+        await this.axios.delete(endpoint, requestBody);
+        EventBus.$emit(this.rowEvents.update, this.index);
+        this.$toastr.s(this.$t('admin.role_deleted'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
+    },
+    updatePermissionSelection: async function (selections) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE_PERMISSION}`;
+      const requestBody = {
+        role: this.role.uuid,
+        permissions: selections.map((selection) => selection.name),
+      };
+
+      try {
+        const response = await this.axios.put(endpoint, requestBody);
+        this.$toastr.s(this.$t('admin.permissions_updated'));
+        this.syncVariables(response.data);
+      } catch (error) {
+        if (error?.response?.status === 304) return;
+        console.error(error);
+      }
+    },
+    removePermission: async function (permission) {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_PERMISSION}/${permission.name}/role/${this.role.uuid}`;
+
+      try {
+        const response = await this.axios.delete(endpoint);
+        EventBus.$emit(this.rowEvents.update, this.index, response.data);
+        this.$toastr.s(this.$t('admin.permission_removed'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
     syncVariables: function (role) {
-      this.role = role;
-      this.permissions = role.permissions;
+      EventBus.$emit(this.rowEvents.update, this.index, role);
     },
   },
 };

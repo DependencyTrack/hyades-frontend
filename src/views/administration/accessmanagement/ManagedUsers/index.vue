@@ -55,8 +55,16 @@ export default {
   data() {
     return {
       rowEvents: {
-        update: 'admin:managedusers:rowUpdate',
-        delete: 'admin:managedusers:rowDeleted',
+        userType: 'managed',
+        get cacheKey() {
+          return `${this.userType}user`;
+        },
+        get update() {
+          return `admin:${this.cacheKey}:rowUpdate`;
+        },
+        get delete() {
+          return `admin:${this.cacheKey}:rowDeleted`;
+        },
       },
       columns: [
         {
@@ -121,6 +129,8 @@ export default {
           });
         },
         onExpandRow: this.vueFormatterInit,
+        onRefresh: this.clearSessionCache,
+        onLoadSuccess: this.clearSessionCache,
         toolbar: '#customToolbar',
         responseHandler: function (res, xhr) {
           res.total = xhr.getResponseHeader('X-Total-Count');
@@ -135,6 +145,12 @@ export default {
       this.$refs.table.refresh({
         silent: true,
       });
+      this.clearSessionCache();
+    },
+    clearSessionCache: function () {
+      Object.entries(sessionStorage)
+        .filter(([key]) => key.startsWith(this.rowEvents.cacheKey))
+        .forEach(([key]) => sessionStorage.removeItem(key));
     },
   },
 };
