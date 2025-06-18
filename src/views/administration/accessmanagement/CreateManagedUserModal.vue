@@ -136,8 +136,7 @@ export default {
         this.username?.length > 0 &&
         this.fullname?.length > 0 &&
         this.email?.length > 0 &&
-        this.password?.length > 0 &&
-        this.confirmPassword?.length > 0
+        this.verifyPasswordState()
       );
     },
   },

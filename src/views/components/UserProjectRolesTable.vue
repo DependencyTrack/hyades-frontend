@@ -1,7 +1,14 @@
 <!-- Table containing the users participating project and their respective roles -->
 <template>
   <div>
-    <b-table :items="projectRoles" :fields="fields">
+    <b-table :busy="!projectRoles" :items="projectRoles" :fields="fields">
+      <template #table-busy>
+        <div class="text-center text-primary my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
+
       <!-- Project Column -->
       <template #cell(project)="data">
         <div
@@ -20,6 +27,7 @@
           style="gap: 0.625rem"
         >
           <multiselect
+            v-if="availableRoles"
             v-model="projectRolesCurrent[data.index].role"
             :options="availableRoles"
             :id="data.index"
@@ -32,18 +40,16 @@
             track-by="uuid"
             class="multiselect"
           ></multiselect>
-
+          <b-spinner v-else small variant="primary"></b-spinner>
           <b-button
             small
             class="action-icon"
             @click="onRemoveProjectRole(data)"
-            v-if="!projectRolesCurrent[data.index].loading"
             v-b-tooltip.hover
             :title="$t('admin.remove_role')"
           >
             <span class="fa fa-trash-o"></span>
           </b-button>
-          <b-spinner v-else small variant="primary"></b-spinner>
         </div>
       </template>
 
@@ -129,14 +135,11 @@ export default {
         );
       },
     },
-    projectRoles: { type: Array, required: true, default: null },
-    availableRoles: { type: Array, required: true, default: null },
+    projectRoles: { required: true, default: null },
+    availableRoles: { required: true, default: null },
   },
   mixins: [],
   components: { Multiselect, SelectProjectModal },
-  created() {
-    this.createProjectMapping(this.projectRoles);
-  },
   data() {
     return {
       // multiselect mutates its model which will cause violation errors, copy is requireds
@@ -162,11 +165,12 @@ export default {
   },
   watch: {
     projectRoles(newValue) {
-      this.createProjectMapping(newValue);
+      if (!newValue) return;
+      this.assignProjectMapping(newValue);
     },
   },
   methods: {
-    createProjectMapping(project) {
+    assignProjectMapping(project) {
       this.projectRolesCurrent = project.map((project) => ({
         ...project,
         // for multiselect

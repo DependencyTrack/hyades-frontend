@@ -97,22 +97,15 @@
     </b-row>
     <b-row class="expanded-row p-3" colspan="2">
       <div class="" style="width: 100%">
-        <div v-if="loading" class="d-flex justify-content-center">
-          <b-spinner variant="primary" type="grow" label="Loading"
-            >Loading ...
-          </b-spinner>
-        </div>
-        <div v-else>
-          <label for="">{{ this.$t('message.projects') }}</label>
-          <user-roles-table
-            :parentContext="{ row, index }"
-            :projectRoles="projectRoles"
-            :availableRoles="availableRoles"
-            @addProjectRole="addProjectRole"
-            @updateProjectRole="updateProjectRole"
-            @removeProjectRole="removeProjectRole"
-          />
-        </div>
+        <label>{{ this.$t('message.project_roles') }}</label>
+        <user-project-roles-table
+          :parentContext="{ row, index }"
+          :projectRoles="projectRoles"
+          :availableRoles="availableRoles"
+          @addProjectRole="addProjectRole"
+          @updateProjectRole="updateProjectRole"
+          @removeProjectRole="removeProjectRole"
+        />
       </div>
     </b-row>
     <select-team-modal
@@ -139,14 +132,19 @@ import BInputGroupFormInput from '@/forms/BInputGroupFormInput';
 import userManagementMixin from '../../../../mixins/userManagementMixin';
 import EventBus from '../../../../shared/eventbus';
 import i18n from '../../../../i18n';
-import UserRolesTable from '../../../components/UserRolesTable.vue';
+import UserProjectRolesTable from '../../../components/UserProjectRolesTable.vue';
 
 export default {
   i18n,
   props: {
     index: { type: Number, required: true },
     row: { type: Object, required: true },
-    rowEvents: { update: { type: String }, delete: { type: String } },
+    rowEvents: {
+      userType: { type: String },
+      cacheKey: { type: String },
+      update: { type: String },
+      delete: { type: String },
+    },
   },
   mixins: [permissionsMixin, userManagementMixin],
   components: {
@@ -156,10 +154,11 @@ export default {
     SelectPermissionModal,
     ChangePasswordModal,
     BInputGroupFormInput,
-    UserRolesTable,
+    UserProjectRolesTable,
   },
   data() {
     return {
+      user: this.row,
       username: this.row.username,
       teams: this.row.teams,
       permissions: this.row.permissions,
@@ -170,7 +169,7 @@ export default {
       suspended: this.row.suspended,
       projectRoles: null,
       availableRoles: null,
-      loading: true,
+      supressSwitchWatchers: false,
       counter: 0,
       labelIcon: {
         dataOn: '\u2713',
@@ -178,33 +177,61 @@ export default {
       },
     };
   },
+  beforeMount() {
+    this.initFromSessionCache();
+  },
   mounted() {
-    // Fetch user projects and available roles for each project (userManagementMixin)
-    Promise.all([
-      this.loadUserProjects(this.username),
-      this.loadAvailableProjectRoles(),
-    ])
-      .then((response) => {
-        this.projectRoles = response[0] || [];
-        this.availableRoles = response[1] || [];
-      })
-      .catch((error) => {
-        if (!this.axios.isAxiosError(error)) console.error(error);
-        this.$toastr.e(this.$t('condition.unsuccessful_action'));
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+    this.loadUserManagementData();
   },
   watch: {
     forcePasswordChange() {
+      if (this.supressSwitchWatchers) return;
       this.updateUser();
     },
     nonExpiryPassword() {
+      if (this.supressSwitchWatchers) return;
       this.updateUser();
     },
-    suspended() {
+    async suspended(newValue) {
+      if (this.supressSwitchWatchers) return;
+
+      // If suspending self, confirm first
+      if (newValue && this.$currentUser.username === this.username) {
+        const confirmed = await this.confirmAction('Suspend');
+        if (confirmed) {
+          this.updateUser();
+          return;
+        }
+        // Undo the change and suppress watcher recursion
+        this.supressSwitchWatchers = true;
+        this.suspended = false;
+        this.$nextTick(() => {
+          this.supressSwitchWatchers = false;
+        });
+        return;
+      }
+
+      // All other cases
       this.updateUser();
+    },
+    user: {
+      handler: function (newValue) {
+        this.username = newValue.username;
+        this.fullname = newValue.fullname ?? this.fullname;
+        this.email = newValue.email;
+        this.teams = newValue.teams;
+        this.permissions = newValue.permissions;
+        this.forcePasswordChange = newValue.forcePasswordChange;
+        this.nonExpiryPassword = newValue.nonExpiryPassword;
+        this.suspended = newValue.suspended;
+
+        this.supressSwitchWatchers = true;
+        // needs to be done after the DOM is updated
+        this.$nextTick(() => {
+          this.supressSwitchWatchers = false;
+        });
+      },
+      deep: true,
     },
   },
   methods: {
@@ -213,6 +240,24 @@ export default {
     },
     openProjectModal() {
       this.$root.$emit('bv::show::modal', 'selectProjectModal');
+    },
+    confirmAction(action) {
+      const h = this.$createElement;
+      const message =
+        'Warning: You are about to perform this action on your own account. This may result in losing access or being locked out. Are you sure you want to continue?';
+      const titleVNode = h('div', {
+        domProps: { innerHTML: `Confirm <strong><b>${action}</b><strong>` },
+      });
+      const messageVNode = h('div', [
+        h('p', { class: ['text-center'] }, message),
+      ]);
+
+      return this.$bvModal.msgBoxConfirm([messageVNode], {
+        title: titleVNode,
+        okVariant: 'danger',
+        okTitle: action,
+        centered: true,
+      });
     },
     updateUser: function () {
       const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
@@ -235,8 +280,12 @@ export default {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
-    deleteUser: function () {
+    async deleteUser() {
       const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`;
+      if (this.$currentUser.username === this.username) {
+        const confirmed = await this.confirmAction('Delete');
+        if (!confirmed) return;
+      }
       this._deleteUser(endpoint);
     },
 
