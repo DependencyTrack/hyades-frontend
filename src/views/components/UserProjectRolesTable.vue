@@ -1,7 +1,11 @@
 <!-- Table containing the users participating project and their respective roles -->
 <template>
   <div>
-    <b-table :busy="!projectRoles" :items="projectRoles" :fields="fields">
+    <b-table
+      :busy="!projectRolesCurrent"
+      :items="projectRolesCurrent"
+      :fields="fields"
+    >
       <template #table-busy>
         <div class="text-center text-primary my-2">
           <b-spinner class="align-middle"></b-spinner>
@@ -28,14 +32,16 @@
         >
           <multiselect
             v-if="availableRoles"
-            v-model="projectRolesCurrent[data.index].role"
+            v-model="data.item.role"
             :options="availableRoles"
             :id="data.index"
             :allow-empty="false"
-            @input="onRoleSelection"
+            @input="(selectedRole) => onRoleSelection(data, selectedRole)"
             :deselect-label="$t('admin.multiselect_remove_role')"
             :placeholder="$t('admin.select_role')"
             :open-direction="isLastRow(data.index, false) ? 'top' : 'auto'"
+            :disabled="data.item.disabled"
+            :loading="data.item.loading"
             label="name"
             track-by="uuid"
             class="multiselect"
@@ -75,7 +81,6 @@
                 track-by="uuid"
                 class="multiselect"
               ></multiselect>
-
               <b-button
                 v-if="!prototype.loading"
                 small
@@ -88,7 +93,6 @@
               </b-button>
               <b-spinner v-else small variant="primary"></b-spinner>
             </div>
-            <!-- *Project Prototype* -->
           </b-td>
         </b-tr>
 
@@ -143,20 +147,20 @@ export default {
   data() {
     return {
       // multiselect mutates its model which will cause violation errors, copy is requireds
-      projectRolesCurrent: [],
-      projectRolesPrototype: [],
+      projectRolesCurrent: [], // mutable copy for display
+      projectRolesPrototype: [], // for adding new project roles
       fields: [
         {
           key: 'project',
           label: this.$t('admin.project'),
           thClass: 'project-column header-row',
           tdClass: 'project-column',
-          sortable: false,
+          sortable: true,
         },
         {
           key: 'role',
           label: this.$t('admin.role'),
-          sortable: false,
+          sortable: true,
           thClass: 'role-column header-row',
           tdClass: 'role-column',
         },
@@ -236,19 +240,21 @@ export default {
     },
 
     // Update/change project role
-    onRoleSelection(data, id) {
-      const role = data.uuid;
-      const project = this.projectRoles[id].project.uuid;
-      this.projectRolesCurrent[id].loading = true;
-      this.projectRolesCurrent[id].disabled = true;
+    onRoleSelection(data, selectionData) {
+      const targetRole = selectionData;
+      const currentRole = data.item.role;
+      const project = data.item.project;
+
+      data.item.loading = true;
+      data.item.disabled = true;
       const abortRoleChange = () => {
-        this.projectRolesCurrent[id].disabled = false;
-        this.projectRolesCurrent[id].loading = false;
-        this.projectRolesCurrent[id].role = this.projectRoles[id].role; // set to original
+        data.item.disabled = false;
+        data.item.loading = false;
+        data.item.role = currentRole; // set to original
       };
       const roleChange = () => {
-        this.projectRolesCurrent[id].disabled = false;
-        this.projectRolesCurrent[id].loading = false;
+        data.item.disabled = false;
+        data.item.loading = false;
       };
 
       const error = (error) => {
@@ -261,7 +267,7 @@ export default {
 
       this.$emit(
         'updateProjectRole',
-        { role, project },
+        { role: targetRole.uuid, project: project.uuid },
         { success: roleChange, error },
       );
     },
@@ -270,7 +276,7 @@ export default {
     onRemoveProjectRole(data) {
       const projectRole = {
         role: data.item.role.uuid,
-        project: this.projectRolesCurrent[data.index].project.uuid,
+        project: data.item.project.uuid,
       };
       this.$emit('removeProjectRole', projectRole);
     },
