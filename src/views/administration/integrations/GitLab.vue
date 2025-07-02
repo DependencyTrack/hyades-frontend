@@ -1,136 +1,128 @@
 <template>
-  <b-card no-body :header="header">
-    <b-card-body>
-      <c-switch
-        id="isGitlabEnabled"
-        color="primary"
-        v-model="isGitlabEnabled"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.integration_gitlab_enable') }}
-      <br />
-      <c-switch
-        id="sbomEnabled"
-        color="primary"
-        v-model="sbomEnabled"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.integration_gitlab_sbom_enable') }}
-      <br />
-      <c-switch
-        id="includeArchived"
-        color="primary"
-        v-model="includeArchived"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.include_archived_projects') }} <br /><br />
-      <b-validated-input-group-form-input
-        id="gitlab-app-id"
-        :label="$t('admin.gitlab_application_id')"
-        input-group-size="mb-3"
-        rules="required"
-        type="password"
-        v-model="gitlabAppId"
-        lazy="true"
-      />
-      <b-validated-input-group-form-input
-        id="gitlab-url"
-        :label="$t('admin.gitlab_url')"
-        input-group-size="mb-3"
-        rules="required"
-        type="url"
-        v-model="gitlabUrl"
-        lazy="true"
-      />
-      <b-validated-input-group-form-input
-        id="gitlab-jwks-path"
-        :label="$t('admin.gitlab_jwks_path')"
-        input-group-size="mb-3"
-        rules="required"
-        type="url"
-        v-model="gitlabJwksPath"
-        lazy="true"
-      />
-      <br />
-      <c-switch
-        id="autoCreateProjects"
-        color="primary"
-        v-model="autoCreateProjects"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.integration_auto_create_enabled') }}
-      <br />
-      <b-validated-input-group-form-input
-        id="audience"
-        label="Audience"
-        input-group-size="mb-3"
-        v-model="audience"
-        lazy="true"
-      />
-      <br />
-    </b-card-body>
-    <b-card-footer>
-      <b-row>
-        <b-col>
-          <h5>Topics</h5>
+  <div>
+    <b-card no-body :header="header">
+      <b-card-header>
+        <c-switch
+          id="gitlabEnabled"
+          color="primary"
+          v-model="isGitlabEnabled"
+          label
+          v-bind="labelIcon"
+        />{{ $t('admin.integration_gitlab_enable') }}
+      </b-card-header>
+      <b-collapse :visible="isGitlabEnabled">
+        <b-card-body>
+          <b-validated-input-group-form-input
+            id="gitlab-app-id"
+            :label="$t('admin.gitlab_application_id')"
+            input-group-size="mb-3"
+            rules="required"
+            type="password"
+            v-model="gitlabAppId"
+            lazy="true"
+          />
+          <b-validated-input-group-form-input
+            id="gitlab-url"
+            :label="$t('admin.gitlab_url')"
+            input-group-size="mb-3"
+            rules="required"
+            type="url"
+            v-model="gitlabUrl"
+            lazy="true"
+          />
+          <c-switch
+            id="includeArchived"
+            color="primary"
+            v-model="includeArchived"
+            label
+            v-bind="labelIcon"
+          />{{ $t('admin.include_archived_projects') }} <br /><br />
+          <h5>{{ $t('admin.topics') }}</h5>
           <div class="mb-2">
-            <ul style="width: 100%; list-style-type: none; padding: 0">
-              <li v-for="(topic, index) in topics" :key="index">
-                <actionable-list-group-item
-                  :value="topic"
-                  :delete-icon="true"
-                  v-on:actionClicked="removeTopic(index)"
-                >
-                  {{ topic }}
-                </actionable-list-group-item>
-              </li>
-              <li>
-                <actionable-list-group-item
-                  :add-icon="true"
-                  v-on:actionClicked="openAddTopicModal"
-                >
-                </actionable-list-group-item>
-              </li>
-            </ul>
+            <multiselect
+              v-model="topics"
+              :options="mOptions"
+              :multiple="true"
+              :taggable="true"
+              :showNoOptions="false"
+              :selectLabel="$t('admin.multiselect_add_topic')"
+              :tag-placeholder="$t('admin.multiselect_add_new_topic')"
+              :deselectLabel="$t('admin.multiselect_remove_topic')"
+              :placeholder="$t('admin.multiselect_enter_new_topic')"
+              @tag="addTopicTag"
+            >
+            </multiselect>
           </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
-          <b-modal
-            id="add-topic-modal"
-            :title="$t('admin.create_topic')"
-            @hidden="clearNewTopic"
-            @ok="addTopic"
-          >
-            <b-form-group :label="$t('admin.topic_name')">
-              <b-form-input
-                v-model="newTopic"
-                type="text"
-                class="px-12"
-              ></b-form-input>
-            </b-form-group>
-          </b-modal>
-          <b-button
-            variant="outline-primary"
-            class="px-5 mt-2"
-            @click="saveChanges"
-            >{{ $t('message.update') }}</b-button
-          >
-        </b-col>
-      </b-row>
-    </b-card-footer>
-  </b-card>
+          <c-switch
+            id="sbomEnabled"
+            color="primary"
+            v-model="sbomEnabled"
+            label
+            v-bind="labelIcon"
+          />{{ $t('admin.integration_gitlab_sbom_enable') }}
+          <b-collapse :visible="sbomEnabled">
+            <c-switch
+              id="autoCreateProjects"
+              color="primary"
+              v-model="autoCreateProjects"
+              label
+              v-bind="labelIcon"
+            />{{ $t('admin.integration_auto_create_enabled') }}
+            <br />
+            <b-validated-input-group-form-input
+              id="audience"
+              :label="$t('admin.gitlab_audience')"
+              input-group-size="mb-3"
+              v-model="audience"
+              lazy="true"
+            />
+            <br />
+            <b-validated-input-group-form-input
+              id="gitlab-jwks-path"
+              :label="$t('admin.gitlab_jwks_path')"
+              input-group-size="mb-3"
+              rules="required"
+              type="url"
+              v-model="gitlabJwksPath"
+              lazy="true"
+            />
+          </b-collapse>
+        </b-card-body>
+      </b-collapse>
+
+      <b-card-footer>
+        <b-button
+          :disabled="!isGitlabEnabled"
+          variant="outline-primary"
+          class="px-5"
+          @click="saveChanges"
+          >{{ $t('message.update') }}</b-button
+        >
+      </b-card-footer>
+    </b-card>
+    <b-modal
+      id="add-topic-modal"
+      :title="$t('admin.create_topic')"
+      @hidden="clearNewTopic"
+      @ok="addTopic"
+    >
+      <b-form-group :label="$t('admin.topic_name')">
+        <b-form-input
+          v-model="newTopic"
+          type="text"
+          class="px-12"
+        ></b-form-input>
+      </b-form-group>
+    </b-modal>
+  </div>
 </template>
 
 <script>
 import { Switch as cSwitch } from '@coreui/vue';
-
 import common from '../../../shared/common';
 import configPropertyMixin from '../mixins/configPropertyMixin';
-import ActionableListGroupItem from '../../components/ActionableListGroupItem';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
-
+import Multiselect from 'vue-multiselect';
 export default {
   mixins: [configPropertyMixin],
   props: {
@@ -138,8 +130,45 @@ export default {
   },
   components: {
     cSwitch,
-    ActionableListGroupItem,
     BValidatedInputGroupFormInput,
+    Multiselect,
+  },
+  created() {
+    const filterByIntegrations = (item) => item.groupName === 'integrations';
+    const processConfigItem = (item) => {
+      switch (item.propertyName) {
+        case 'gitlab.enabled':
+          this.isGitlabEnabled = common.toBoolean(item.propertyValue);
+          break;
+        case 'sbom.push.enabled':
+          this.sbomEnabled = common.toBoolean(item.propertyValue);
+          break;
+        case 'gitlab.include.archived':
+          this.includeArchived = common.toBoolean(item.propertyValue);
+          break;
+        case 'gitlab.autocreate.projects':
+          this.autoCreateProjects = common.toBoolean(item.propertyValue);
+          break;
+        case 'gitlab.audience':
+          this.audience = item.propertyValue;
+          break;
+        case 'gitlab.topics':
+          this.topics = JSON.parse(item.propertyValue);
+          break;
+        case 'gitlab.app.id':
+          this.gitlabAppId = item.propertyValue;
+          break;
+        case 'gitlab.url':
+          this.gitlabUrl = item.propertyValue;
+          break;
+        case 'gitlab.jwks.path':
+          this.gitlabJwksPath = item.propertyValue;
+          break;
+      }
+    };
+    this.axios.get(this.configUrl).then((response) => {
+      response.data.filter(filterByIntegrations).forEach(processConfigItem);
+    });
   },
   data() {
     return {
@@ -153,11 +182,23 @@ export default {
       audience: '',
       topics: [],
       newTopic: '',
+      mOptions: [],
     };
   },
   methods: {
     openAddTopicModal() {
       this.$bvModal.show('add-topic-modal');
+    },
+    addTopicTag(topicTag) {
+      if (this.topics.includes(topicTag)) {
+        return;
+      }
+      const trimmedTag = topicTag.trim();
+      if (trimmedTag === '') {
+        return;
+      }
+      this.mOptions.push(topicTag);
+      this.topics.push(topicTag);
     },
     addTopic() {
       if (this.newTopic && !this.topics.includes(this.newTopic)) {
@@ -235,44 +276,6 @@ export default {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
-  },
-  created() {
-    this.axios.get(this.configUrl).then((response) => {
-      let configItems = response.data.filter((item) => {
-        return item.groupName === 'integrations';
-      });
-      for (let item of configItems) {
-        switch (item.propertyName) {
-          case 'gitlab.enabled':
-            this.isGitlabEnabled = common.toBoolean(item.propertyValue);
-            break;
-          case 'sbom.push.enabled':
-            this.sbomEnabled = common.toBoolean(item.propertyValue);
-            break;
-          case 'gitlab.include.archived':
-            this.includeArchived = common.toBoolean(item.propertyValue);
-            break;
-          case 'gitlab.autocreate.projects':
-            this.autoCreateProjects = common.toBoolean(item.propertyValue);
-            break;
-          case 'gitlab.audience':
-            this.audience = item.propertyValue;
-            break;
-          case 'gitlab.topics':
-            this.topics = JSON.parse(item.propertyValue);
-            break;
-          case 'gitlab.app.id':
-            this.gitlabAppId = item.propertyValue;
-            break;
-          case 'gitlab.url':
-            this.gitlabUrl = item.propertyValue;
-            break;
-          case 'gitlab.jwks.path':
-            this.gitlabJwksPath = configItemsAppId[0].propertyValue;
-            break;
-        }
-      }
-    });
   },
 };
 </script>
