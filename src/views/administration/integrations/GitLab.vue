@@ -140,7 +140,7 @@ export default {
         case 'gitlab.enabled':
           this.isGitlabEnabled = common.toBoolean(item.propertyValue);
           break;
-        case 'sbom.push.enabled':
+        case 'gitlab.sbom.push.enabled':
           this.sbomEnabled = common.toBoolean(item.propertyValue);
           break;
         case 'gitlab.include.archived':
@@ -219,7 +219,7 @@ export default {
         this.updateConfigProperties([
           {
             groupName: 'integrations',
-            propertyName: 'sbom.push.enabled',
+            propertyName: 'gitlab.sbom.push.enabled',
             propertyValue: this.sbomEnabled,
           },
           {
