@@ -606,7 +606,7 @@
     "login_desc": "Melden Sie sich bei Ihrem Konto an",
     "login_forbidden": "Dieses Konto ist inaktiv oder wurde gesperrt",
     "login_more_options": "Mehr Optionen",
-    "login_permission_required": "Für den Zugriff auf das Dashboard ist eine Berechtigung erforderlich",
+    "login_permission_required": "Die Anmeldung war erfolgreich, aber Sie verfügen anscheinend noch nicht über die erforderlichen Berechtigungen. Bitte wenden Sie sich an Ihren Administrator.",
     "login_unauthorized": "ungültiger Benutzername oder Passwort",
     "logout": "Ausloggen",
     "manufacturer": "Hersteller",

@@ -182,17 +182,22 @@ export default {
         .post(url, qs.stringify(requestBody), config)
         .then((result) => {
           if (result.status === 200) {
-                EventBus.$emit('authenticated', result.data);
-                // Check for permissions
-                let decodedToken = permissions.decodeToken(result.data);
-                if (permissions.hasPermission(permissions.VIEW_PORTFOLIO, decodedToken)) {
-                  redirectTo
-                    ? this.$router.replace(redirectTo)
-                    : this.$router.replace({ name: 'Dashboard' });
-                } else {
-                  this.$bvModal.show('modal-informational');
-                  this.loginError = this.$t('message.login_permission_required');
-                }
+            EventBus.$emit('authenticated', result.data);
+            // Check for permissions
+            let decodedToken = permissions.decodeToken(result.data);
+            if (
+              permissions.hasPermission(
+                permissions.VIEW_PORTFOLIO,
+                decodedToken,
+              )
+            ) {
+              redirectTo
+                ? this.$router.replace(redirectTo)
+                : this.$router.replace({ name: 'Dashboard' });
+            } else {
+              this.$bvModal.show('modal-informational');
+              this.loginError = this.$t('message.login_permission_required');
+            }
           }
         })
         .catch((err) => {
@@ -293,15 +298,22 @@ export default {
               if (result.status === 200) {
                 // Check for permissions
                 let decodedToken = permissions.decodeToken(result.data);
-                if (permissions.hasPermission(permissions.VIEW_PORTFOLIO, decodedToken)) {
+                if (
+                  permissions.hasPermission(
+                    permissions.VIEW_PORTFOLIO,
+                    decodedToken,
+                  )
+                ) {
                   // redirect to url from query param but only if it is save for redirection
                   const redirectTo = getRedirectUrl(this.$router);
-                                  redirectTo
-                                    ? this.$router.replace(redirectTo)
-                                    : this.$router.replace({ name: 'Dashboard' });
+                  redirectTo
+                    ? this.$router.replace(redirectTo)
+                    : this.$router.replace({ name: 'Dashboard' });
                 } else {
                   this.$bvModal.show('modal-informational');
-                  this.loginError = this.$t('message.login_permission_required');
+                  this.loginError = this.$t(
+                    'message.login_permission_required',
+                  );
                 }
               }
             })
