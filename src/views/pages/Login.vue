@@ -182,7 +182,6 @@ export default {
         .post(url, qs.stringify(requestBody), config)
         .then((result) => {
           if (result.status === 200) {
-            EventBus.$emit('authenticated', result.data);
             // Check for permissions
             let decodedToken = permissions.decodeToken(result.data);
             if (
@@ -191,6 +190,7 @@ export default {
                 decodedToken,
               )
             ) {
+              EventBus.$emit('authenticated', result.data);
               redirectTo
                 ? this.$router.replace(redirectTo)
                 : this.$router.replace({ name: 'Dashboard' });
@@ -304,6 +304,7 @@ export default {
                     decodedToken,
                   )
                 ) {
+                  EventBus.$emit('authenticated', result.data);
                   // redirect to url from query param but only if it is save for redirection
                   const redirectTo = getRedirectUrl(this.$router);
                   redirectTo
