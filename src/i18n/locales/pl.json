@@ -606,6 +606,7 @@
     "login_desc": "Zaloguj się",
     "login_forbidden": "To konto jest nieaktywne lub zostało zawieszone",
     "login_more_options": "Więcej możliwości",
+    "login_permission_required": "Wymagane jest zezwolenie na dostęp do pulpitu nawigacyjnego",
     "login_unauthorized": "Nieprawidłowa nazwa użytkownika lub hasło",
     "logout": "Wyloguj",
     "manufacturer": "Producent",

@@ -1289,6 +1289,7 @@ router.beforeEach((to, from, next) => {
           });
       } else {
         Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
+        next({ name: 'Dashboard', replace: true });
       }
     } else {
       // no token at all, redirect to login page

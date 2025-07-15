@@ -606,6 +606,7 @@
     "login_desc": "Iniciar sesión en su cuenta",
     "login_forbidden": "Esta cuenta está inactiva o ha sido suspendida",
     "login_more_options": "Mas opciones",
+    "login_permission_required": "Se requiere permiso para acceder al panel de control",
     "login_unauthorized": "usuario o contraseña invalido",
     "logout": "Cerrar sesión",
     "manufacturer": "Fabricante",
