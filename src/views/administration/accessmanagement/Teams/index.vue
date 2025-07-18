@@ -6,13 +6,13 @@
           <span class="fa fa-plus"></span> {{ $t('admin.create_team') }}
         </b-button>
       </div>
-      <bootstrap-table
+      <token-paginated-table
         ref="table"
+        :base-url="`http://localhost:8080/api/v2/teams`"
         :columns="columns"
-        :data="data"
         :options="options"
-      >
-      </bootstrap-table>
+        :response-data-field="'teams'"
+      />
     </b-card-body>
     <create-team-modal v-on:refreshTable="refreshTable" />
   </b-card>
@@ -21,6 +21,7 @@
 <script>
 import xssFilters from 'xss-filters';
 import common from '../../../../shared/common';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 import CreateTeamModal from '../CreateTeamModal';
 import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../../shared/eventbus';
@@ -33,6 +34,7 @@ export default {
   },
   mixins: [bootstrapTableMixin],
   components: {
+    TokenPaginatedTable,
     CreateTeamModal,
   },
   mounted() {
@@ -65,7 +67,7 @@ export default {
         },
         {
           title: this.$t('admin.api_keys'),
-          field: 'apiKeys',
+          field: 'api_keys',
           sortable: false,
           formatter(value) {
             return value
@@ -79,35 +81,9 @@ export default {
           title: this.$t('admin.members'),
           field: 'members',
           sortable: false,
-          formatter(value, row) {
-            let count = 0;
-            if (row.managedUsers) {
-              count += row.managedUsers.length;
-            }
-            if (row.ldapUsers) {
-              count += row.ldapUsers.length;
-            }
-            if (row.oidcUsers) {
-              count += row.oidcUsers.length;
-            }
-            return count;
-          },
         },
       ],
-      data: [],
       options: {
-        search: true,
-        showColumns: true,
-        showRefresh: true,
-        pagination: true,
-        silentSort: false,
-        sidePagination: 'server',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize: 10,
-        icons: {
-          refresh: 'fa-refresh',
-        },
         detailView: true,
         detailViewIcon: false,
         detailViewByClick: true,
@@ -120,19 +96,12 @@ export default {
         },
         onExpandRow: this.vueFormatterInit,
         toolbar: '#customToolbar',
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`,
       },
     };
   },
   methods: {
-    refreshTable: function () {
-      this.$refs.table.refresh({
-        silent: true,
-      });
+    refreshTable: async function () {
+      await this.$refs.table.refreshCurrentPage();
     },
   },
 };
