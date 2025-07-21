@@ -110,7 +110,7 @@ export default {
     tableDataUrl() {
       const url = new URL('http://localhost:8080/api/v2/teams');
       if (this.nameFilter) {
-        url.searchParams.set('name', this.nameFilter.value);
+        url.searchParams.set('name_contains', this.nameFilter.value);
       }
 
       return url.toString();
