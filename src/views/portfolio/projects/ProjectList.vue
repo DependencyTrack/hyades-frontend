@@ -365,7 +365,7 @@ export default {
         {
           title: this.$t('message.risk_score'),
           field: 'metrics.inheritedRiskScore',
-          sortable: true,
+          sortable: false,
         },
         {
           title: this.$t('message.active'),
@@ -379,7 +379,7 @@ export default {
         {
           title: this.$t('message.components'),
           field: 'metrics.components',
-          sortable: true,
+          sortable: false,
           visible: false,
         },
         {
