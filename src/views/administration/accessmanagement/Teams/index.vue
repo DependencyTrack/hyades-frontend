@@ -2,13 +2,17 @@
   <b-card no-body :header="header">
     <b-card-body>
       <div id="customToolbar">
-        <b-button size="md" variant="outline-primary" v-b-modal.createTeamModal>
-          <span class="fa fa-plus"></span> {{ $t('admin.create_team') }}
-        </b-button>
+        <text-filter-pill
+          ref="nameFilterPill"
+          :field-name="'name'"
+          :field-label="'Name'"
+          :operators="['contains']"
+          v-model="nameFilter"
+        />
       </div>
       <token-paginated-table
         ref="table"
-        :base-url="`http://localhost:8080/api/v2/teams`"
+        :base-url="tableDataUrl"
         :columns="columns"
         :options="options"
         :response-data-field="'teams'"
@@ -26,6 +30,7 @@ import CreateTeamModal from '../CreateTeamModal';
 import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../../shared/eventbus';
 import TeamDetails from './TeamDetails.vue';
+import TextFilterPill from '@/views/components/TextFilterPill.vue';
 
 export default {
   name: 'TeamsView',
@@ -34,6 +39,7 @@ export default {
   },
   mixins: [bootstrapTableMixin],
   components: {
+    TextFilterPill,
     TokenPaginatedTable,
     CreateTeamModal,
   },
@@ -52,6 +58,7 @@ export default {
   },
   data() {
     return {
+      nameFilter: null,
       rowEvents: {
         update: 'admin:teams:rowUpdate',
         delete: 'admin:teams:rowDeleted',
@@ -98,6 +105,16 @@ export default {
         toolbar: '#customToolbar',
       },
     };
+  },
+  computed: {
+    tableDataUrl() {
+      const url = new URL('http://localhost:8080/api/v2/teams');
+      if (this.nameFilter) {
+        url.searchParams.set('name', this.nameFilter.value);
+      }
+
+      return url.toString();
+    },
   },
   methods: {
     refreshTable: async function () {

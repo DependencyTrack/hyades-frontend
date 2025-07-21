@@ -9,8 +9,17 @@
     </bootstrap-table>
     <div class="mt-2 d-flex justify-content-between">
       <div>
+        <b-button
+          id="pagination-button-prev"
+          class="pagination-button"
+          :disabled="!hasPreviousPage"
+          @click="goToPrevPage"
+          >‹ Previous
+        </b-button>
+      </div>
+      <div>
         <b-form-group
-          label="Rows per page"
+          label="Rows per page:"
           label-for="pagination-page-size-select"
           label-cols="auto"
         >
@@ -28,38 +37,53 @@
         </b-form-group>
       </div>
       <div>
-        <b-button-group id="pagination-button-group">
-          <b-button
-            id="pagination-button-prev"
-            class="page-item page-link"
-            v-if="hasPreviousPage"
-            @click="goToPrevPage"
-            >‹ Previous
-          </b-button>
-          <b-button
-            id="pagination-button-next"
-            class="page-item page-link"
-            v-if="hasNextPage"
-            @click="goToNextPage"
-            >Next ›
-          </b-button>
-        </b-button-group>
+        <b-button
+          id="pagination-button-next"
+          class="pagination-button"
+          :disabled="!hasNextPage"
+          @click="goToNextPage"
+          >Next ›
+        </b-button>
       </div>
     </div>
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/assets/scss/style';
 
 .pagination-button {
-  background: $pagination-bg;
-  border-color: $pagination-border-color;
-}
+  position: relative;
+  display: block;
+  padding: $pagination-padding-y $pagination-padding-x;
+  margin-left: -$pagination-border-width;
+  line-height: $pagination-line-height;
+  color: $pagination-color;
+  text-decoration: if($link-decoration == none, null, none);
+  background-color: $pagination-bg;
+  border: $pagination-border-width solid $pagination-border-color;
 
-.pagination-button:hover {
-  background: $pagination-hover-bg;
-  border-color: $pagination-hover-border-color;
+  &:disabled {
+    z-index: 2;
+    color: $pagination-disabled-color;
+    text-decoration: none;
+    background-color: $pagination-disabled-bg;
+    border-color: $pagination-disabled-border-color;
+  }
+
+  &:not(:disabled):hover {
+    z-index: 2;
+    color: $pagination-hover-color;
+    text-decoration: none;
+    background-color: $pagination-hover-bg;
+    border-color: $pagination-hover-border-color;
+  }
+
+  &:not(:disabled):focus {
+    z-index: 3;
+    outline: $pagination-focus-outline;
+    box-shadow: $pagination-focus-box-shadow;
+  }
 }
 </style>
 
@@ -80,7 +104,7 @@ export default {
       currentPageNumber: 1,
       currentPageSize: 10,
       currentPageUrl: null,
-      allowedPageSizes: [5, 10, 25],
+      allowedPageSizes: [5, 10, 15, 20],
       nextPageUrl: null,
       pageUrlHistory: [],
       tableData: [],
@@ -155,16 +179,22 @@ export default {
       this.currentPageNumber++;
       await this.loadPage(this.nextPageUrl);
     },
+    async reset() {
+      this.currentPageNumber = 1;
+      this.pageUrlHistory = [];
+      this.nextPageUrl = null;
+      await this.loadPage(this.baseUrl);
+    },
   },
   mounted() {
     this.loadPage(this.baseUrl);
   },
   watch: {
+    async baseUrl() {
+      await this.reset();
+    },
     async currentPageSize() {
-      this.currentPageNumber = 1;
-      this.pageUrlHistory = [];
-      this.nextPageUrl = null;
-      await this.loadPage(this.baseUrl);
+      await this.reset();
     },
   },
 };
