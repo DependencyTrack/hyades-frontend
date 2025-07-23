@@ -2,17 +2,21 @@
   <b-card no-body :header="header">
     <b-card-body>
       <div id="customToolbar">
-        <b-button size="md" variant="outline-primary" v-b-modal.createTeamModal>
-          <span class="fa fa-plus"></span> {{ $t('admin.create_team') }}
-        </b-button>
+        <text-filter-pill
+          ref="nameFilterPill"
+          :field-name="'name'"
+          :field-label="'Name'"
+          :operators="['contains']"
+          v-model="nameFilter"
+        />
       </div>
-      <bootstrap-table
+      <token-paginated-table
         ref="table"
+        :base-url="tableDataUrl"
         :columns="columns"
-        :data="data"
         :options="options"
-      >
-      </bootstrap-table>
+        :response-data-field="'teams'"
+      />
     </b-card-body>
     <create-team-modal v-on:refreshTable="refreshTable" />
   </b-card>
@@ -21,10 +25,12 @@
 <script>
 import xssFilters from 'xss-filters';
 import common from '../../../../shared/common';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 import CreateTeamModal from '../CreateTeamModal';
 import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../../shared/eventbus';
 import TeamDetails from './TeamDetails.vue';
+import TextFilterPill from '@/views/components/TextFilterPill.vue';
 
 export default {
   name: 'TeamsView',
@@ -33,6 +39,8 @@ export default {
   },
   mixins: [bootstrapTableMixin],
   components: {
+    TextFilterPill,
+    TokenPaginatedTable,
     CreateTeamModal,
   },
   mounted() {
@@ -50,6 +58,7 @@ export default {
   },
   data() {
     return {
+      nameFilter: null,
       rowEvents: {
         update: 'admin:teams:rowUpdate',
         delete: 'admin:teams:rowDeleted',
@@ -65,7 +74,7 @@ export default {
         },
         {
           title: this.$t('admin.api_keys'),
-          field: 'apiKeys',
+          field: 'api_keys',
           sortable: false,
           formatter(value) {
             return value
@@ -79,35 +88,9 @@ export default {
           title: this.$t('admin.members'),
           field: 'members',
           sortable: false,
-          formatter(value, row) {
-            let count = 0;
-            if (row.managedUsers) {
-              count += row.managedUsers.length;
-            }
-            if (row.ldapUsers) {
-              count += row.ldapUsers.length;
-            }
-            if (row.oidcUsers) {
-              count += row.oidcUsers.length;
-            }
-            return count;
-          },
         },
       ],
-      data: [],
       options: {
-        search: true,
-        showColumns: true,
-        showRefresh: true,
-        pagination: true,
-        silentSort: false,
-        sidePagination: 'server',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize: 10,
-        icons: {
-          refresh: 'fa-refresh',
-        },
         detailView: true,
         detailViewIcon: false,
         detailViewByClick: true,
@@ -120,19 +103,22 @@ export default {
         },
         onExpandRow: this.vueFormatterInit,
         toolbar: '#customToolbar',
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_TEAM}`,
       },
     };
   },
+  computed: {
+    tableDataUrl() {
+      const url = new URL('http://localhost:8080/api/v2/teams');
+      if (this.nameFilter) {
+        url.searchParams.set('name_contains', this.nameFilter.value);
+      }
+
+      return url.toString();
+    },
+  },
   methods: {
-    refreshTable: function () {
-      this.$refs.table.refresh({
-        silent: true,
-      });
+    refreshTable: async function () {
+      await this.$refs.table.refreshCurrentPage();
     },
   },
 };
