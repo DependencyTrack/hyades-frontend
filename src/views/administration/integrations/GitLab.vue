@@ -1,44 +1,43 @@
 <template>
-  <div>
-    <b-card no-body :header="header">
-      <b-card-header>
-        <c-switch
-          id="gitlabEnabled"
-          color="primary"
-          v-model="isGitlabEnabled"
-          label
-          v-bind="labelIcon"
-        />{{ $t('admin.integration_gitlab_enable') }}
-      </b-card-header>
-      <b-collapse :visible="isGitlabEnabled">
-        <b-card-body>
-          <b-validated-input-group-form-input
-            id="gitlab-app-id"
-            :label="$t('admin.gitlab_application_id')"
-            input-group-size="mb-3"
-            rules="required"
-            type="password"
-            v-model="gitlabAppId"
-            lazy="true"
+  <b-card no-body :header="header">
+    <b-card-header>
+      <c-switch
+        id="gitlabEnabled"
+        color="primary"
+        v-model="isGitlabEnabled"
+        label
+        v-bind="labelIcon"
+      />
+      {{ $t('admin.integration_gitlab_enable') }}
+    </b-card-header>
+
+    <b-collapse :visible="isGitlabEnabled">
+      <b-card-body>
+        <!-- GitLab Integration Config Group -->
+        <div class="mb-4">
+          <label class="mb-3">OIDC {{ $t('admin.configuration') }}</label>
+          <copy-field
+            v-model="$oidc.CLIENT_ID"
+            :label="$t('admin.app_id')"
+            class="mb-2"
           />
-          <b-validated-input-group-form-input
-            id="gitlab-url"
-            :label="$t('admin.gitlab_url')"
-            input-group-size="mb-3"
-            rules="required"
-            type="url"
-            v-model="gitlabUrl"
-            lazy="true"
+          <copy-field
+            v-model="$oidc.ISSUER"
+            :label="$t('admin.url')"
+            class="mb-2"
           />
-          <c-switch
-            id="includeArchived"
-            color="primary"
-            v-model="includeArchived"
-            label
-            v-bind="labelIcon"
-          />{{ $t('admin.include_archived_projects') }} <br /><br />
-          <h5>{{ $t('admin.topics') }}</h5>
           <div class="mb-2">
+            <c-switch
+              id="includeArchived"
+              color="primary"
+              v-model="includeArchived"
+              label
+              v-bind="labelIcon"
+            />
+            <span>{{ $t('admin.include_archived_projects') }}</span>
+          </div>
+          <div>
+            <label class="mb-3">{{ $t('admin.topics') }}</label>
             <multiselect
               v-model="topics"
               :options="mOptions"
@@ -50,71 +49,53 @@
               :deselectLabel="$t('admin.multiselect_remove_topic')"
               :placeholder="$t('admin.multiselect_enter_new_topic')"
               @tag="addTopicTag"
-            >
-            </multiselect>
+            />
           </div>
+        </div>
+
+        <!-- SBOM Push Config Group -->
+        <c-switch
+          id="sbomEnabled"
+          color="primary"
+          v-model="sbomEnabled"
+          label
+          v-bind="labelIcon"
+        />
+        {{ $t('admin.integration_gitlab_sbom_enable') }}
+        <b-collapse :visible="sbomEnabled">
           <c-switch
-            id="sbomEnabled"
+            id="autoCreateProjects"
             color="primary"
-            v-model="sbomEnabled"
+            v-model="autoCreateProjects"
             label
             v-bind="labelIcon"
-          />{{ $t('admin.integration_gitlab_sbom_enable') }}
-          <b-collapse :visible="sbomEnabled">
-            <c-switch
-              id="autoCreateProjects"
-              color="primary"
-              v-model="autoCreateProjects"
-              label
-              v-bind="labelIcon"
-            />{{ $t('admin.integration_auto_create_enabled') }}
-            <br />
-            <b-validated-input-group-form-input
-              id="audience"
-              :label="$t('admin.gitlab_audience')"
-              input-group-size="mb-3"
-              v-model="audience"
-              lazy="true"
-            />
-            <br />
-            <b-validated-input-group-form-input
-              id="gitlab-jwks-path"
-              :label="$t('admin.gitlab_jwks_path')"
-              input-group-size="mb-3"
-              rules="required"
-              type="url"
-              v-model="gitlabJwksPath"
-              lazy="true"
-            />
-          </b-collapse>
-        </b-card-body>
-      </b-collapse>
-
-      <b-card-footer>
-        <b-button
-          :disabled="!isGitlabEnabled"
-          variant="outline-primary"
-          class="px-5"
-          @click="saveChanges"
-          >{{ $t('message.update') }}</b-button
-        >
-      </b-card-footer>
-    </b-card>
-    <b-modal
-      id="add-topic-modal"
-      :title="$t('admin.create_topic')"
-      @hidden="clearNewTopic"
-      @ok="addTopic"
-    >
-      <b-form-group :label="$t('admin.topic_name')">
-        <b-form-input
-          v-model="newTopic"
-          type="text"
-          class="px-12"
-        ></b-form-input>
-      </b-form-group>
-    </b-modal>
-  </div>
+          />
+          {{ $t('admin.integration_auto_create_enabled') }}
+          <b-validated-input-group-form-input
+            id="audience"
+            :label="$t('admin.gitlab_audience')"
+            input-group-size="mb-3"
+            v-model="audience"
+            lazy="true"
+          />
+          <b-validated-input-group-form-input
+            id="gitlab-jwks-path"
+            :label="$t('admin.gitlab_jwks_path')"
+            input-group-size="mb-3"
+            rules="required"
+            type="url"
+            v-model="gitlabJwksPath"
+            lazy="true"
+          />
+        </b-collapse>
+      </b-card-body>
+    </b-collapse>
+    <b-card-footer>
+      <b-button variant="outline-primary" class="px-5" @click="saveChanges">
+        {{ $t('message.update') }}
+      </b-button>
+    </b-card-footer>
+  </b-card>
 </template>
 
 <script>
@@ -123,6 +104,8 @@ import common from '../../../shared/common';
 import configPropertyMixin from '../mixins/configPropertyMixin';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
 import Multiselect from 'vue-multiselect';
+import CopyField from '../../components/CopyField.vue';
+
 export default {
   mixins: [configPropertyMixin],
   props: {
@@ -131,6 +114,7 @@ export default {
   components: {
     cSwitch,
     BValidatedInputGroupFormInput,
+    CopyField,
     Multiselect,
   },
   created() {
@@ -155,12 +139,6 @@ export default {
         case 'gitlab.topics':
           this.topics = JSON.parse(item.propertyValue);
           break;
-        case 'gitlab.app.id':
-          this.gitlabAppId = item.propertyValue;
-          break;
-        case 'gitlab.url':
-          this.gitlabUrl = item.propertyValue;
-          break;
         case 'gitlab.jwks.path':
           this.gitlabJwksPath = item.propertyValue;
           break;
@@ -174,8 +152,6 @@ export default {
     return {
       isGitlabEnabled: false,
       includeArchived: false,
-      gitlabAppId: '',
-      gitlabUrl: '',
       gitlabJwksPath: '/oauth/discovery/keys',
       sbomEnabled: false,
       autoCreateProjects: false,
@@ -211,7 +187,6 @@ export default {
       this.newTopic = '';
     },
     removeTopic(index) {
-      console.log('Removing topic at index:', index);
       this.topics.splice(index, 1);
     },
     saveChanges: function () {
@@ -244,16 +219,6 @@ export default {
           },
           {
             groupName: 'integrations',
-            propertyName: 'gitlab.app.id',
-            propertyValue: this.gitlabAppId,
-          },
-          {
-            groupName: 'integrations',
-            propertyName: 'gitlab.url',
-            propertyValue: this.gitlabUrl,
-          },
-          {
-            groupName: 'integrations',
             propertyName: 'gitlab.jwks.path',
             propertyValue: this.gitlabJwksPath,
           },
@@ -264,11 +229,10 @@ export default {
       }
     },
     setGitlabState: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_INTEGRATION}/gitlab/${this.isGitlabEnabled}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_INTEGRATION}/gitlab/${this.isGitlabEnabled}`;
       this.axios
         .post(url)
         .then(() => {
-          console.log('GitLab state updated successfully');
           this.$toastr.s(this.$t('admin.configuration_saved'));
         })
         .catch((error) => {
