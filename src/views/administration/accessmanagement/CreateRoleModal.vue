@@ -4,7 +4,6 @@
     size="md"
     @hide="resetValues()"
     hide-header-close
-    no-stacking
     :title="$t('admin.create_role')"
   >
     <b-input-group-form-input
@@ -40,7 +39,12 @@
       <b-button size="md" variant="secondary" @click="cancel()">
         {{ $t('message.close') }}
       </b-button>
-      <b-button size="md" variant="primary" @click="createRole()">
+      <b-button
+        size="md"
+        variant="primary"
+        @click="createRole()"
+        :disabled="!name"
+      >
         {{ $t('message.create') }}
       </b-button>
     </template>
@@ -101,11 +105,7 @@ export default {
       this.$root.$emit('bv::show::modal', 'selectPermissionModal');
     },
     updatePermissionSelection(selections) {
-      this.$root.$emit('bv::hide::modal', 'selectPermissionModal');
-      for (let i = 0; i < selections.length; i++) {
-        let selection = selections[i];
-        this.permissions.push(selection);
-      }
+      this.permissions = selections;
     },
   },
 };
