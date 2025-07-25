@@ -90,15 +90,15 @@ export default {
       }
     },
     deleteRole: async function () {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      const requestBody = { data: { uuid: this.role.uuid } };
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${this.role.uuid}`;
 
       try {
-        await this.axios.delete(endpoint, requestBody);
-        EventBus.$emit(this.rowEvents.update, this.index);
+        await this.axios.delete(endpoint);
+        EventBus.$emit(this.rowEvents.delete, this.index);
         this.$toastr.s(this.$t('admin.role_deleted'));
       } catch (error) {
         this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        console.error(error);
       }
     },
     updatePermissionSelection: async function (selections) {
