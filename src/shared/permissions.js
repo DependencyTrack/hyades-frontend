@@ -1,78 +1,179 @@
 /* eslint-disable prettier/prettier */
 // API Permissions
-export const BOM_UPLOAD = 'BOM_UPLOAD';
-export const VIEW_PORTFOLIO = 'VIEW_PORTFOLIO';
-export const PORTFOLIO_MANAGEMENT = 'PORTFOLIO_MANAGEMENT';
-export const PORTFOLIO_MANAGEMENT_CREATE = 'PORTFOLIO_MANAGEMENT_CREATE';
-export const PORTFOLIO_MANAGEMENT_READ = 'PORTFOLIO_MANAGEMENT_READ';
-export const PORTFOLIO_MANAGEMENT_UPDATE = 'PORTFOLIO_MANAGEMENT_UPDATE';
-export const PORTFOLIO_MANAGEMENT_DELETE = 'PORTFOLIO_MANAGEMENT_DELETE';
-export const VIEW_VULNERABILITY = 'VIEW_VULNERABILITY';
-export const VULNERABILITY_ANALYSIS = 'VULNERABILITY_ANALYSIS';
-export const VULNERABILITY_ANALYSIS_CREATE = 'VULNERABILITY_ANALYSIS_CREATE';
-export const VULNERABILITY_ANALYSIS_READ = 'VULNERABILITY_ANALYSIS_READ';
-export const VULNERABILITY_ANALYSIS_UPDATE = 'VULNERABILITY_ANALYSIS_UPDATE';
-export const VIEW_POLICY_VIOLATION = 'VIEW_POLICY_VIOLATION';
-export const VULNERABILITY_MANAGEMENT = 'VULNERABILITY_MANAGEMENT';
-export const VULNERABILITY_MANAGEMENT_CREATE =
-  'VULNERABILITY_MANAGEMENT_CREATE';
-export const VULNERABILITY_MANAGEMENT_READ = 'VULNERABILITY_MANAGEMENT_READ';
-export const VULNERABILITY_MANAGEMENT_UPDATE =
-  'VULNERABILITY_MANAGEMENT_UPDATE';
-export const VULNERABILITY_MANAGEMENT_DELETE =
-  'VULNERABILITY_MANAGEMENT_DELETE';
-export const POLICY_VIOLATION_ANALYSIS = 'POLICY_VIOLATION_ANALYSIS';
+import EventBus from './eventbus';
+
 export const ACCESS_MANAGEMENT = 'ACCESS_MANAGEMENT';
-export const ACCESS_MANAGEMENT_CREATE = 'ACCESS_MANAGEMENT_CREATE';
-export const ACCESS_MANAGEMENT_READ = 'ACCESS_MANAGEMENT_READ';
-export const ACCESS_MANAGEMENT_UPDATE = 'ACCESS_MANAGEMENT_UPDATE';
-export const ACCESS_MANAGEMENT_DELETE = 'ACCESS_MANAGEMENT_DELETE';
-export const SYSTEM_CONFIGURATION = 'SYSTEM_CONFIGURATION';
-export const SYSTEM_CONFIGURATION_CREATE = 'SYSTEM_CONFIGURATION_CREATE';
-export const SYSTEM_CONFIGURATION_READ = 'SYSTEM_CONFIGURATION_READ';
-export const SYSTEM_CONFIGURATION_UPDATE = 'SYSTEM_CONFIGURATION_UPDATE';
-export const SYSTEM_CONFIGURATION_DELETE = 'SYSTEM_CONFIGURATION_DELETE';
-export const PROJECT_CREATION_UPLOAD = 'PROJECT_CREATION_UPLOAD';
+export const BADGES_READ = 'BADGES_READ';
+export const BOM_CREATE = 'BOM_CREATE';
+export const BOM_READ = 'BOM_READ';
+export const FINDING_CREATE = 'FINDING_CREATE';
+export const FINDING_READ = 'FINDING_READ';
+export const FINDING_UPDATE = 'FINDING_UPDATE';
+export const NOTIFICATION_RULE_MANAGEMENT = 'NOTIFICATION_RULE_MANAGEMENT';
 export const POLICY_MANAGEMENT = 'POLICY_MANAGEMENT';
-export const POLICY_MANAGEMENT_CREATE = 'POLICY_MANAGEMENT_CREATE';
-export const POLICY_MANAGEMENT_READ = 'POLICY_MANAGEMENT_READ';
-export const POLICY_MANAGEMENT_UPDATE = 'POLICY_MANAGEMENT_UPDATE';
-export const POLICY_MANAGEMENT_DELETE = 'POLICY_MANAGEMENT_DELETE';
+export const POLICY_VIOLATION_CREATE = 'POLICY_VIOLATION_CREATE';
+export const POLICY_VIOLATION_READ = 'POLICY_VIOLATION_READ';
+export const POLICY_VIOLATION_UPDATE = 'POLICY_VIOLATION_UPDATE';
+export const PORTFOLIO_ACCESS_CONTROL_BYPASS = 'PORTFOLIO_ACCESS_CONTROL_BYPASS';
+export const PORTFOLIO_MANAGEMENT = 'PORTFOLIO_MANAGEMENT';
+export const PROJECT_DELETE = 'PROJECT_DELETE';
+export const PROJECT_READ = 'PROJECT_READ';
+export const PROJECT_UPDATE = 'PROJECT_UPDATE';
+export const SYSTEM_CONFIGURATION = 'SYSTEM_CONFIGURATION';
 export const TAG_MANAGEMENT = 'TAG_MANAGEMENT';
-export const TAG_MANAGEMENT_DELETE = 'TAG_MANAGEMENT_DELETE';
+export const VULNERABILITY_MANAGEMENT = 'VULNERABILITY_MANAGEMENT';
+
+export default Object.freeze({
+  ACCESS_MANAGEMENT,
+  BADGES_READ,
+  BOM_CREATE,
+  BOM_READ,
+  FINDING_CREATE,
+  FINDING_READ,
+  FINDING_UPDATE,
+  NOTIFICATION_RULE_MANAGEMENT,
+  POLICY_MANAGEMENT,
+  POLICY_VIOLATION_CREATE,
+  POLICY_VIOLATION_READ,
+  POLICY_VIOLATION_UPDATE,
+  PORTFOLIO_ACCESS_CONTROL_BYPASS,
+  PORTFOLIO_MANAGEMENT,
+  PROJECT_DELETE,
+  PROJECT_READ,
+  PROJECT_UPDATE,
+  SYSTEM_CONFIGURATION,
+  TAG_MANAGEMENT,
+  VULNERABILITY_MANAGEMENT,
+});
+
+let cachedToken = null;
+const existingToken = getToken();
+
+// On module load, try to cache the token if present
+if (existingToken) {
+  const decodedToken = decodeToken(existingToken);
+  cachedToken = Object.freeze({
+    raw: existingToken,
+    decoded: decodedToken,
+    permissions: decodedToken.permissions?.split(',') || [],
+  });
+}
+
+// Listen for authentication events to update the cached token (e.g. login/logout)
+EventBus.$on('authenticated', (jwt) => {
+  if (!jwt) return;
+  const decodedToken = decodeToken(jwt);
+  cachedToken = Object.freeze({
+    raw: jwt,
+    decoded: decodedToken,
+    permissions: decodedToken.permissions?.split(',') || [],
+  });
+});
 
 /**
  * Determines if the current logged in user has a specific permission.
- * If the decodedToken is not passed, the function will automatically
- * retrieve and decode it.
  */
-export const hasPermission = function hasPermission(permission, decodedToken) {
-  const token = decodedToken || decodeToken(getToken());
-  const permissions = token?.permissions?.split(',') || [];
-  if (typeof permission == 'string') {
-    return permissions.includes(permission);
-  } else if (Array.isArray(permission)) {
-    for (let perm of permission) {
-      if (permissions.includes(perm)) {
-        return true;
+export function hasPermission(permission, operation = 'and') {
+  if (!cachedToken) return false;
+
+  if (typeof permission === 'string') {
+    return cachedToken.permissions.includes(permission);
+  }
+
+  if (typeof permission === 'object' && permission !== null) {
+    return hasComplexPermission(permission);
+  }
+
+  if (Array.isArray(permission)) {
+    switch (operation) {
+      case 'and':
+        return permission.every((perm) =>
+          cachedToken.permissions.includes(perm),
+        );
+      case 'not':
+        return permission.every((perm) => !cachedToken.permissions.includes(perm));
+      case 'or':
+      default:
+        return permission.some((perm) =>
+          cachedToken.permissions.includes(perm),
+        );
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Recursively determines if a user has complex permissions.
+ * Complex permissions can be specified as:
+ * - A string: single permission (e.g. "perm_x")
+ * - An array: all permissions required (AND logic, e.g. ["perm_x", "perm_y"])
+ * - An object:
+ *     { and: [...] }  // All required (AND)
+ *     { or: [...] }   // Any required (OR)
+ *     { not: [...] }  // None must be present (NOT)
+ * Nested structures are supported.
+ *
+ * Example:
+ *   {
+ *     and: [
+ *       "perm_x",
+ *       { or: ["perm_y", "perm_z"] },
+ *       { not: ["perm_a"] }
+ *     ]
+ *   }
+ * Means: perm_x AND (perm_y OR perm_z) AND (NOT perm_a)
+ *
+ * @param {string|Array|Object} requiredPermissions - The required permission(s).
+ * @param {Array<string>} userPermissions - The user's permissions as an array of strings.
+ * @returns {boolean} True if the user has the required permissions, false otherwise.
+ */
+export function hasComplexPermission(requiredPermissions) {
+  try {
+    if (!requiredPermissions) return true;
+
+    if (typeof requiredPermissions === 'string')
+      // return hasPermission(requiredPermissions);
+      return cachedToken.permissions?.includes(requiredPermissions);
+
+    if (Array.isArray(requiredPermissions)) {
+      return requiredPermissions.every((r) => hasComplexPermission(r));
+    }
+
+    if (typeof requiredPermissions === 'object') {
+      if (requiredPermissions.and) {
+        return requiredPermissions.and.every((r) => hasComplexPermission(r));
+      }
+
+      if (requiredPermissions.or) {
+        return requiredPermissions.or.some((r) => hasComplexPermission(r));
+      }
+
+      if (requiredPermissions.not) {
+        return requiredPermissions.not.every((r) => !hasComplexPermission(r));
       }
     }
+
+    // If the structure is not recognized, log and return false
+    console.error('Unrecognized permission structure:', requiredPermissions);
+    return false;
+  } catch (err) {
+    console.error('Error in hasComplexPermission:', err, requiredPermissions);
     return false;
   }
-};
-
+}
 /**
  * Returns the decoded token as a JSON object.
  */
-export const decodeToken = function decodeToken(token) {
-  let base64Url = token.split('.')[1];
-  let base64 = base64Url.replace('-', '+').replace('_', '/');
+export function decodeToken(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace('-', '+').replace('_', '/');
   return JSON.parse(window.atob(base64));
-};
+}
 
 /**
  * Retrieves the token from session storage.
  */
-export const getToken = function getToken() {
+export function getToken() {
   return sessionStorage.getItem('token');
-};
+}

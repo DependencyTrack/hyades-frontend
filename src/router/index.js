@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import i18n from '../i18n';
 import EventBus from '../shared/eventbus';
-import { getToken, hasPermission } from '../shared/permissions';
+import PERMISSIONS, { getToken, hasPermission } from '../shared/permissions';
 import { getContextPath } from '../shared/utils';
 
 // Containers
@@ -1259,44 +1259,48 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   const redirectToLogin = () => {
+    if (to.name === 'Login') {
+      next(); // Already on login, allow navigation
+      return;
+    }
     next({ name: 'Login', query: { redirect: to.fullPath }, replace: true });
   };
 
-  if (to.meta.permissions) {
-    // non-public route, check permissions
-    const jwt = getToken();
-    if (jwt) {
-      const isAllowed = to.meta.permissions.some((permission) =>
-        hasPermission(permission),
-      );
-      if (isAllowed) {
-        // let backend verify the token
-        router.app.axios
-          .get(`${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF}`, {
-            headers: { Authorization: `Bearer ${jwt}` },
-          })
-          .then((result) => {
-            Vue.prototype.$currentUser = result.data;
-            // allowed to proceed
-            next();
-          })
-          .catch(() => {
-            // token is stale
-            // notify app about this
-            EventBus.$emit('authenticated', null);
-            // redirect to login page
-            redirectToLogin();
-          });
-      } else {
-        Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
-        next({ name: 'Dashboard', replace: true });
-      }
-    } else {
-      // no token at all, redirect to login page
+  let permissionsRequired =
+    to.meta.permissions ?? (to.meta.permission ? [to.meta.permission] : []);
+
+  const jwt = getToken();
+
+  // Check if the user is authenticated
+  if (permissionsRequired.length || to.path === '/dashboard') {
+    // Check if the user is authenticated
+    if (!jwt) {
       redirectToLogin();
+      return;
     }
+
+    // Check if the user has the required permissions
+    if (!hasPermission(permissionsRequired ?? [])) {
+      Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
+      next({ name: 'Dashboard', replace: true });
+    }
+
+    // debugger;
+    // Verify the JWT and fetch user details
+    router.app.axios
+      .get(`${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF}`, {
+        headers: { Authorization: `Bearer ${jwt}` },
+      })
+      .then((result) => {
+        Vue.prototype.$currentUser = result.data;
+        next();
+      })
+      .catch(() => {
+        EventBus.$emit('authenticated', null);
+        redirectToLogin();
+      });
   } else {
-    // public route, allowed to proceed
+    // Public Route, proceed
     next();
   }
 });
