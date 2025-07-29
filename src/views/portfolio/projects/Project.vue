@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn">
     <b-card :no-body="true" footer-class="px-3 py-2 card-footer-action">
       <b-card-body class="p-3 clearfix">
         <b-row>
@@ -265,7 +265,7 @@
       </b-tab>
       <b-tab
         ref="findings"
-        v-if="isPermitted(PERMISSIONS.VIEW_VULNERABILITY)"
+        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
         @click="routeTo('findings')"
       >
         <template v-slot:title>
@@ -291,7 +291,7 @@
       </b-tab>
       <b-tab
         ref="epss"
-        v-if="isPermitted(PERMISSIONS.VIEW_VULNERABILITY)"
+        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
         @click="routeTo('epss')"
       >
         <template v-slot:title
@@ -306,7 +306,10 @@
       </b-tab>
       <b-tab
         ref="policyviolations"
-        v-if="isPermitted(PERMISSIONS.VIEW_POLICY_VIOLATION)"
+        v-permission:and="[
+          PERMISSIONS.PROJECT_READ,
+          PERMISSIONS.POLICY_VIOLATION_READ,
+        ]"
         @click="routeTo('policyViolations')"
       >
         <template v-slot:title
