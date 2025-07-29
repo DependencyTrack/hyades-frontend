@@ -131,7 +131,6 @@ function configRoutes() {
             i18n: 'message.dashboard',
             sectionPath: '/dashboard',
             sectionName: 'Dashboard',
-            permissions: ['VIEW_PORTFOLIO'],
           },
         },
         {
@@ -143,7 +142,6 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
           },
         },
         {
@@ -179,7 +177,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.PROJECT_READ, // TODO: inquire
           },
         },
         {
@@ -222,7 +220,7 @@ function configRoutes() {
             i18n: 'message.component_search',
             sectionPath: '/components',
             sectionName: 'Component Lookup',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -238,7 +236,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
+            permissions: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -262,7 +260,7 @@ function configRoutes() {
             i18n: 'message.vulnerabilities',
             sectionPath: '/vulnerabilities',
             sectionName: 'Vulnerabilities',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.VULNERABILITY_MANAGEMENT,
           },
         },
         {
@@ -293,7 +291,7 @@ function configRoutes() {
             i18n: 'message.tags',
             sectionPath: '/tags',
             sectionName: 'Tags',
-            permission: 'VIEW_PORTFOLIO',
+            permission: PERMISSIONS.TAG_MANAGEMENT,
           },
         },
         {
@@ -305,7 +303,6 @@ function configRoutes() {
             i18n: 'message.licenses',
             sectionPath: '/licenses',
             sectionName: 'Licenses',
-            permissions: ['VIEW_PORTFOLIO'],
           },
         },
         {
@@ -323,7 +320,6 @@ function configRoutes() {
             i18n: 'message.licenses',
             sectionPath: '/licenses',
             sectionName: 'Licenses',
-            permissions: ['VIEW_PORTFOLIO'],
           },
         },
         {
@@ -340,13 +336,7 @@ function configRoutes() {
             i18n: 'message.policy_management',
             sectionPath: '/policy',
             sectionName: 'Policy Management',
-            permissions: [
-              'POLICY_MANAGEMENT',
-              'POLICY_MANAGEMENT_CREATE',
-              'POLICY_MANAGEMENT_READ',
-              'POLICY_MANAGEMENT_UPDATE',
-              'POLICY_MANAGEMENT_DELETE',
-            ],
+            permissions: PERMISSIONS.POLICY_MANAGEMENT,
           },
         },
         {
@@ -356,7 +346,10 @@ function configRoutes() {
             title: i18n.t('message.policy_violation_audit'),
             i18n: 'message.policy_violation_audit',
             sectionPath: '/audit',
-            permission: 'VIEW_POLICY_VIOLATION',
+            permission: [
+              PERMISSIONS.POLICY_VIOLATION_READ,
+              PERMISSIONS.POLICY_MANAGEMENT,
+            ],
           },
         },
         {
@@ -368,13 +361,7 @@ function configRoutes() {
             i18n: 'message.administration',
             sectionPath: '/admin',
             sectionName: 'Admin',
-            permissions: [
-              'SYSTEM_CONFIGURATION',
-              'SYSTEM_CONFIGURATION_CREATE',
-              'SYSTEM_CONFIGURATION_READ',
-              'SYSTEM_CONFIGURATION_UPDATE',
-              'SYSTEM_CONFIGURATION_DELETE',
-            ],
+            permissions: PERMISSIONS.SYSTEM_CONFIGURATION,
           },
           children: [
             {
@@ -387,13 +374,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -404,13 +384,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -421,7 +394,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permission: 'SYSTEM_CONFIGURATION',
               },
             },
             {
@@ -432,13 +404,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -449,13 +414,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -466,13 +424,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -483,13 +434,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -500,13 +444,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -517,13 +454,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -534,13 +464,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -551,13 +474,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -569,13 +485,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -586,13 +495,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -603,13 +505,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -620,13 +515,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -637,13 +525,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -655,13 +536,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -672,13 +546,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -689,13 +556,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -707,13 +567,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -724,13 +577,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -741,13 +587,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -758,13 +597,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -775,13 +607,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -792,13 +617,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -809,13 +627,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -826,13 +637,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -843,13 +647,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -860,13 +657,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -877,13 +667,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -894,13 +677,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -911,13 +687,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -929,13 +698,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -946,13 +708,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -964,13 +719,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -981,13 +729,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -998,13 +739,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {
@@ -1016,13 +750,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1033,13 +760,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1050,13 +770,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1067,13 +780,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1084,13 +790,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1101,13 +800,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1118,13 +810,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
             {
@@ -1135,13 +820,6 @@ function configRoutes() {
                 i18n: 'message.administration',
                 sectionPath: '/admin',
                 sectionName: 'Admin',
-                permissions: [
-                  'ACCESS_MANAGEMENT',
-                  'ACCESS_MANAGEMENT_CREATE',
-                  'ACCESS_MANAGEMENT_READ',
-                  'ACCESS_MANAGEMENT_UPDATE',
-                  'ACCESS_MANAGEMENT_DELETE',
-                ],
               },
             },
           ],
@@ -1159,7 +837,9 @@ function configRoutes() {
             i18n: 'message.vulnerability_audit',
             sectionPath: '/vulnerabilityAudit',
             sectionName: 'Vulnerability Audit',
-            permissions: ['VIEW_VULNERABILITY'],
+            permission: {
+              or: [PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ],
+            },
           },
         },
         // The following route redirects URLs from legacy Dependency-Track UI to new URL format.
@@ -1257,6 +937,21 @@ const router = new Router({
   routes: configRoutes(),
 });
 
+function getInheritedPermissions(route) {
+  let current = route;
+  while (current) {
+    if (current.meta && (current.meta.permissions || current.meta.permission)) {
+      return current.meta.permissions ?? [current.meta.permission];
+    }
+    current =
+      current.parent ||
+      (current.matched && current.matched.length > 1
+        ? current.matched[current.matched.length - 2]
+        : null);
+  }
+  return [];
+}
+
 router.beforeEach((to, from, next) => {
   const redirectToLogin = () => {
     if (to.name === 'Login') {
@@ -1266,9 +961,7 @@ router.beforeEach((to, from, next) => {
     next({ name: 'Login', query: { redirect: to.fullPath }, replace: true });
   };
 
-  let permissionsRequired =
-    to.meta.permissions ?? (to.meta.permission ? [to.meta.permission] : []);
-
+  const permissionsRequired = getInheritedPermissions(to);
   const jwt = getToken();
 
   // Check if the user is authenticated

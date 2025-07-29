@@ -27,12 +27,7 @@
             :tooltip="this.$t('message.project_name_desc')"
             :feedback-text="$t('message.required_project_name')"
             v-on:change="syncReadOnlyNameField"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
           />
           <b-row align-v="stretch">
             <b-col>
@@ -49,10 +44,7 @@
                 :label="$t('message.version')"
                 :tooltip="this.$t('message.component_version_desc')"
                 :readonly="
-                  this.isNotPermitted([
-                    PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                    PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-                  ])
+                  !this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)
                 "
               />
             </b-col>
@@ -63,10 +55,7 @@
                 v-model="project.isLatest"
                 :show-placeholder-label="true"
                 :readonly="
-                  this.isNotPermitted([
-                    PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                    PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-                  ])
+                  !this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)
                 "
               />
             </b-col>
@@ -78,12 +67,7 @@
             :options="availableClassifiers"
             :label="$t('message.classifier')"
             :tooltip="$t('message.component_classifier_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
           />
           <div style="margin-bottom: 1rem">
             <label>Parent</label>
@@ -151,10 +135,7 @@
             v-model="project.active"
             :tooltip="$t('message.inactive_active_children')"
             :disabled="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ]) ||
+              !this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT) ||
               (project.active && this.hasActiveChild(project))
             "
           />
@@ -216,12 +197,7 @@
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
           />
           <b-input-group-form-input
             id="project-purl-input"
@@ -231,12 +207,7 @@
             required="false"
             :label="$t('message.package_url_full')"
             :tooltip="this.$t('message.component_package_url_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
           />
           <b-input-group-form-input
             id="project-cpe-input"
@@ -246,12 +217,7 @@
             required="false"
             :label="$t('message.cpe_full')"
             :tooltip="$t('message.component_cpe_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
           />
           <b-input-group-form-input
             id="project-swidTagId-input"
@@ -261,12 +227,7 @@
             required="false"
             :label="$t('message.swid_tagid')"
             :tooltip="$t('message.component_swid_tagid_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!this.hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
           />
         </b-card>
       </b-tab>

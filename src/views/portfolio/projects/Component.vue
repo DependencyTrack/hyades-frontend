@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn" v-permission="PERMISSIONS.PROJECT_READ">
     <b-card :no-body="true" footer-class="px-3 py-2 card-footer-action">
       <b-card-body class="p-3 clearfix">
         <b-row>
@@ -199,7 +199,7 @@ export default {
   title: '',
   computed: {
     projectLabel() {
-      if (this.component.hasOwnProperty('project')) {
+      if (Object.prototype.hasOwnProperty.call(this.component, 'project')) {
         if (this.component.project.name && this.component.project.version) {
           return (
             this.component.project.name + ' ▸ ' + this.component.project.version
@@ -208,6 +208,7 @@ export default {
           return this.component.project.name;
         }
       }
+      return null;
     },
     componentLabel() {
       let label = this.component.name;

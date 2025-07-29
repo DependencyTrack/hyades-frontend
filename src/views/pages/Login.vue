@@ -111,7 +111,6 @@ import EventBus from '../../shared/eventbus';
 import { getRedirectUrl, getContextPath } from '../../shared/utils';
 const qs = require('querystring');
 import common from '../../shared/common';
-import * as permissions from '../../shared/permissions';
 
 export default {
   name: 'Login',
@@ -147,7 +146,7 @@ export default {
     };
   },
   beforeMount() {
-    let enabled_url = `${this.$api.BASE_URL}/${this.$api.URL_CONFIG_PROPERTY}/public/general/welcome.message.enabled`;
+    const enabled_url = `${this.$api.BASE_URL}/${this.$api.URL_CONFIG_PROPERTY}/public/general/welcome.message.enabled`;
     axios
       .get(enabled_url)
       .then((response) => {
@@ -155,7 +154,7 @@ export default {
       })
       .then(() => {
         if (this.isWelcomeMessage) {
-          let message_url = `${this.$api.BASE_URL}/${this.$api.URL_CONFIG_PROPERTY}/public/general/welcome.message.html`;
+          const message_url = `${this.$api.BASE_URL}/${this.$api.URL_CONFIG_PROPERTY}/public/general/welcome.message.html`;
           axios.get(message_url).then((response) => {
             this.welcomeMessage = decodeURIComponent(
               response.data.propertyValue,
@@ -166,7 +165,7 @@ export default {
   },
   methods: {
     login() {
-      const url = this.$api.BASE_URL + '/' + this.$api.URL_LOGIN;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_LOGIN}`;
       const requestBody = {
         username: this.input.username,
         password: this.input.password,
@@ -182,22 +181,8 @@ export default {
         .post(url, qs.stringify(requestBody), config)
         .then((result) => {
           if (result.status === 200) {
-            // Check for permissions
-            let decodedToken = permissions.decodeToken(result.data);
-            if (
-              permissions.hasPermission(
-                permissions.VIEW_PORTFOLIO,
-                decodedToken,
-              )
-            ) {
-              EventBus.$emit('authenticated', result.data);
-              redirectTo
-                ? this.$router.replace(redirectTo)
-                : this.$router.replace({ name: 'Dashboard' });
-            } else {
-              this.$bvModal.show('modal-informational');
-              this.loginError = this.$t('message.login_permission_required');
-            }
+            EventBus.$emit('authenticated', result.data);
+            this.$router.replace(redirectTo ?? { name: 'Dashboard' });
           }
         })
         .catch((err) => {
@@ -229,20 +214,13 @@ export default {
         return Promise.resolve(false);
       }
 
-      const url = this.$api.BASE_URL + '/' + this.$api.URL_OIDC_AVAILABLE;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_OIDC_AVAILABLE}`;
 
+      // Check OIDC availability in backend and return boolean
       return axios
         .get(url)
-        .then((result) => {
-          var oidcAvailableInBackend = false;
-          if (result.status === 200) {
-            oidcAvailableInBackend = result.data === true;
-          }
-          return oidcAvailableInBackend;
-        })
-        .catch((err) => {
-          return Promise.reject(err);
-        });
+        .then((result) => result.data && result.status === 200)
+        .catch((err) => Promise.reject(err));
     },
     oidcLogin() {
       this.oidcUserManager
@@ -281,7 +259,7 @@ export default {
           }
 
           // Exchange OAuth2 Access Token for a JWT issued by Dependency-Track
-          const url = this.$api.BASE_URL + '/' + this.$api.URL_USER_OIDC_LOGIN;
+          const url = `${this.$api.BASE_URL}/${this.$api.URL_USER_OIDC_LOGIN}`;
           const requestBody = {
             accessToken: oidcUser.access_token,
             idToken: oidcUser.id_token,
@@ -292,30 +270,13 @@ export default {
             },
           };
 
+          const redirectTo = getRedirectUrl(this.$router);
           this.axios
             .post(url, qs.stringify(requestBody), config)
             .then((result) => {
               if (result.status === 200) {
-                // Check for permissions
-                let decodedToken = permissions.decodeToken(result.data);
-                if (
-                  permissions.hasPermission(
-                    permissions.VIEW_PORTFOLIO,
-                    decodedToken,
-                  )
-                ) {
-                  EventBus.$emit('authenticated', result.data);
-                  // redirect to url from query param but only if it is save for redirection
-                  const redirectTo = getRedirectUrl(this.$router);
-                  redirectTo
-                    ? this.$router.replace(redirectTo)
-                    : this.$router.replace({ name: 'Dashboard' });
-                } else {
-                  this.$bvModal.show('modal-informational');
-                  this.loginError = this.$t(
-                    'message.login_permission_required',
-                  );
-                }
+                EventBus.$emit('authenticated', result.data);
+                this.$router.replace(redirectTo ?? { name: 'Dashboard' });
               }
             })
             .catch((err) => {

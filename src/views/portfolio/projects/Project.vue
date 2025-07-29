@@ -39,7 +39,10 @@
                         ></i
                       ></a>
                       <ul class="dropdown-menu">
-                        <span v-for="projectVersion in activeProjectVersions">
+                        <span
+                          v-for="projectVersion in activeProjectVersions"
+                          :key="projectVersion.uuid"
+                        >
                           <b-dropdown-item
                             :to="{
                               name: 'Project',
@@ -55,6 +58,7 @@
                         >
                           <span
                             v-for="projectVersion in inactiveProjectVersions"
+                            :key="projectVersion.uuid"
                           >
                             <b-dropdown-item
                               :to="{
