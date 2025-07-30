@@ -142,6 +142,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -162,7 +163,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -192,7 +193,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
+            permissions: [PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ],
           },
         },
         {
@@ -236,7 +237,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: PERMISSIONS.PROJECT_READ,
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -336,7 +337,7 @@ function configRoutes() {
             i18n: 'message.policy_management',
             sectionPath: '/policy',
             sectionName: 'Policy Management',
-            permissions: PERMISSIONS.POLICY_MANAGEMENT,
+            permission: PERMISSIONS.POLICY_MANAGEMENT,
           },
         },
         {
@@ -346,7 +347,7 @@ function configRoutes() {
             title: i18n.t('message.policy_violation_audit'),
             i18n: 'message.policy_violation_audit',
             sectionPath: '/audit',
-            permission: [
+            permissions: [
               PERMISSIONS.POLICY_VIOLATION_READ,
               PERMISSIONS.POLICY_MANAGEMENT,
             ],
@@ -361,7 +362,7 @@ function configRoutes() {
             i18n: 'message.administration',
             sectionPath: '/admin',
             sectionName: 'Admin',
-            permissions: PERMISSIONS.SYSTEM_CONFIGURATION,
+            permission: PERMISSIONS.SYSTEM_CONFIGURATION,
           },
           children: [
             {
@@ -907,6 +908,7 @@ function configRoutes() {
       name: 'Login',
       component: Login,
       meta: {
+        isPublic: true,
         title: i18n.t('message.login'),
       },
     },
@@ -915,6 +917,7 @@ function configRoutes() {
       name: 'PasswordForceChange',
       component: PasswordForceChange,
       meta: {
+        isPublic: true,
         title: i18n.t('message.change_password'),
       },
     },
@@ -923,6 +926,7 @@ function configRoutes() {
       name: '404',
       component: Page404,
       meta: {
+        isPublic: true,
         title: i18n.t('404.heading'),
       },
     },

@@ -93,7 +93,7 @@
             </div>
             <div class="text-muted font-xs">
               <span class="text-lowercase font-weight-bold">
-                <span v-for="tag in project.tags">
+                <span v-for="tag in project.tags" :key="tag.name">
                   <b-badge
                     :to="{ name: 'Projects', query: { tag: tag.name } }"
                     variant="tag"
@@ -265,7 +265,9 @@
       </b-tab>
       <b-tab
         ref="findings"
-        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
+        v-if="
+          hasPermission([PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ])
+        "
         @click="routeTo('findings')"
       >
         <template v-slot:title>
@@ -274,14 +276,14 @@
             variant="tab-total"
             v-b-tooltip.hover
             :title="$t('message.total_findings_excluding_aliases')"
-            >{{ totalFindings }}</b-badge
-          >
+            >{{ totalFindings }}
+          </b-badge>
           <b-badge
             variant="tab-info"
             v-b-tooltip.hover
             :title="$t('message.total_findings_including_aliases')"
-            >{{ totalFindingsIncludingAliases }}</b-badge
-          >
+            >{{ totalFindingsIncludingAliases }}
+          </b-badge>
         </template>
         <project-findings
           :key="this.uuid"
@@ -291,7 +293,9 @@
       </b-tab>
       <b-tab
         ref="epss"
-        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
+        v-if="
+          hasPermission([PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ])
+        "
         @click="routeTo('epss')"
       >
         <template v-slot:title
@@ -306,10 +310,12 @@
       </b-tab>
       <b-tab
         ref="policyviolations"
-        v-permission:and="[
-          PERMISSIONS.PROJECT_READ,
-          PERMISSIONS.POLICY_VIOLATION_READ,
-        ]"
+        v-if="
+          hasPermission([
+            PERMISSIONS.PROJECT_READ,
+            PERMISSIONS.POLICY_VIOLATION_READ,
+          ])
+        "
         @click="routeTo('policyViolations')"
       >
         <template v-slot:title
@@ -457,7 +463,7 @@ export default {
       this.$title = this.projectLabel;
     },
     initialize: function () {
-      let projectUrl = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.uuid}`;
+      const projectUrl = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.uuid}`;
       this.axios
         .get(projectUrl)
         .catch((error) => {
