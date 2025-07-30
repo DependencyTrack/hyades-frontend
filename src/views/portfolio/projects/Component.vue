@@ -159,7 +159,7 @@
       </b-tab>
     </b-tabs>
     <component-details-modal
-      :component="cloneDeep(component)"
+      :component="component"
       v-on:componentUpdated="syncComponentFields"
     />
     <component-properties-modal :uuid="this.uuid" />
@@ -169,7 +169,6 @@
 
 <script>
 import common from '../../../shared/common';
-import { cloneDeep } from 'lodash-es';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
 import VueEasyPieChart from 'vue-easy-pie-chart';
 import PortfolioWidgetRow from '../../dashboard/PortfolioWidgetRow';
@@ -246,9 +245,6 @@ export default {
     };
   },
   methods: {
-    cloneDeep: function (component) {
-      return cloneDeep(component);
-    },
     getStyle: function (style) {
       return getStyle(style);
     },
