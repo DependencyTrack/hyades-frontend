@@ -51,93 +51,83 @@
               />
             </span>
             <actionable-list-group-item
-              v-permission:or="PERMISSIONS.POLICY_MANAGEMENT"
               :add-icon="true"
               v-on:actionClicked="addCondition"
             />
           </div>
         </b-form-group>
-        <b-form-group
-          v-if="limitToVisible === true"
-          id="projectLimitsList"
-          :label="this.$t('admin.limit_to_projects')"
-        >
-          <div class="list-group">
-            <span v-for="project in projects" :key="project.uuid">
+
+        <b-collapse v-model="limitToVisible">
+          <b-form-group
+            id="projectLimitsList"
+            :label="this.$t('admin.limit_to_projects')"
+          >
+            <div class="list-group">
+              <span v-for="project in projects" :key="project.uuid">
+                <actionable-list-group-item
+                  :value="formatLabel(project.name, project.version)"
+                  :delete-icon="true"
+                  v-on:actionClicked="deleteProjectLimiter(project.uuid)"
+                />
+              </span>
               <actionable-list-group-item
-                :value="formatLabel(project.name, project.version)"
-                :delete-icon="true"
-                v-on:actionClicked="deleteProjectLimiter(project.uuid)"
+                :add-icon="true"
+                v-on:actionClicked="
+                  $root.$emit('bv::show::modal', 'selectProjectModal')
+                "
               />
-            </span>
-            <actionable-list-group-item
-              v-permission:or="[
-                PERMISSIONS.POLICY_MANAGEMENT,
-                PERMISSIONS.POLICY_MANAGEMENT_UPDATE,
-              ]"
-              :add-icon="true"
-              v-on:actionClicked="
-                $root.$emit('bv::show::modal', 'selectProjectModal')
-              "
-            />
+            </div>
+          </b-form-group>
+          <div style="margin-bottom: 1.5rem">
+            <b-row>
+              <b-col cols="auto">
+                <b-input-group-form-switch
+                  id="isNotifyChildrenEnabled"
+                  :label="$t('admin.include_children')"
+                  v-model="includeChildren"
+                />
+              </b-col>
+              <b-col>
+                <b-input-group-form-switch
+                  id="isOnlyLatestProjectVersion"
+                  :label="
+                    $t('message.policy_is_only_for_latest_project_version')
+                  "
+                  v-model="onlyLatestProjectVersion"
+                />
+              </b-col>
+            </b-row>
           </div>
-        </b-form-group>
-        <div v-if="limitToVisible === true" style="margin-bottom: 1.5rem">
-          <b-row>
-            <b-col cols="auto">
-              <b-input-group-form-switch
-                id="isNotifyChildrenEnabled"
-                :label="$t('admin.include_children')"
-                v-model="includeChildren"
-              />
-            </b-col>
-            <b-col>
-              <b-input-group-form-switch
-                id="isOnlyLatestProjectVersion"
-                :label="$t('message.policy_is_only_for_latest_project_version')"
-                v-model="onlyLatestProjectVersion"
-              />
-            </b-col>
-          </b-row>
-        </div>
-        <b-form-group
-          v-if="limitToVisible === true"
-          id="tagLimitsList"
-          :label="this.$t('admin.limit_to_tags')"
-        >
-          <div class="list-group">
-            <span v-for="tag in tags">
+          <b-form-group
+            id="tagLimitsList"
+            :label="this.$t('admin.limit_to_tags')"
+          >
+            <div class="list-group">
+              <span v-for="tag in tags" :key="tag.name">
+                <actionable-list-group-item
+                  :value="formatLabel(tag.name, tag.id)"
+                  :delete-icon="true"
+                  v-on:actionClicked="deleteTagLimiter(tag.name)"
+                />
+              </span>
               <actionable-list-group-item
-                :value="formatLabel(tag.name, tag.id)"
-                :delete-icon="true"
-                v-on:actionClicked="deleteTagLimiter(tag.name)"
+                :add-icon="true"
+                v-on:actionClicked="
+                  $root.$emit('bv::show::modal', 'selectTagModal')
+                "
               />
-            </span>
-            <actionable-list-group-item
-              v-permission:or="[
-                PERMISSIONS.POLICY_MANAGEMENT,
-                PERMISSIONS.POLICY_MANAGEMENT_UPDATE,
-              ]"
-              :add-icon="true"
-              v-on:actionClicked="
-                $root.$emit('bv::show::modal', 'selectTagModal')
-              "
-            />
-          </div>
-        </b-form-group>
-        <div style="text-align: right">
+            </div>
+          </b-form-group>
+        </b-collapse>
+        <div class="d-flex justify-content-end" style="gap: 0.625rem">
           <b-toggleable-display-button
             variant="outline-primary"
             :label="$t('admin.limit_to')"
-            v-permission="PERMISSIONS.VIEW_PORTFOLIO"
-            v-on:toggle="limitToVisible = !limitToVisible"
+            v-model="limitToVisible"
           />
-          <b-button
-            v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_DELETE']"
-            variant="outline-danger"
-            @click="deletePolicy"
-            >{{ $t('message.delete_policy') }}</b-button
-          >
+          <b-button variant="outline-danger" @click="deletePolicy">{{
+            $t('message.delete_policy')
+          }}</b-button>
         </div>
       </b-col>
     </b-row>
@@ -148,7 +138,6 @@
 
 <script>
 import i18n from '../../../i18n';
-import permissionsMixin from '../../../mixins/permissionsMixin';
 import ActionableListGroupItem from '../ActionableListGroupItem.vue';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput.vue';
 import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect.vue';
@@ -161,7 +150,6 @@ import EventBus from '../../../shared/eventbus';
 
 export default {
   i18n,
-  mixins: [permissionsMixin],
   components: {
     ActionableListGroupItem,
     BInputGroupFormInput,
@@ -289,7 +277,7 @@ export default {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}/project/${projectUuid}`;
       this.axios
         .delete(url)
-        .then((response) => {
+        .then(() => {
           let p = [];
           for (let i = 0; i < this.projects.length; i++) {
             if (this.projects[i].uuid !== projectUuid) {
@@ -299,7 +287,7 @@ export default {
           this.projects = p;
           this.$toastr.s(this.$t('message.updated'));
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
@@ -323,7 +311,7 @@ export default {
         let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}/project/${selection.uuid}`;
         this.axios
           .post(url)
-          .then((response) => {
+          .then(() => {
             this.projects.push(selection);
             this.$toastr.s(this.$t('message.updated'));
           })
