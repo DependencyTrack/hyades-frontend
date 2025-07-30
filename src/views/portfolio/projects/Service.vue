@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn">
     <b-card :no-body="true" footer-class="px-3 py-2 card-footer-action">
       <b-card-body class="p-3 clearfix">
         <b-row>
@@ -118,26 +118,22 @@
       </b-tab>
     </b-tabs>
     <service-details-modal
-      :service="cloneDeep(service)"
+      :service="service"
       v-on:serviceUpdated="syncServiceFields"
     />
   </div>
 </template>
 
 <script>
-import common from '../../../shared/common';
-import { cloneDeep } from 'lodash-es';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
 import VueEasyPieChart from 'vue-easy-pie-chart';
 import PortfolioWidgetRow from '../../dashboard/PortfolioWidgetRow';
 import ServiceDashboard from './ServiceDashboard';
 import SeverityBarChart from '../../dashboard/SeverityBarChart';
 import EventBus from '../../../shared/eventbus';
-import permissionsMixin from '../../../mixins/permissionsMixin';
 import ServiceDetailsModal from './ServiceDetailsModal';
 
 export default {
-  mixins: [permissionsMixin],
   components: {
     SeverityBarChart,
     ServiceDashboard,
@@ -147,7 +143,7 @@ export default {
   },
   computed: {
     projectLabel() {
-      if (this.service.hasOwnProperty('project')) {
+      if (Object.prototype.hasOwnProperty.call(this.service, 'project')) {
         if (this.service.project.name && this.service.project.version) {
           return (
             this.service.project.name + ' ▸ ' + this.service.project.version
@@ -156,6 +152,7 @@ export default {
           return this.service.project.name;
         }
       }
+      return '';
     },
     serviceLabel() {
       if (this.service.name && this.service.version) {
@@ -187,9 +184,6 @@ export default {
     };
   },
   methods: {
-    cloneDeep: function (service) {
-      return cloneDeep(service);
-    },
     getStyle: function (style) {
       return getStyle(style);
     },
