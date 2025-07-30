@@ -6,10 +6,7 @@
           size="md"
           variant="outline-primary"
           v-b-modal.projectAddComponentModal
-          v-permission:or="[
-            PERMISSIONS.PORTFOLIO_MANAGEMENT,
-            PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-          ]"
+          v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >
           <span class="fa fa-plus"></span> {{ $t('message.add_component') }}
         </b-button>
@@ -17,10 +14,7 @@
           size="md"
           variant="outline-primary"
           @click="removeDependencies"
-          v-permission:or="[
-            PERMISSIONS.PORTFOLIO_MANAGEMENT,
-            PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
-          ]"
+          v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >
           <span class="fa fa-minus"></span> {{ $t('message.remove_component') }}
         </b-button>
@@ -36,17 +30,17 @@
         <b-tooltip target="upload-button" triggers="hover focus">{{
           $t('message.upload_bom_tooltip')
         }}</b-tooltip>
-        <b-dropdown
-          variant="outline-primary"
-          v-permission="PERMISSIONS.VIEW_PORTFOLIO"
-        >
+        <b-dropdown variant="outline-primary">
           <template #button-content>
             <span class="fa fa-download"></span>
             {{ $t('message.download_bom') }}
           </template>
-          <b-dropdown-item @click="downloadBom('inventory')" href="#">{{
-            $t('message.inventory')
-          }}</b-dropdown-item>
+          <b-dropdown-item
+            v-permission:or="[PERMISSIONS.PROJECT_READ, PERMISSIONS.BOM_READ]"
+            @click="downloadBom('inventory')"
+            href="#"
+            >{{ $t('message.inventory') }}</b-dropdown-item
+          >
           <b-dropdown-item
             @click="downloadBom('withVulnerabilities')"
             href="#"
@@ -55,7 +49,7 @@
         </b-dropdown>
         <b-dropdown
           variant="outline-primary"
-          v-permission="PERMISSIONS.VIEW_PORTFOLIO"
+          v-permission="PERMISSIONS.PROJECT_READ"
         >
           <template #button-content>
             <span class="fa fa-download"></span>

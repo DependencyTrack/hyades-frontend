@@ -209,7 +209,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -249,7 +249,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -280,7 +280,7 @@ function configRoutes() {
             i18n: 'message.vulnerabilities',
             sectionPath: '/vulnerabilities',
             sectionName: 'Vulnerabilities',
-            permissions: ['VIEW_PORTFOLIO'],
+            permission: PERMISSIONS.VULNERABILITY_MANAGEMENT,
           },
         },
         {
