@@ -353,7 +353,7 @@
       </b-tab>
     </b-tabs>
     <project-details-modal
-      :project="cloneDeep(project)"
+      :project="project"
       :uuid="this.uuid"
       v-on:projectUpdated="syncProjectFields"
     />
@@ -365,7 +365,6 @@
 
 <script>
 import common from '../../../shared/common';
-import { cloneDeep } from 'lodash-es';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
 import VueEasyPieChart from 'vue-easy-pie-chart';
 import ProjectComponents from './ProjectComponents';
@@ -451,9 +450,6 @@ export default {
     };
   },
   methods: {
-    cloneDeep: function (component) {
-      return cloneDeep(component);
-    },
     getStyle: function (style) {
       return getStyle(style);
     },

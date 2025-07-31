@@ -18,7 +18,7 @@
             id="project-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.name"
+            v-model="localProject.name"
             lazy="true"
             required="true"
             feedback="true"
@@ -35,7 +35,7 @@
                 id="project-version-input"
                 input-group-size="mb-3"
                 type="text"
-                v-model="project.version"
+                v-model="localProject.version"
                 lazy="true"
                 required="false"
                 feedback="false"
@@ -50,7 +50,7 @@
               <b-input-group-form-switch
                 id="project-details-islatest"
                 :label="$t('message.project_is_latest')"
-                v-model="project.isLatest"
+                v-model="localProject.isLatest"
                 :show-placeholder-label="true"
                 :readonly="!hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
               />
@@ -59,7 +59,7 @@
           <b-input-group-form-select
             id="v-classifier-input"
             required="true"
-            v-model="project.classifier"
+            v-model="localProject.classifier"
             :options="availableClassifiers"
             :label="$t('message.classifier')"
             :tooltip="$t('message.component_classifier_desc')"
@@ -92,7 +92,7 @@
           >
             <b-form-textarea
               id="project-description-description"
-              v-model="project.description"
+              v-model="localProject.description"
               rows="3"
               :readonly="!hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
             />
@@ -117,12 +117,12 @@
           <b-input-group-form-switch
             id="project-details-active"
             :label-on="$t('message.active')"
-            :label-off="$t(`${inactiveSinceTimestamp}`)"
-            v-model="project.active"
+            :label-off="inactiveSinceTimestamp"
+            v-model="localProject.active"
             :tooltip="$t('message.inactive_active_children')"
             :disabled="
               !hasPermission(PERMISSIONS.PORTFOLIO_MANAGEMENT) ||
-              (project.active && this.hasActiveChild(project))
+              (localProject.active && this.hasActiveChild(localProject))
             "
           />
           <p></p>
@@ -130,7 +130,7 @@
             id="project-uuid"
             input-group-size="mb-3"
             type="text"
-            v-model="project.uuid"
+            v-model="localProject.uuid"
             lazy="false"
             required="false"
             feedback="false"
@@ -179,7 +179,7 @@
             id="project-group-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.group"
+            v-model="localProject.group"
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
@@ -189,7 +189,7 @@
             id="project-purl-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.purl"
+            v-model="localProject.purl"
             required="false"
             :label="$t('message.package_url_full')"
             :tooltip="this.$t('message.component_package_url_desc')"
@@ -199,7 +199,7 @@
             id="project-cpe-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.cpe"
+            v-model="localProject.cpe"
             required="false"
             :label="$t('message.cpe_full')"
             :tooltip="$t('message.component_cpe_desc')"
@@ -209,7 +209,7 @@
             id="project-swidTagId-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.swidTagId"
+            v-model="localProject.swidTagId"
             required="false"
             :label="$t('message.swid_tagid')"
             :tooltip="$t('message.component_swid_tagid_desc')"
@@ -220,7 +220,7 @@
       <b-tab
         class="body-bg-color"
         style="border: 0; padding: 0"
-        v-if="project.manufacturer"
+        v-if="localProject.manufacturer"
       >
         <template v-slot:title
           ><i class="fa fa-industry"></i>
@@ -231,7 +231,7 @@
             id="project-manufacturer-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.manufacturer.name"
+            v-model="localProject.manufacturer.name"
             required="false"
             readonly
             :label="$t('message.manufacturer_name')"
@@ -247,7 +247,7 @@
               id="manufacturerUrlsTable"
               ref="manufacturerUrlsTable"
               :columns="urlsTableColumns"
-              :data="project.manufacturer.urls"
+              :data="localProject.manufacturer.urls"
               :options="urlsTableOptions"
             >
             </bootstrap-table>
@@ -261,7 +261,7 @@
               id="manufacturerContactsTable"
               ref="manufacturerContactsTable"
               :columns="contactsTableColumns"
-              :data="project.manufacturer.contacts"
+              :data="localProject.manufacturer.contacts"
               :options="contactsTableOptions"
             >
             </bootstrap-table>
@@ -271,7 +271,7 @@
       <b-tab
         class="body-bg-color"
         style="border: 0; padding: 0"
-        v-if="project.supplier"
+        v-if="localProject.supplier"
       >
         <template v-slot:title
           ><i class="fa fa-building-o"></i>
@@ -282,7 +282,7 @@
             id="project-supplier-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="project.supplier.name"
+            v-model="localProject.supplier.name"
             required="false"
             readonly
             :label="$t('message.supplier_name')"
@@ -298,7 +298,7 @@
               id="supplierUrlsTable"
               ref="supplierUrlsTable"
               :columns="urlsTableColumns"
-              :data="project.supplier.urls"
+              :data="localProject.supplier.urls"
               :options="urlsTableOptions"
             >
             </bootstrap-table>
@@ -312,7 +312,7 @@
               id="supplierContactsTable"
               ref="supplierContactsTable"
               :columns="contactsTableColumns"
-              :data="project.supplier.contacts"
+              :data="localProject.supplier.contacts"
               :options="contactsTableOptions"
             >
             </bootstrap-table>
@@ -328,7 +328,7 @@
           <bootstrap-table
             ref="referencesTable"
             :columns="referencesTableColumns"
-            :data="project.externalReferences"
+            :data="localProject.externalReferences"
             :options="referencesTableOptions"
           >
           </bootstrap-table>
@@ -337,8 +337,8 @@
       <b-tab
         style="border: 0; padding: 0"
         v-if="
-          project.metadata &&
-          (project.metadata.authors || project.metadata.supplier)
+          localProject.metadata &&
+          (localProject.metadata.authors || localProject.metadata.supplier)
         "
       >
         <template v-slot:title
@@ -348,7 +348,7 @@
           <b-tabs pills card vertical>
             <b-tab
               :title="$t('message.authors')"
-              v-if="project.metadata.authors"
+              v-if="localProject.metadata.authors"
             >
               <b-card>
                 <b-form-group id="authorsTable-Fieldset">
@@ -356,7 +356,7 @@
                     id="authorsTable"
                     ref="authorsTable"
                     :columns="contactsTableColumns"
-                    :data="project.metadata.authors"
+                    :data="localProject.metadata.authors"
                     :options="contactsTableOptions"
                   >
                   </bootstrap-table>
@@ -365,14 +365,14 @@
             </b-tab>
             <b-tab
               :title="$t('message.supplier')"
-              v-if="project.metadata.supplier"
+              v-if="localProject.metadata.supplier"
             >
               <b-card>
                 <b-input-group-form-input
                   id="project-metadata-supplier-name-input"
                   input-group-size="mb-3"
                   type="text"
-                  v-model="project.metadata.supplier.name"
+                  v-model="localProject.metadata.supplier.name"
                   required="false"
                   readonly
                   :label="$t('message.supplier_name')"
@@ -390,7 +390,7 @@
                     id="supplierUrlsTable"
                     ref="supplierUrlsTable"
                     :columns="urlsTableColumns"
-                    :data="project.metadata.supplier.urls"
+                    :data="localProject.metadata.supplier.urls"
                     :options="urlsTableOptions"
                   >
                   </bootstrap-table>
@@ -404,7 +404,7 @@
                     id="supplierContactsTable"
                     ref="supplierContactsTable"
                     :columns="contactsTableColumns"
-                    :data="project.metadata.supplier.contacts"
+                    :data="localProject.metadata.supplier.contacts"
                     :options="contactsTableOptions"
                   >
                   </bootstrap-table>
@@ -427,20 +427,14 @@
         size="md"
         variant="outline-primary"
         v-b-modal.projectPropertiesModal
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-        ]"
+        v-permission:or="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.properties') }}</b-button
       >
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.projectAddVersionModal
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_CREATE,
-        ]"
+        v-permission:or="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.add_version') }}</b-button
       >
       <b-button size="md" variant="secondary" @click="cancel()">{{
@@ -450,10 +444,7 @@
         size="md"
         variant="primary"
         @click="updateProject()"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-        ]"
+        v-permission:or="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.update') }}</b-button
       >
     </template>
@@ -470,6 +461,7 @@ import common from '../../../shared/common';
 import Multiselect from 'vue-multiselect';
 import xssFilters from 'xss-filters';
 import BInputGroupFormSwitch from '@/forms/BInputGroupFormSwitch.vue';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   name: 'ProjectDetailsModal',
@@ -488,6 +480,7 @@ export default {
   },
   data() {
     return {
+      localProject: {}, // local copy of project
       readOnlyProjectName: '',
       readOnlyProjectVersion: '',
       availableClassifiers: [
@@ -648,31 +641,41 @@ export default {
       },
     };
   },
+  watch: {
+    project: {
+      handler(newVal) {
+        this.localProject = cloneDeep(newVal);
+      },
+      immediate: true,
+      deep: true,
+    },
+    tag: 'searchTags',
+  },
   beforeUpdate() {
-    this.readOnlyProjectName = this.project.name;
-    this.readOnlyProjectVersion = this.project.version;
+    this.readOnlyProjectName = this.localProject.name;
+    this.readOnlyProjectVersion = this.localProject.version;
   },
   beforeMount() {
     this.$root.$on('initializeProjectDetailsModal', async () => {
-      if (!this.retrievedParents && this.project.parent) {
+      if (!this.retrievedParents && this.localProject.parent) {
         this.parent = (
           await this.axios.get(
-            `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.project.parent.uuid}`,
+            `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.localProject.parent.uuid}`,
           )
         ).data;
         this.selectedParent = this.parent;
         this.availableParents = [{ name: '', version: '', uuid: null }];
         this.retrievedParents = true;
       }
+      this.localProject = cloneDeep(this.project);
       this.$root.$emit('bv::show::modal', 'projectDetailsModal');
     });
   },
-  watch: {
-    tag: 'searchTags',
-  },
   methods: {
     initializeTags: function () {
-      this.tags = (this.project.tags || []).map((tag) => ({ text: tag.name }));
+      this.tags = (this.localProject.tags || []).map((tag) => ({
+        text: tag.name,
+      }));
     },
     syncReadOnlyNameField: function (value) {
       this.readOnlyProjectName = value;
@@ -680,45 +683,27 @@ export default {
     syncReadOnlyVersionField: function (value) {
       this.readOnlyProjectVersion = value;
     },
-    updateProject: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}`;
-      let tagsNode = [];
-      let parent = null;
-      if (this.selectedParent) {
-        parent = { uuid: this.selectedParent.uuid };
+    updateProject: async function () {
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}`;
+      const tagsNode = this.tags.map((tag) => ({ name: tag.text }));
+      const parent = this.selectedParent
+        ? { uuid: this.selectedParent.uuid }
+        : null;
+      const payload = {
+        ...this.localProject,
+        parent,
+        tags: tagsNode,
+      };
+      try {
+        const response = await this.axios.post(url, payload);
+        this.$emit('projectUpdated', response.data);
+        this.$toastr.s(this.$t('message.project_updated'));
+        this.parent = this.selectedParent;
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      } finally {
+        this.$root.$emit('bv::hide::modal', 'projectDetailsModal');
       }
-      this.tags.forEach((tag) => tagsNode.push({ name: tag.text }));
-      this.axios
-        .post(url, {
-          uuid: this.project.uuid,
-          author: this.project.author,
-          publisher: this.project.publisher,
-          supplier: this.project.supplier,
-          group: this.project.group,
-          name: this.project.name,
-          version: this.project.version,
-          description: this.project.description,
-          classifier: this.project.classifier,
-          parent: parent,
-          cpe: this.project.cpe,
-          purl: this.project.purl,
-          swidTagId: this.project.swidTagId,
-          tags: tagsNode,
-          active: this.project.active,
-          isLatest: this.project.isLatest,
-          externalReferences: this.project.externalReferences,
-        })
-        .then((response) => {
-          this.$emit('projectUpdated', response.data);
-          this.$toastr.s(this.$t('message.project_updated'));
-          this.parent = this.selectedParent;
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        })
-        .finally(() => {
-          this.$root.$emit('bv::hide::modal', 'projectDetailsModal');
-        });
     },
     deleteProject: async function () {
       this.$root.$emit('bv::hide::modal', 'projectDetailsModal');
@@ -751,11 +736,7 @@ export default {
       );
     },
     createProjectLabel: function (project) {
-      if (project.version) {
-        return project.name + ' : ' + project.version;
-      } else {
-        return project.name;
-      }
+      return `${project.name}${project.version ? ' - ' + project.version : ''}`;
     },
     asyncFind: function (query) {
       if (query) {
@@ -796,12 +777,12 @@ export default {
     },
   },
   computed: {
-    inactiveSinceTimestamp: function () {
-      return this.project.inactiveSince
-        ? this.$t('message.inactive_since') +
-            ': ' +
-            common.formatTimestamp(this.project.inactiveSince, true)
-        : this.$t('message.inactive');
+    inactiveSinceTimestamp() {
+      const { inactiveSince } = this.project;
+      if (inactiveSince) {
+        return `${this.$t('message.inactive_since')}: ${common.formatTimestamp(inactiveSince, true)}`;
+      }
+      return this.$t('message.inactive');
     },
   },
 };

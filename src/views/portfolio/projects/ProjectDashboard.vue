@@ -16,10 +16,7 @@
               <td>
                 {{ lastMeasurement }}
                 <b-link
-                  v-permission:or="[
-                    'PORTFOLIO_MANAGEMENT',
-                    'PORTFOLIO_MANAGEMENT_READ',
-                  ]"
+                  v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
                   class="font-weight-bold"
                   style="margin-left: 6px"
                   v-on:click="refreshMetrics"
@@ -214,6 +211,7 @@ import ChartComponentVulnerabilities from '../../dashboard/ChartComponentVulnera
 import ChartPortfolioVulnerabilities from '../../dashboard/ChartPortfolioVulnerabilities';
 import ChartPolicyViolationsState from '@/views/dashboard/ChartPolicyViolationsState';
 import ChartPolicyViolationBreakdown from '@/views/dashboard/ChartPolicyViolationBreakdown';
+import permissionsMixin from '../../../mixins/permissionsMixin';
 
 export default {
   name: 'project-dashboard',
@@ -225,6 +223,7 @@ export default {
     ChartPortfolioVulnerabilities,
     Callout,
   },
+  mixins: [permissionsMixin],
   props: {
     uuid: String,
     project: Object,
@@ -294,13 +293,13 @@ export default {
       );
     },
     refreshMetrics() {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/refresh`;
-      this.axios.get(url).then((response) => {
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/refresh`;
+      this.axios.get(url).then(() => {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
     fetchMetrics() {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/days/${this.metricDays}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/project/${this.uuid}/days/${this.metricDays}`;
       this.axios.get(url).then((response) => {
         this.$refs.chartProjectVulnerabilities.render(response.data);
         this.$refs.chartPolicyViolationsState.render(response.data);

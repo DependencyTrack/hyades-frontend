@@ -241,16 +241,9 @@
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="createComponent()"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-        ]"
-        >{{ $t('message.create') }}</b-button
-      >
+      <b-button size="md" variant="primary" @click="createComponent()">{{
+        $t('message.create')
+      }}</b-button>
     </template>
   </b-modal>
 </template>
@@ -306,38 +299,21 @@ export default {
   methods: {
     createComponent: function () {
       this.$root.$emit('bv::hide::modal', 'projectAddComponentModal');
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/project/${this.uuid}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/project/${this.uuid}`;
+      const payload = {
+        ...this.component,
+        license: this.selectedLicense,
+      };
       this.axios
-        .put(url, {
-          name: this.component.name,
-          version: this.component.version,
-          group: this.component.group,
-          description: this.component.description,
-          license: this.selectedLicense,
-          licenseExpression: this.component.licenseExpression,
-          licenseUrl: this.component.licenseUrl,
-          filename: this.component.filename,
-          classifier: this.component.classifier,
-          purl: this.component.purl,
-          cpe: this.component.cpe,
-          swidTagId: this.component.swidTagId,
-          copyright: this.component.copyright,
-          md5: this.component.md5,
-          sha1: this.component.sha1,
-          sha256: this.component.sha256,
-          sha512: this.component.sha512,
-          sha3_256: this.component.sha3_256,
-          sha3_512: this.component.sha3_512,
-          notes: this.component.notes,
-        })
-        .then((response) => {
+        .put(url, payload)
+        .then(() => {
           this.$emit('refreshTable');
           this.$toastr.s(this.$t('message.component_created'));
+          this.resetValues();
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
-      this.resetValues();
     },
     resetValues: function () {
       this.component = {
@@ -364,19 +340,17 @@ export default {
       };
     },
     retrieveLicenses: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_CONCISE}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_CONCISE}`;
       this.axios
         .get(url)
         .then((response) => {
-          // Allow for license to be un-selected.
-          this.selectableLicenses.push({ value: '', text: '' });
-          for (let i = 0; i < response.data.length; i++) {
-            let license = response.data[i];
-            this.selectableLicenses.push({
+          this.selectableLicenses = [
+            { value: '', text: '' }, // Allow for license to be un-selected.
+            ...response.data.map((license) => ({
               value: license.licenseId,
               text: license.name,
-            });
-          }
+            })),
+          ];
         })
         .catch((error) => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
