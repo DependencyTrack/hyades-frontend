@@ -219,7 +219,7 @@
       </b-row>
       <b-form-group
         id="fieldset-12"
-        v-permission="[PERMISSIONS.PROJECT_READ]"
+        v-permission="PERMISSIONS.PROJECT_READ"
         :label="this.$t('message.details')"
         label-for="analysisDetailsField"
       >

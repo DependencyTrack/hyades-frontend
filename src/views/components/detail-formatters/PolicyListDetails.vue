@@ -248,7 +248,7 @@ export default {
           }
           this.$toastr.s(this.$t('message.updated'));
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
@@ -256,11 +256,11 @@ export default {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/${this.policy.uuid}`;
       this.axios
         .delete(url)
-        .then((response) => {
+        .then(() => {
           EventBus.$emit('policyManagement:policies:rowDeleted', this.index);
           this.$toastr.s(this.$t('message.policy_deleted'));
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },

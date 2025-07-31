@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     iconClass() {
-      return this.value ? 'fa fa-chevron-up' : 'fa fa-chevron-down';
+      return `fa fa-chevron-${this.value ? 'up' : 'down'}`;
     },
   },
 };

@@ -31,13 +31,11 @@
 </template>
 
 <script>
-import permissionsMixin from '../../../mixins/permissionsMixin';
 import common from '../../../shared/common';
 import xssFilters from 'xss-filters';
 
 export default {
   name: 'ProjectPropertiesModal',
-  mixins: [permissionsMixin],
   props: {
     uuid: String,
   },

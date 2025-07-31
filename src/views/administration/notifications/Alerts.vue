@@ -28,7 +28,7 @@ import common from '../../../shared/common';
 import CreateAlertModal from './CreateAlertModal';
 import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../shared/eventbus';
-import AlertListItemDetails from '../../components/detail-formatters/AlertListItemDetails.vue';
+import AlertDetails from '../../components/detail-formatters/AlertDetails.vue';
 
 export default {
   props: {
@@ -115,7 +115,7 @@ export default {
         detailViewByClick: true,
         detailFormatter: (index, row) => {
           return this.vueFormatter({
-            render: () => <AlertListItemDetails alert={row} index={index} />,
+            render: () => <AlertDetails alert={row} index={index} />,
           });
         },
         onExpandRow: this.vueFormatterInit,

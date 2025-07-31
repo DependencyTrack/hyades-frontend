@@ -25,7 +25,7 @@ import routerMixin from '../../mixins/routerMixin';
 import EventBus from '../../shared/eventbus';
 import bootstrapTableMixin from '../../mixins/bootstrapTableMixin';
 import BInputGroupFormSwitch from '@/forms/BInputGroupFormSwitch.vue';
-import PolicyListItemDetails from '../components/detail-formatters/PolicyListItemDetails.vue';
+import PolicyListDetails from '../components/detail-formatters/PolicyListDetails.vue';
 
 export default {
   mixins: [permissionsMixin, bootstrapTableMixin, routerMixin],
@@ -102,7 +102,7 @@ export default {
         detailViewByClick: true,
         detailFormatter: (index, row) => {
           return this.vueFormatter({
-            render: () => <PolicyListItemDetails row={row} index={index} />,
+            render: () => <PolicyListDetails row={row} index={index} />,
           });
         },
         onExpandRow: this.vueFormatterInit,
