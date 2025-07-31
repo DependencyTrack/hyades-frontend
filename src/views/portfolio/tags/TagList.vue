@@ -17,7 +17,6 @@ import common from '../../../shared/common';
 import PortfolioWidgetRow from '../../dashboard/PortfolioWidgetRow';
 import xssFilters from 'xss-filters';
 import permissionsMixin from '../../../mixins/permissionsMixin';
-import { TAG_MANAGEMENT } from '../../../shared/permissions';
 import routerMixin from '../../../mixins/routerMixin';
 import bootstrapTableMixin from '@/mixins/bootstrapTableMixin';
 import TaggedNotificationRuleListModal from '@/views/portfolio/tags/TaggedNotificationRuleListModal.vue';
@@ -47,7 +46,9 @@ export default {
   },
   mounted() {
     this.$refs.table.refreshOptions({
-      showBtnDeleteSelected: this.isPermitted(TAG_MANAGEMENT),
+      showBtnDeleteSelected: this.hasPermission(
+        this.PERMISSIONS.TAG_MANAGEMENT,
+      ),
     });
   },
   data() {

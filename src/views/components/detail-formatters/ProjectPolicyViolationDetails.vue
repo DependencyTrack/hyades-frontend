@@ -148,8 +148,13 @@
       </b-form-group>
       <b-form-group
         id="fieldset-8"
-        v-if="this.isPermitted(this.PERMISSIONS.POLICY_VIOLATION_ANALYSIS)"
-        :label="this.$t('message.comment')"
+        v-if="
+          hasPermission(
+            [PERMISSIONS.PROJECT_READ, PERMISSIONS.POLICY_VIOLATION_READ],
+            'or',
+          )
+        "
+        :label="$t('message.comment')"
         label-for="input-8"
       >
         <b-form-textarea
@@ -168,8 +173,13 @@
       </b-form-group>
       <b-form-group
         id="fieldset-9"
-        v-if="this.isPermitted(this.PERMISSIONS.POLICY_VIOLATION_ANALYSIS)"
-        :label="this.$t('message.analysis')"
+        v-if="
+          hasPermission(
+            [PERMISSIONS.PROJECT_READ, PERMISSIONS.POLICY_VIOLATION_READ],
+            'or',
+          )
+        "
+        :label="$t('message.analysis')"
         label-for="input-9"
       >
         <b-input-group id="input-9">
@@ -199,6 +209,7 @@
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import i18n from '../../../i18n';
 import BootstrapToggle from 'vue-bootstrap-toggle';
+import common from '../../../shared/common';
 
 export default {
   i18n,
@@ -216,7 +227,12 @@ export default {
       required: false,
     },
   },
-  component: { BootstrapToggle },
+  beforeMount() {
+    this.getAnalysis();
+  },
+  components: {
+    BootstrapToggle,
+  },
   data() {
     return {
       auditTrail: null,
@@ -232,15 +248,9 @@ export default {
     };
   },
   computed: {
-    conditionString: function () {
-      return (
-        'subject == ' +
-        this.violation.policyCondition.subject +
-        ' && value ' +
-        this.violation.policyCondition.operator +
-        ' ' +
-        this.violation.policyCondition.value
-      );
+    conditionString() {
+      const { subject, operator, value } = this.violation.policyCondition || {};
+      return `subject == ${subject} && value ${operator} ${value}`;
     },
   },
   watch: {
@@ -252,49 +262,27 @@ export default {
   },
   mixins: [permissionsMixin],
   methods: {
-    getAnalysis: function () {
-      let queryString =
-        '?policyViolation=' +
-        this.violation.uuid +
-        '&component=' +
-        this.violation.component.uuid;
-      let url =
-        `${this.$api.BASE_URL}/${this.$api.URL_POLICY_VIOLATION_ANALYSIS}` +
-        queryString;
-      this.axios.get(url).then((response) => {
+    async getAnalysis() {
+      const queryString = `?policyViolation=${this.violation.uuid}&component=${this.violation.component.uuid}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY_VIOLATION_ANALYSIS}${queryString}`;
+      try {
+        const response = await this.axios.get(url);
         this.updateAnalysisData(response.data);
-      });
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      }
     },
-    updateAnalysisData: function (analysis) {
-      if (Object.prototype.hasOwnProperty.call(analysis, 'analysisComments')) {
-        let trail = '';
-        for (let i = 0; i < analysis.analysisComments.length; i++) {
-          if (
-            Object.prototype.hasOwnProperty.call(
-              analysis.analysisComments[i],
-              'commenter',
-            )
-          ) {
-            trail += analysis.analysisComments[i].commenter + ' - ';
-          }
-          trail += common.formatTimestamp(
-            analysis.analysisComments[i].timestamp,
-            true,
-          );
-          trail += '\n';
-          trail += analysis.analysisComments[i].comment;
-          trail += '\n\n';
-        }
-        this.auditTrail = trail;
-      }
-      if (Object.prototype.hasOwnProperty.call(analysis, 'analysisState')) {
-        this.analysisState = analysis.analysisState;
-      }
-      if (Object.prototype.hasOwnProperty.call(analysis, 'isSuppressed')) {
-        this.isSuppressed = analysis.isSuppressed;
-      } else {
-        this.isSuppressed = false;
-      }
+    updateAnalysisData(analysis) {
+      const comments = analysis.analysisComments || [];
+      this.auditTrail = comments
+        .map((comment) => {
+          const commenter = comment.commenter ? `${comment.commenter} - ` : '';
+          const timestamp = common.formatTimestamp(comment.timestamp, true);
+          return `${commenter}${timestamp}\n${comment.comment}\n`;
+        })
+        .join('\n');
+      this.analysisState = analysis.analysisState || null;
+      this.isSuppressed = analysis.isSuppressed ?? false;
     },
     makeAnalysis: function () {
       this.callRestEndpoint(this.analysisState, null, null);
@@ -305,7 +293,7 @@ export default {
       }
     },
     callRestEndpoint: function (analysisState, comment, isSuppressed) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY_VIOLATION_ANALYSIS}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY_VIOLATION_ANALYSIS}`;
       this.axios
         .put(url, {
           policyViolation: this.violation.uuid,
@@ -318,16 +306,10 @@ export default {
           this.$toastr.s(this.$t('message.updated'));
           this.updateAnalysisData(response.data);
         })
-        .catch((error) => {
+        .catch(() => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
-  },
-  beforeMount() {
-    this.getAnalysis();
-  },
-  components: {
-    BootstrapToggle,
   },
 };
 </script>
