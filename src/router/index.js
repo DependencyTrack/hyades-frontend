@@ -2,8 +2,14 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import i18n from '../i18n';
 import EventBus from '../shared/eventbus';
-import PERMISSIONS, { getToken, hasPermission } from '../shared/permissions';
+import PERMISSIONS, {
+  getToken,
+  hasComplexPermission,
+  hasPermission,
+} from '../shared/permissions';
 import { getContextPath } from '../shared/utils';
+import { canAccessDashboard, resolveAuthorization } from './routerGuard';
+import permissions from '../shared/permissions';
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer');
@@ -178,7 +184,7 @@ function configRoutes() {
             i18n: 'message.projects',
             sectionPath: '/projects',
             sectionName: 'Projects',
-            permission: PERMISSIONS.PROJECT_READ, // TODO: inquire
+            permission: PERMISSIONS.PROJECT_READ,
           },
         },
         {
@@ -362,6 +368,7 @@ function configRoutes() {
             i18n: 'message.administration',
             sectionPath: '/admin',
             sectionName: 'Admin',
+            propagatePermissionsToChildren: true,
             permission: PERMISSIONS.SYSTEM_CONFIGURATION,
           },
           children: [
@@ -941,22 +948,16 @@ const router = new Router({
   routes: configRoutes(),
 });
 
-function getInheritedPermissions(route) {
-  let current = route;
-  while (current) {
-    if (current.meta && (current.meta.permissions || current.meta.permission)) {
-      return current.meta.permissions ?? [current.meta.permission];
-    }
-    current =
-      current.parent ||
-      (current.matched && current.matched.length > 1
-        ? current.matched[current.matched.length - 2]
-        : null);
+function redirectToDashboardOrLogin(next) {
+  const auth = canAccessDashboard(router);
+  if (auth) {
+    next({ name: 'Dashboard', replace: true });
+  } else {
+    next({ name: 'Login', replace: true });
   }
-  return [];
 }
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const redirectToLogin = () => {
     if (to.name === 'Login') {
       next(); // Already on login, allow navigation
@@ -965,41 +966,37 @@ router.beforeEach((to, from, next) => {
     next({ name: 'Login', query: { redirect: to.fullPath }, replace: true });
   };
 
-  const permissionsRequired = getInheritedPermissions(to);
-  const jwt = getToken();
+  if (to.meta?.isPublic) {
+    next();
+    return;
+  }
 
   // Check if the user is authenticated
-  if (permissionsRequired.length || to.path === '/dashboard') {
-    // Check if the user is authenticated
-    if (!jwt) {
-      redirectToLogin();
-      return;
-    }
-
-    // Check if the user has the required permissions
-    if (!hasPermission(permissionsRequired ?? [])) {
-      Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
-      next({ name: 'Dashboard', replace: true });
-    }
-
-    // debugger;
-    // Verify the JWT and fetch user details
-    router.app.axios
-      .get(`${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF}`, {
-        headers: { Authorization: `Bearer ${jwt}` },
-      })
-      .then((result) => {
-        Vue.prototype.$currentUser = result.data;
-        next();
-      })
-      .catch(() => {
-        EventBus.$emit('authenticated', null);
-        redirectToLogin();
-      });
-  } else {
-    // Public Route, proceed
-    next();
+  const jwt = getToken();
+  if (!jwt) {
+    redirectToLogin();
+    return;
   }
+
+  // validate token and fetch user details
+  try {
+    const url = `${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF}`;
+    const body = { headers: { Authorization: `Bearer ${jwt}` } };
+    const result = await router.app.axios.get(url, body);
+    Vue.prototype.$currentUser = result.data;
+  } catch (error) {
+    EventBus.$emit('authenticated', null);
+    redirectToLogin();
+    return;
+  }
+
+  // Check if the user has the required permissions
+  if (!resolveAuthorization(to.matched)) {
+    Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
+    redirectToDashboardOrLogin(next);
+    return;
+  }
+  next();
 });
 
 export default router;

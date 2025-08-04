@@ -14,7 +14,8 @@ export const POLICY_MANAGEMENT = 'POLICY_MANAGEMENT';
 export const POLICY_VIOLATION_CREATE = 'POLICY_VIOLATION_CREATE';
 export const POLICY_VIOLATION_READ = 'POLICY_VIOLATION_READ';
 export const POLICY_VIOLATION_UPDATE = 'POLICY_VIOLATION_UPDATE';
-export const PORTFOLIO_ACCESS_CONTROL_BYPASS = 'PORTFOLIO_ACCESS_CONTROL_BYPASS';
+export const PORTFOLIO_ACCESS_CONTROL_BYPASS =
+  'PORTFOLIO_ACCESS_CONTROL_BYPASS';
 export const PORTFOLIO_MANAGEMENT = 'PORTFOLIO_MANAGEMENT';
 export const PROJECT_DELETE = 'PROJECT_DELETE';
 export const PROJECT_READ = 'PROJECT_READ';
@@ -49,25 +50,25 @@ export default Object.freeze({
 let cachedToken = null;
 const existingToken = getToken();
 
+function parseToken(token) {
+  if (!token) return null;
+  const decoded = decodeToken(token);
+  return Object.freeze({
+    ...decoded,
+    rawToken: token,
+    rawPermissions: decoded.permissions,
+    permissions: decoded.permissions?.split(',') || [],
+  });
+}
+
 // On module load, try to cache the token if present
 if (existingToken) {
-  const decodedToken = decodeToken(existingToken);
-  cachedToken = Object.freeze({
-    raw: existingToken,
-    decoded: decodedToken,
-    permissions: decodedToken.permissions?.split(',') || [],
-  });
+  cachedToken = parseToken(existingToken);
 }
 
 // Listen for authentication events to update the cached token (e.g. login/logout)
 EventBus.$on('authenticated', (jwt) => {
-  if (!jwt) return;
-  const decodedToken = decodeToken(jwt);
-  cachedToken = Object.freeze({
-    raw: jwt,
-    decoded: decodedToken,
-    permissions: decodedToken.permissions?.split(',') || [],
-  });
+  cachedToken = parseToken(jwt);
 });
 
 /**
@@ -80,10 +81,6 @@ export function hasPermission(permission, operation = 'and') {
     return cachedToken.permissions.includes(permission);
   }
 
-  if (typeof permission === 'object' && permission !== null) {
-    return hasComplexPermission(permission);
-  }
-
   if (Array.isArray(permission)) {
     switch (operation) {
       case 'and':
@@ -91,7 +88,9 @@ export function hasPermission(permission, operation = 'and') {
           cachedToken.permissions.includes(perm),
         );
       case 'not':
-        return permission.every((perm) => !cachedToken.permissions.includes(perm));
+        return permission.every(
+          (perm) => !cachedToken.permissions.includes(perm),
+        );
       case 'or':
       default:
         return permission.some((perm) =>
@@ -129,38 +128,32 @@ export function hasPermission(permission, operation = 'and') {
  * @returns {boolean} True if the user has the required permissions, false otherwise.
  */
 export function hasComplexPermission(requiredPermissions) {
-  try {
-    if (!requiredPermissions) return true;
+  if (!requiredPermissions) return true;
 
-    if (typeof requiredPermissions === 'string')
-      // return hasPermission(requiredPermissions);
-      return cachedToken.permissions?.includes(requiredPermissions);
+  if (typeof requiredPermissions === 'string')
+    return cachedToken.permissions?.includes(requiredPermissions);
 
-    if (Array.isArray(requiredPermissions)) {
-      return requiredPermissions.every((r) => hasComplexPermission(r));
-    }
-
-    if (typeof requiredPermissions === 'object') {
-      if (requiredPermissions.and) {
-        return requiredPermissions.and.every((r) => hasComplexPermission(r));
-      }
-
-      if (requiredPermissions.or) {
-        return requiredPermissions.or.some((r) => hasComplexPermission(r));
-      }
-
-      if (requiredPermissions.not) {
-        return requiredPermissions.not.every((r) => !hasComplexPermission(r));
-      }
-    }
-
-    // If the structure is not recognized, log and return false
-    console.error('Unrecognized permission structure:', requiredPermissions);
-    return false;
-  } catch (err) {
-    console.error('Error in hasComplexPermission:', err, requiredPermissions);
-    return false;
+  if (Array.isArray(requiredPermissions)) {
+    return requiredPermissions.every((r) => hasComplexPermission(r));
   }
+
+  if (typeof requiredPermissions === 'object') {
+    if (requiredPermissions.and) {
+      return requiredPermissions.and.every((r) => hasComplexPermission(r));
+    }
+
+    if (requiredPermissions.or) {
+      return requiredPermissions.or.some((r) => hasComplexPermission(r));
+    }
+
+    if (requiredPermissions.not) {
+      return requiredPermissions.not.every((r) => !hasComplexPermission(r));
+    }
+  }
+
+  throw new Error(
+    'Unrecognized permission structure: ' + JSON.stringify(requiredPermissions),
+  );
 }
 /**
  * Returns the decoded token as a JSON object.
