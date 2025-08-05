@@ -4,7 +4,6 @@
     size="lg"
     hide-header-close
     no-stacking
-    v-permission="'VIEW_PORTFOLIO'"
     :title="$t('message.select_project')"
   >
     <bootstrap-table

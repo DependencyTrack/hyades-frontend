@@ -37,7 +37,11 @@ import DefaultHeader from './DefaultHeader';
 import DefaultFooter from './DefaultFooter';
 import EventBus from '../shared/eventbus';
 import ProfileEditModal from '../views/components/ProfileEditModal';
-import * as permissions from '../shared/permissions';
+import PERMISSIONS, {
+  getToken,
+  decodeToken,
+  hasPermission,
+} from '../shared/permissions';
 
 export default {
   name: 'DefaultContainer',
@@ -64,7 +68,6 @@ export default {
           name: this.$t('message.dashboard'),
           url: '/dashboard',
           icon: 'icon-speedometer',
-          permission: permissions.VIEW_PORTFOLIO,
         },
         {
           title: true,
@@ -74,37 +77,35 @@ export default {
             element: '',
             attributes: {},
           },
-          permission: permissions.VIEW_PORTFOLIO,
         },
         {
           name: this.$t('message.projects'),
           url: '/projects',
           icon: 'fa fa-sitemap',
-          permission: permissions.VIEW_PORTFOLIO,
+          permission: PERMISSIONS.PROJECT_READ,
         },
         {
           name: this.$t('message.components'),
           url: '/components',
           icon: 'fa fa-cubes',
-          permission: permissions.VIEW_PORTFOLIO,
+          permission: PERMISSIONS.PROJECT_READ,
         },
         {
           name: this.$t('message.vulnerabilities'),
           url: '/vulnerabilities',
           icon: 'fa fa-shield',
-          permission: permissions.VIEW_PORTFOLIO,
+          permission: PERMISSIONS.VULNERABILITY_MANAGEMENT,
         },
         {
           name: this.$t('message.licenses'),
           url: '/licenses',
           icon: 'fa fa-balance-scale',
-          permission: permissions.VIEW_PORTFOLIO,
         },
         {
-          name: 'Tags',
+          name: this.$t('message.tags'),
           url: '/tags',
           icon: 'fa fa-tag',
-          permission: permissions.VIEW_PORTFOLIO,
+          permission: PERMISSIONS.TAG_MANAGEMENT,
         },
         {
           title: true,
@@ -115,21 +116,22 @@ export default {
             attributes: {},
           },
           permissions: [
-            permissions.VIEW_VULNERABILITY,
-            permissions.VIEW_POLICY_VIOLATION,
+            PERMISSIONS.PROJECT_READ,
+            PERMISSIONS.FINDING_READ,
+            PERMISSIONS.POLICY_VIOLATION_READ,
           ],
         },
         {
           name: this.$t('message.vulnerability_audit'),
           url: '/vulnerabilityAudit',
           icon: 'fa fa-tasks',
-          permission: permissions.VIEW_VULNERABILITY,
+          permissions: [PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ],
         },
         {
           name: this.$t('message.policy_violation_audit'),
           url: '/policyViolationAudit',
           icon: 'fa fa-fire',
-          permission: permissions.VIEW_POLICY_VIOLATION,
+          permission: PERMISSIONS.POLICY_VIOLATION_READ,
         },
         {
           title: true,
@@ -139,37 +141,19 @@ export default {
             element: '',
             attributes: {},
           },
-          permission: [
-            permissions.SYSTEM_CONFIGURATION,
-            permissions.SYSTEM_CONFIGURATION_CREATE,
-            permissions.SYSTEM_CONFIGURATION_READ,
-            permissions.SYSTEM_CONFIGURATION_UPDATE,
-            permissions.SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: PERMISSIONS.SYSTEM_CONFIGURATION,
         },
         {
           name: this.$t('message.policy_management'),
           url: '/policy',
           icon: 'fa fa-list-alt',
-          permission: [
-            permissions.POLICY_MANAGEMENT,
-            permissions.POLICY_MANAGEMENT_CREATE,
-            permissions.POLICY_MANAGEMENT_READ,
-            permissions.POLICY_MANAGEMENT_UPDATE,
-            permissions.POLICY_MANAGEMENT_DELETE,
-          ],
+          permission: PERMISSIONS.POLICY_MANAGEMENT,
         },
         {
           name: this.$t('message.administration'),
           url: '/admin',
           icon: 'fa fa-cogs',
-          permission: [
-            permissions.SYSTEM_CONFIGURATION,
-            permissions.SYSTEM_CONFIGURATION_CREATE,
-            permissions.SYSTEM_CONFIGURATION_READ,
-            permissions.SYSTEM_CONFIGURATION_UPDATE,
-            permissions.SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: PERMISSIONS.SYSTEM_CONFIGURATION,
         },
       ],
     };
@@ -229,9 +213,8 @@ export default {
   },
   mounted() {
     this.isSidebarMinimized =
-      localStorage && localStorage.getItem('isSidebarMinimized') !== null
-        ? localStorage.getItem('isSidebarMinimized') === 'true'
-        : false;
+      localStorage?.getItem('isSidebarMinimized') === 'true';
+
     const sidebar = document.body;
     if (sidebar) {
       if (this.isSidebarMinimized) {
@@ -259,21 +242,11 @@ export default {
       }
     },
     permissibleNav() {
-      let decodedToken = permissions.decodeToken(permissions.getToken());
-      let array = [];
-      for (const item of this.nav) {
-        if (
-          (item.permission !== null &&
-            permissions.hasPermission(item.permission, decodedToken)) ||
-          (Object.prototype.hasOwnProperty.call(item, 'permissions') &&
-            item.permissions.some((permission) =>
-              permissions.hasPermission(permission, decodedToken),
-            ))
-        ) {
-          array.push(item);
-        }
-      }
-      return array;
+      return this.nav.filter((item) => {
+        const perms = item.permission ?? item.permissions;
+        if (perms) return hasPermission(perms);
+        return true;
+      });
     },
   },
   created() {

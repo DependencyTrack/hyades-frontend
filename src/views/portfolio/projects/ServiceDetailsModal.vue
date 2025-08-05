@@ -16,7 +16,7 @@
             id="service-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="service.name"
+            v-model="localService.name"
             lazy="true"
             required="true"
             feedback="true"
@@ -24,42 +24,27 @@
             :label="$t('message.service_name')"
             :tooltip="this.$t('message.service_name_desc')"
             :feedback-text="$t('message.required_service_name')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canUpdateComponent"
           />
           <b-input-group-form-input
             id="service-version-input"
             input-group-size="mb-3"
             type="text"
-            v-model="service.version"
+            v-model="localService.version"
             required="false"
             :label="$t('message.version')"
             :tooltip="this.$t('message.service_version_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canUpdateComponent"
           />
           <b-input-group-form-input
             id="service-group-input"
             input-group-size="mb-3"
             type="text"
-            v-model="service.group"
+            v-model="localService.group"
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canUpdateComponent"
           />
           <b-form-group
             id="service-notes-form-group"
@@ -68,21 +53,16 @@
           >
             <b-form-textarea
               id="service-notes-description"
-              v-model="service.description"
+              v-model="localService.description"
               rows="3"
-              :readonly="
-                this.isNotPermitted([
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-                ])
-              "
+              :readonly="!canUpdateComponent"
             />
           </b-form-group>
           <b-input-group-form-input
             id="service-uuid"
             input-group-size="mb-3"
             type="text"
-            v-model="service.uuid"
+            v-model="localService.uuid"
             lazy="false"
             required="false"
             feedback="false"
@@ -104,7 +84,7 @@
             id="service-provider-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="service.provider.name"
+            v-model="localService.provider.name"
             required="false"
             :label="$t('message.provider_name')"
             :tooltip="this.$t('message.service_provider_name_desc')"
@@ -118,7 +98,7 @@
               id="providerUrlsTable"
               ref="providerUrlsTable"
               :columns="providerUrlsTableColumns"
-              :data="service.provider.urls"
+              :data="localService.provider.urls"
               :options="providerUrlsTableOptions"
             >
             </bootstrap-table>
@@ -132,7 +112,7 @@
               id="contactsTable"
               ref="contactsTable"
               :columns="contactsTableColumns"
-              :data="service.provider.contacts"
+              :data="localService.provider.contacts"
               :options="contactsTableOptions"
             >
             </bootstrap-table>
@@ -147,7 +127,7 @@
           <bootstrap-table
             ref="endpointTable"
             :columns="endpointTableColumns"
-            :data="service.endpoints"
+            :data="localService.endpoints"
             :options="endpointTableOptions"
           >
           </bootstrap-table>
@@ -161,7 +141,7 @@
           <bootstrap-table
             ref="dataTable"
             :columns="dataTableColumns"
-            :data="service.data"
+            :data="localService.data"
             :options="dataTableOptions"
           >
           </bootstrap-table>
@@ -176,7 +156,7 @@
           <bootstrap-table
             ref="referencesTable"
             :columns="referencesTableColumns"
-            :data="service.externalReferences"
+            :data="localService.externalReferences"
             :options="referencesTableOptions"
           >
           </bootstrap-table>
@@ -188,10 +168,7 @@
         size="md"
         variant="outline-danger"
         @click="deleteService()"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
-        ]"
+        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.delete') }}</b-button
       >
       <b-button size="md" variant="secondary" @click="cancel()">{{
@@ -201,10 +178,7 @@
         size="md"
         variant="primary"
         @click="updateService()"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-        ]"
+        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.update') }}</b-button
       >
     </template>
@@ -217,6 +191,7 @@ import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import xssFilters from 'xss-filters';
 import common from '@/shared/common';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   name: 'ServiceDetailsModal',
@@ -230,6 +205,7 @@ export default {
   },
   data() {
     return {
+      localService: {},
       contactsTableColumns: [
         {
           title: this.$t('message.name'),
@@ -416,13 +392,25 @@ export default {
       },
     };
   },
+  computed: {
+    canUpdateComponent() {
+      return this.hasPermission(this.PERMISSIONS.PORTFOLIO_MANAGEMENT);
+    },
+  },
+  watch: {
+    service: {
+      handler(newVal) {
+        this.localService = cloneDeep(newVal);
+      },
+      immediate: true,
+    },
+  },
   methods: {
     updateService: function () {
       this.$root.$emit('bv::hide::modal', 'serviceDetailsModal');
       let url = `${this.$api.BASE_URL}/${this.$api.URL_SERVICE}`;
-      console.log(this.service);
       this.axios
-        .post(url, this.service)
+        .post(url, this.localService)
         .then((response) => {
           this.$emit('serviceUpdated', response.data);
           this.$toastr.s(this.$t('message.service_updated'));
@@ -434,13 +422,14 @@ export default {
     deleteService: function () {
       this.$root.$emit('bv::hide::modal', 'serviceDetailsModal');
       let url =
-        `${this.$api.BASE_URL}/${this.$api.URL_SERVICE}/` + this.service.uuid;
+        `${this.$api.BASE_URL}/${this.$api.URL_SERVICE}/` +
+        this.localService.uuid;
       this.axios
         .delete(url)
         .then((response) => {
           this.$toastr.s(this.$t('message.service_deleted'));
           this.$router.replace({
-            path: '/projects/' + this.service.project.uuid,
+            path: '/projects/' + this.localService.project.uuid,
           });
         })
         .catch((error) => {

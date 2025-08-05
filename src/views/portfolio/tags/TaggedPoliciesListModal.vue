@@ -4,7 +4,7 @@
     size="lg"
     hide-header-close
     no-stacking
-    v-permission="'VIEW_PORTFOLIO'"
+    v-permission="PERMISSIONS.POLICY_MANAGEMENT"
     :title="$t('message.policies_tagged_with', { tag: this.tag })"
   >
     <bootstrap-table
@@ -57,9 +57,8 @@ export default {
     const interval = setInterval(() => {
       if (this.$refs.table) {
         this.$refs.table.refreshOptions({
-          showBtnDeleteSelected: this.isPermitted([
+          showBtnDeleteSelected: this.hasPermission([
             this.PERMISSIONS.POLICY_MANAGEMENT,
-            this.PERMISSIONS.POLICY_MANAGEMENT_UPDATE,
           ]),
         });
         clearInterval(interval);

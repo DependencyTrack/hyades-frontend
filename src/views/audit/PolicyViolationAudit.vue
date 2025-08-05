@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_POLICY_VIOLATION">
+  <div class="animated fadeIn" v-permission="PERMISSIONS.POLICY_MANAGEMENT">
     <b-row>
       <b-col xs="6" sm="4" md="4" lg="2" id="filter-controls">
         <div>
@@ -145,8 +145,6 @@ import permissionsMixin from '../../mixins/permissionsMixin';
 import common from '@/shared/common';
 import xssFilters from 'xss-filters';
 import { loadUserPreferencesForBootstrapTable } from '@/shared/utils';
-import { hasPermission } from '@/shared/permissions';
-import * as permissions from '@/shared/permissions';
 
 export default {
   mixins: [permissionsMixin],
@@ -173,27 +171,22 @@ export default {
   },
   methods: {
     initializePolicies: function () {
-      let policyUrl = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}`;
-      if (
-        hasPermission(permissions.POLICY_MANAGEMENT, this.decodedToken) ||
-        hasPermission(permissions.ACCESS_MANAGEMENT, this.decodedToken)
-      ) {
-        this.axios
-          .get(policyUrl)
-          .then((response) => {
-            if (response.data) {
-              response.data.forEach((policy) =>
-                this.policyOptions.push({
-                  text: policy.name,
-                  value: policy.uuid,
-                }),
-              );
-            }
-          })
-          .catch((error) => {
-            this.$toastr.w(this.$t('condition.unsuccessful_action'));
-          });
-      }
+      if (!this.hasPermission(this.PERMISSIONS.POLICY_MANAGEMENT)) return;
+      const policyUrl = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}`;
+
+      this.axios
+        .get(policyUrl)
+        .then((response) => {
+          if (Array.isArray(response.data)) {
+            this.policyOptions = response.data.map((policy) => ({
+              text: policy.name,
+              value: policy.uuid,
+            }));
+          }
+        })
+        .catch((error) => {
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        });
     },
     initializeWatchers: function () {
       this.simpleWatcher = this.$watch('watchers', () => this.refreshTable());

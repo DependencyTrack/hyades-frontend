@@ -4,7 +4,7 @@
     size="lg"
     hide-header-close
     no-stacking
-    v-permission="'SYSTEM_CONFIGURATION'"
+    v-permission="PERMISSIONS.SYSTEM_CONFIGURATION"
     :title="$t('message.alerts_tagged_with', { tag: this.tag })"
   >
     <bootstrap-table
@@ -57,9 +57,8 @@ export default {
     const interval = setInterval(() => {
       if (this.$refs.table) {
         this.$refs.table.refreshOptions({
-          showBtnDeleteSelected: this.isPermitted([
+          showBtnDeleteSelected: this.hasPermission([
             this.PERMISSIONS.SYSTEM_CONFIGURATION,
-            this.PERMISSIONS.SYSTEM_CONFIGURATION_UPDATE,
           ]),
         });
         clearInterval(interval);

@@ -2,34 +2,44 @@
  * Permissions Vue Directive
  */
 import Vue from 'vue';
-import { hasPermission, decodeToken, getToken } from '../shared/permissions';
+import { hasPermission, hasComplexPermission } from '../shared/permissions';
 
-Vue.directive('permission', function (el, binding) {
-  let decodedToken = decodeToken(getToken());
-  if (Array.isArray(binding.value)) {
+Vue.directive('permission', {
+  inserted(el, binding) {
+    const { arg, value, modifiers } = binding;
+    const modifierKeys = Object.keys(modifiers);
     let permitted = false;
-    if (binding.arg === 'and') {
-      // This is the AND case. If a user has ALL of the specified permissions, permitted will be true
-      permitted = true;
-      binding.value.forEach(function (b) {
-        if (!hasPermission(b, decodedToken)) {
-          permitted = false;
-        }
-      });
-    } else if (binding.arg === 'or') {
-      // This is the OR case. If a user has one or more of the specified permissions, permitted will be true
-      binding.value.forEach(function (b) {
-        if (hasPermission(b, decodedToken)) {
-          permitted = true;
-        }
-      });
+
+    if (arg === 'complex') {
+      permitted = hasComplexPermission(value);
+    } else {
+      permitted = hasPermission(value, arg);
     }
-    if (!permitted) {
+
+    if (permitted) return; // User has permission, do nothing
+
+    if (modifierKeys.length === 0) {
       el.style.display = 'none';
+      return;
     }
-  } else {
-    if (!hasPermission(binding.value, decodedToken)) {
-      el.style.display = 'none';
-    }
-  }
+
+    modifierKeys.forEach((modifier) => {
+      switch (modifier.toLowerCase()) {
+        case 'readonly':
+          el.setAttribute('readonly', true);
+          break;
+        case 'disabled':
+          el.setAttribute('disabled', true);
+          break;
+        case 'hide':
+          el.style.display = 'none';
+          break;
+        case 'visibility':
+          el.style.visibility = 'hidden';
+          break;
+        default:
+          throw new Error(`Unknown modifier v-permission:${modifier}`);
+      }
+    });
+  },
 });

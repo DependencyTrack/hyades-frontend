@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn">
     <b-card :no-body="true" footer-class="px-3 py-2 card-footer-action">
       <b-card-body class="p-3 clearfix">
         <b-row>
@@ -39,7 +39,10 @@
                         ></i
                       ></a>
                       <ul class="dropdown-menu">
-                        <span v-for="projectVersion in activeProjectVersions">
+                        <span
+                          v-for="projectVersion in activeProjectVersions"
+                          :key="projectVersion.uuid"
+                        >
                           <b-dropdown-item
                             :to="{
                               name: 'Project',
@@ -55,6 +58,7 @@
                         >
                           <span
                             v-for="projectVersion in inactiveProjectVersions"
+                            :key="projectVersion.uuid"
                           >
                             <b-dropdown-item
                               :to="{
@@ -89,7 +93,7 @@
             </div>
             <div class="text-muted font-xs">
               <span class="text-lowercase font-weight-bold">
-                <span v-for="tag in project.tags">
+                <span v-for="tag in project.tags" :key="tag.name">
                   <b-badge
                     :to="{ name: 'Projects', query: { tag: tag.name } }"
                     variant="tag"
@@ -261,7 +265,9 @@
       </b-tab>
       <b-tab
         ref="findings"
-        v-if="isPermitted(PERMISSIONS.VIEW_VULNERABILITY)"
+        v-if="
+          hasPermission([PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ])
+        "
         @click="routeTo('findings')"
       >
         <template v-slot:title>
@@ -270,14 +276,14 @@
             variant="tab-total"
             v-b-tooltip.hover
             :title="$t('message.total_findings_excluding_aliases')"
-            >{{ totalFindings }}</b-badge
-          >
+            >{{ totalFindings }}
+          </b-badge>
           <b-badge
             variant="tab-info"
             v-b-tooltip.hover
             :title="$t('message.total_findings_including_aliases')"
-            >{{ totalFindingsIncludingAliases }}</b-badge
-          >
+            >{{ totalFindingsIncludingAliases }}
+          </b-badge>
         </template>
         <project-findings
           :key="this.uuid"
@@ -287,7 +293,9 @@
       </b-tab>
       <b-tab
         ref="epss"
-        v-if="isPermitted(PERMISSIONS.VIEW_VULNERABILITY)"
+        v-if="
+          hasPermission([PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ])
+        "
         @click="routeTo('epss')"
       >
         <template v-slot:title
@@ -302,7 +310,12 @@
       </b-tab>
       <b-tab
         ref="policyviolations"
-        v-if="isPermitted(PERMISSIONS.VIEW_POLICY_VIOLATION)"
+        v-if="
+          hasPermission([
+            PERMISSIONS.PROJECT_READ,
+            PERMISSIONS.POLICY_VIOLATION_READ,
+          ])
+        "
         @click="routeTo('policyViolations')"
       >
         <template v-slot:title
@@ -340,7 +353,7 @@
       </b-tab>
     </b-tabs>
     <project-details-modal
-      :project="cloneDeep(project)"
+      :project="project"
       :uuid="this.uuid"
       v-on:projectUpdated="syncProjectFields"
     />
@@ -352,7 +365,6 @@
 
 <script>
 import common from '../../../shared/common';
-import { cloneDeep } from 'lodash-es';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
 import VueEasyPieChart from 'vue-easy-pie-chart';
 import ProjectComponents from './ProjectComponents';
@@ -438,9 +450,6 @@ export default {
     };
   },
   methods: {
-    cloneDeep: function (component) {
-      return cloneDeep(component);
-    },
     getStyle: function (style) {
       return getStyle(style);
     },
@@ -450,7 +459,7 @@ export default {
       this.$title = this.projectLabel;
     },
     initialize: function () {
-      let projectUrl = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.uuid}`;
+      const projectUrl = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.uuid}`;
       this.axios
         .get(projectUrl)
         .catch((error) => {

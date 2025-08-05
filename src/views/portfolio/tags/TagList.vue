@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn">
     <portfolio-widget-row :fetch="true" />
     <bootstrap-table
       ref="table"
@@ -46,10 +46,9 @@ export default {
   },
   mounted() {
     this.$refs.table.refreshOptions({
-      showBtnDeleteSelected: this.isPermitted([
+      showBtnDeleteSelected: this.hasPermission(
         this.PERMISSIONS.TAG_MANAGEMENT,
-        this.PERMISSIONS.TAG_MANAGEMENT_DELETE,
-      ]),
+      ),
     });
   },
   data() {

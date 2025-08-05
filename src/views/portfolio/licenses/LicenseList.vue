@@ -1,15 +1,12 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn">
     <portfolio-widget-row :fetch="true" />
     <div id="licensesToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.licenseAddLicenseModal
-        v-permission:or="[
-          PERMISSIONS.SYSTEM_CONFIGURATION,
-          PERMISSIONS.SYSTEM_CONFIGURATION_CREATE,
-        ]"
+        v-permission="PERMISSIONS.SYSTEM_CONFIGURATION"
       >
         <span class="fa fa-plus"></span> {{ $t('message.add_license') }}
       </b-button>

@@ -9,10 +9,7 @@
           <div class="small text-muted">
             {{ $t('message.last_measurement') }}: {{ lastMeasurement
             }}<b-link
-              v-permission:or="[
-                'PORTFOLIO_MANAGEMENT',
-                'PORTFOLIO_MANAGEMENT_READ',
-              ]"
+              v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
               class="font-weight-bold"
               style="margin-left: 6px"
               v-on:click="refreshMetrics"
@@ -148,9 +145,11 @@ import ChartComponentVulnerabilities from '../../dashboard/ChartComponentVulnera
 import ChartPortfolioVulnerabilities from '../../dashboard/ChartPortfolioVulnerabilities';
 import ChartPolicyViolationsState from '@/views/dashboard/ChartPolicyViolationsState';
 import ChartPolicyViolationBreakdown from '@/views/dashboard/ChartPolicyViolationBreakdown';
+import permissionsMixin from '../../../mixins/permissionsMixin';
 
 export default {
   name: 'ServiceDashboard',
+  mixins: [permissionsMixin],
   components: {
     ChartComponentVulnerabilities,
     ChartPortfolioVulnerabilities,

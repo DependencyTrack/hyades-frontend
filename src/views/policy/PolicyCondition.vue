@@ -1,6 +1,5 @@
 <template>
   <actionable-list-group-item
-    v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_UPDATE']"
     :delete-icon="true"
     v-on:actionClicked="removeCondition()"
   >
@@ -176,11 +175,13 @@
 <script>
 import BInputGroupFormInput from '../../forms/BInputGroupFormInput';
 import BInputGroupFormSelect from '../../forms/BInputGroupFormSelect';
+import permissionsMixin from '../../mixins/permissionsMixin';
 import common from '../../shared/common';
 import ActionableListGroupItem from '../components/ActionableListGroupItem';
 import MonacoEditor from '@/views/components/MonacoEditor.vue';
 
 export default {
+  mixins: [permissionsMixin],
   props: {
     policy: Object,
     condition: Object,
@@ -287,45 +288,19 @@ export default {
     };
   },
   computed: {
-    isSubjectSelectable: function () {
-      switch (this.subject) {
-        case 'AGE':
-          return false;
-        case 'ANALYZER':
-          return true;
-        case 'BOM':
-          return true;
-        case 'SEVERITY':
-          return true;
-        case 'COORDINATES':
-          return false;
-        case 'LICENSE':
-          return true;
-        case 'LICENSE_GROUP':
-          return true;
-        case 'PACKAGE_URL':
-          return false;
-        case 'CPE':
-          return false;
-        case 'SWID_TAGID':
-          return false;
-        case 'VERSION':
-          return false;
-        case 'COMPONENT_HASH':
-          return false;
-        case 'CWE':
-          return false;
-        case 'VULNERABILITY_ID':
-          return false;
-        case 'VERSION_DISTANCE':
-          return false;
-        case 'EPSS':
-          return false;
-        case 'EXPRESSION':
-          return false;
-        default:
-          return false;
-      }
+    isSubjectSelectable() {
+      // Subjects that are selectable (dropdown)
+      const selectableSubjects = [
+        'ANALYZER',
+        'BOM',
+        'SEVERITY',
+        'LICENSE',
+        'LICENSE_GROUP',
+      ];
+      return selectableSubjects.includes(this.subject);
+    },
+    canEditPolicy() {
+      return this.hasPermission(this.PERMISSIONS.POLICY_MANAGEMENT);
     },
   },
   beforeMount() {
@@ -345,64 +320,41 @@ export default {
   },
   methods: {
     subjectChanged: function () {
+      const subjectOpsMap = {
+        AGE: this.numericOperators,
+        ANALYZER: this.objectOperators,
+        BOM: this.objectOperators,
+        SEVERITY: this.objectOperators,
+        COORDINATES: this.regexOperators,
+        LICENSE: this.objectOperators,
+        LICENSE_GROUP: this.objectOperators,
+        PACKAGE_URL: this.regexOperators,
+        CPE: this.regexOperators,
+        SWID_TAGID: this.regexOperators,
+        VERSION: this.numericOperators,
+        COMPONENT_HASH: this.hashAlgorithms,
+        CWE: this.listOperators,
+        VULNERABILITY_ID: this.objectOperators,
+        VERSION_DISTANCE: this.numericOperators,
+        EPSS: this.numericOperators,
+        EXPRESSION: this.regexOperators,
+      };
+
+      this.operators = subjectOpsMap[this.subject] || [];
+
+      // Handle possibleValues population for specific subjects
       switch (this.subject) {
-        case 'AGE':
-          this.operators = this.numericOperators;
-          break;
-        case 'ANALYZER':
-          this.operators = this.objectOperators;
-          break;
-        case 'BOM':
-          this.operators = this.objectOperators;
-          break;
         case 'SEVERITY':
-          this.operators = this.objectOperators;
           this.populateSeverity();
           break;
-        case 'COORDINATES':
-          this.operators = this.regexOperators;
-          break;
         case 'LICENSE':
-          this.operators = this.objectOperators;
           this.retrieveLicenses();
           break;
         case 'LICENSE_GROUP':
-          this.operators = this.objectOperators;
           this.retrieveLicenseGroups();
           break;
-        case 'PACKAGE_URL':
-          this.operators = this.regexOperators;
-          break;
-        case 'CPE':
-          this.operators = this.regexOperators;
-          break;
-        case 'SWID_TAGID':
-          this.operators = this.regexOperators;
-          break;
-        case 'VERSION':
-          this.operators = this.numericOperators;
-          break;
-        case 'COMPONENT_HASH':
-          this.operators = this.hashAlgorithms;
-          break;
-        case 'CWE':
-          this.operators = this.listOperators;
-          break;
-        case 'VULNERABILITY_ID':
-          this.operators = this.objectOperators;
-          break;
-        case 'VERSION_DISTANCE':
-          this.operators = this.numericOperators;
-          break;
-        case 'EPSS':
-          this.operators = this.numericOperators;
-          break;
-        case 'EXPRESSION':
-          this.operators = this.regexOperators;
-          break;
-        default:
-          this.operators = [];
       }
+
       this.saveCondition();
     },
     createDynamicValue: function () {
@@ -528,14 +480,14 @@ export default {
             this.violationType = response.data.violationType;
             this.$toastr.s(this.$t('message.updated'));
           })
-          .catch((error) => {
+          .catch(() => {
             this.$toastr.w(this.$t('condition.unsuccessful_action'));
           });
       }
     },
     removeCondition: function () {
       if (this.uuid) {
-        let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/condition/${this.uuid}`;
+        const url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}/condition/${this.uuid}`;
         this.axios
           .delete(url)
           .then((response) => {
@@ -547,7 +499,7 @@ export default {
             this.$toastr.s(this.$t('message.condition_deleted'));
             this.$emit('conditionRemoved');
           })
-          .catch((error) => {
+          .catch(() => {
             this.$toastr.w(this.$t('condition.unsuccessful_action'));
           });
       } else {
