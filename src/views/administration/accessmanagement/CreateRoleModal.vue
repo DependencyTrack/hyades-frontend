@@ -73,26 +73,23 @@ export default {
     };
   },
   methods: {
-    createRole() {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
+    async createRole() {
+      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
       const requestBody = {
         name: this.name,
         permissions: this.permissions.map((permission) => permission.name),
       };
-      this.axios
-        .put(url, {
-          name: this.name,
-          permissions: this.permissions.map((perm) => perm.name),
-        })
-        .then(() => {
-          this.$emit('refreshTable');
-          this.$toastr.s(this.$t('admin.role_created'));
-        })
-        .catch(() => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
-        });
-      this.$root.$emit('bv::hide::modal', 'createRoleModal');
-      this.resetValues();
+
+      try {
+        await this.axios.put(endpoint, requestBody);
+        this.$emit('refreshTable');
+        this.$toastr.s(this.$t('admin.role_created'));
+      } catch (error) {
+        this.$toastr.w(this.$t('condition.unsuccessful_action'));
+      } finally {
+        this.$root.$emit('bv::hide::modal', 'createRoleModal');
+        this.resetValues();
+      }
     },
     resetValues() {
       this.name = null;
