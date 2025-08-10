@@ -39,7 +39,7 @@
         size="md"
         variant="outline-primary"
         @click="downloadVdr()"
-        v-permission:and="[PERMISSIONS.PROJECT, PERMISSIONS.FINDING_READ]"
+        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
       >
         <span class="fa fa-download"></span> {{ $t('message.export_vdr') }}
       </b-button>
@@ -52,7 +52,7 @@
         size="md"
         variant="outline-primary"
         @click="reAnalyze()"
-        v-permission:and="[PERMISSIONS.PROJECT, PERMISSIONS.FINDING_READ]"
+        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
       >
         <span class="fa fa-refresh"></span>
         {{ $t('message.project_reanalyze') }}
