@@ -17,7 +17,7 @@
             id="component-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.name"
+            v-model="localComponent.name"
             lazy="true"
             required="true"
             feedback="true"
@@ -25,18 +25,13 @@
             :label="$t('message.component_name')"
             :tooltip="this.$t('message.component_name_desc')"
             :feedback-text="$t('message.required_component_name')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-version-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.version"
+            v-model="localComponent.version"
             lazy="true"
             required="true"
             feedback="true"
@@ -44,101 +39,71 @@
             :label="$t('message.version')"
             :tooltip="this.$t('message.component_version_desc')"
             :feedback-text="$t('message.required_component_version')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-group-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.group"
+            v-model="localComponent.group"
             required="false"
             :label="$t('message.component_namespace_group_vendor')"
             :tooltip="this.$t('message.component_group_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           {{ $t('message.component_classification') }}
           <b-badge
-            :variant="component.isInternal ? 'tab-total' : 'tab-info'"
+            :variant="localComponent.isInternal ? 'tab-total' : 'tab-info'"
             v-b-tooltip.hover
             :title="$t('message.component_classification_desc')"
-            >{{ component.isInternal ? 'INTERNAL' : 'EXTERNAL' }}</b-badge
+            >{{ localComponent.isInternal ? 'INTERNAL' : 'EXTERNAL' }}</b-badge
           >
           <p></p>
           <b-input-group-form-input
             id="component-author-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.author"
+            v-model="localComponent.author"
             required="false"
             :label="$t('message.component_author')"
             :tooltip="this.$t('message.component_author_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-purl-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.purl"
+            v-model="localComponent.purl"
             required="false"
             :label="$t('message.package_url_full')"
             :tooltip="this.$t('message.component_package_url_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-cpe-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.cpe"
+            v-model="localComponent.cpe"
             required="false"
             :label="$t('message.cpe_full')"
             :tooltip="$t('message.component_cpe_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-swidTagId-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.swidTagId"
+            v-model="localComponent.swidTagId"
             required="false"
             :label="$t('message.swid_tagid')"
             :tooltip="$t('message.component_swid_tagid_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-uuid"
             input-group-size="mb-3"
             type="text"
-            v-model="component.uuid"
+            v-model="localComponent.uuid"
             lazy="false"
             required="false"
             feedback="false"
@@ -159,31 +124,21 @@
           <b-input-group-form-select
             id="component-classifier-input"
             required="true"
-            v-model="component.classifier"
+            v-model="localComponent.classifier"
             :options="availableClassifiers"
             :label="$t('message.classifier')"
             :tooltip="$t('message.component_classifier_desc')"
-            :disabled="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :disabled="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-filename-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.filename"
+            v-model="localComponent.filename"
             required="false"
             :label="$t('message.filename')"
             :tooltip="$t('message.component_filename_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-form-group
             id="component-description-form-group"
@@ -192,14 +147,9 @@
           >
             <b-form-textarea
               id="component-description-description"
-              v-model="component.description"
+              v-model="localComponent.description"
               rows="3"
-              :readonly="
-                this.isNotPermitted([
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-                ])
-              "
+              :readonly="!canEditComponent"
             />
           </b-form-group>
         </b-card>
@@ -217,42 +167,27 @@
             :options="selectableLicenses"
             :label="$t('message.license')"
             :tooltip="$t('message.component_spdx_license_desc')"
-            :disabled="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :disabled="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-license-expression"
             input-group-size="mb-3"
             type="text"
-            v-model="component.licenseExpression"
+            v-model="localComponent.licenseExpression"
             required="false"
             :label="$t('message.license_expression')"
             :tooltip="$t('message.component_license_expression_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-license-url-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.licenseUrl"
+            v-model="localComponent.licenseUrl"
             required="false"
             :label="$t('message.license_url')"
             :tooltip="$t('message.component_license_url_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-form-group
             id="component-copyright-form-group"
@@ -261,14 +196,9 @@
           >
             <b-form-textarea
               id="component-description-description"
-              v-model="component.copyright"
+              v-model="localComponent.copyright"
               rows="3"
-              :readonly="
-                this.isNotPermitted([
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-                ])
-              "
+              :readonly="!canEditComponent"
             />
           </b-form-group>
         </b-card>
@@ -282,98 +212,68 @@
             id="component-md5-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.md5"
+            v-model="localComponent.md5"
             required="false"
             :label="$t('hashes.md5')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-sha1-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.sha1"
+            v-model="localComponent.sha1"
             required="false"
             :label="$t('hashes.sha_1')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-sha256-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.sha256"
+            v-model="localComponent.sha256"
             required="false"
             :label="$t('hashes.sha_256')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-sha512-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.sha512"
+            v-model="localComponent.sha512"
             required="false"
             :label="$t('hashes.sha_512')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-sha3256-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.sha3_256"
+            v-model="localComponent.sha3_256"
             required="false"
             :label="$t('hashes.sha3_256')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
           <b-input-group-form-input
             id="component-sha3512-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.sha3_512"
+            v-model="localComponent.sha3_512"
             required="false"
             :label="$t('hashes.sha3_512')"
             :tooltip="$t('message.component_hash_desc')"
-            :readonly="
-              this.isNotPermitted([
-                PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-              ])
-            "
+            :readonly="!canEditComponent"
           />
         </b-card>
       </b-tab>
       <b-tab
         class="body-bg-color"
         style="border: 0; padding: 0"
-        v-if="component.supplier"
+        v-if="localComponent.supplier"
       >
         <template v-slot:title
           ><i class="fa fa-building-o"></i>
@@ -384,7 +284,7 @@
             id="component-supplier-name-input"
             input-group-size="mb-3"
             type="text"
-            v-model="component.supplier.name"
+            v-model="localComponent.supplier.name"
             required="false"
             readonly
             :label="$t('message.supplier_name')"
@@ -399,7 +299,7 @@
               id="supplierUrlsTable"
               ref="supplierUrlsTable"
               :columns="supplierUrlsTableColumns"
-              :data="component.supplier.urls"
+              :data="localComponent.supplier.urls"
               :options="supplierUrlsTableOptions"
             >
             </bootstrap-table>
@@ -413,7 +313,7 @@
               id="supplierContactsTable"
               ref="supplierContactsTable"
               :columns="supplierContactsTableColumns"
-              :data="component.supplier.contacts"
+              :data="localComponent.supplier.contacts"
               :options="supplierContactsTableOptions"
             >
             </bootstrap-table>
@@ -429,7 +329,7 @@
           <bootstrap-table
             ref="referencesTable"
             :columns="referencesTableColumns"
-            :data="component.externalReferences"
+            :data="localComponent.externalReferences"
             :options="referencesTableOptions"
           >
           </bootstrap-table>
@@ -447,14 +347,9 @@
           >
             <b-form-textarea
               id="component-notes-description"
-              v-model="component.notes"
+              v-model="localComponent.notes"
               rows="3"
-              :readonly="
-                this.isNotPermitted([
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT,
-                  PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-                ])
-              "
+              :readonly="!canEditComponent"
             />
           </b-form-group>
         </b-card>
@@ -465,20 +360,14 @@
         size="md"
         variant="outline-danger"
         @click="deleteComponent()"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_DELETE,
-        ]"
+        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.delete') }}</b-button
       >
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.componentPropertiesModal
-        v-permission:or="[
-          PERMISSIONS.VIEW_PORTFOLIO,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-        ]"
+        v-permission="PERMISSIONS.PROJECT_READ"
         >{{ $t('message.properties') }}</b-button
       >
       <b-button size="md" variant="secondary" @click="cancel()">{{
@@ -488,10 +377,7 @@
         size="md"
         variant="primary"
         @click="updateComponent()"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_UPDATE,
-        ]"
+        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
         >{{ $t('message.update') }}</b-button
       >
     </template>
@@ -505,6 +391,7 @@ import ComponentPropertiesModal from './ComponentPropertiesModal.vue';
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import xssFilters from 'xss-filters';
 import common from '@/shared/common';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   name: 'ComponentDetailsModal',
@@ -516,6 +403,11 @@ export default {
   },
   props: {
     component: Object,
+  },
+  computed: {
+    canEditComponent() {
+      return this.hasPermission(this.PERMISSIONS.PORTFOLIO_MANAGEMENT);
+    },
   },
   data() {
     return {
@@ -621,7 +513,7 @@ export default {
           field: 'url',
           sortable: false,
           formatter(value, row, index) {
-            let url = xssFilters.uriInUnQuotedAttr(
+            const url = xssFilters.uriInUnQuotedAttr(
               common.valueWithDefault(value, ''),
             );
             return `<a href="${url}">${xssFilters.inHTMLData(
@@ -664,7 +556,16 @@ export default {
           return res;
         },
       },
+      localComponent: {},
     };
+  },
+  watch: {
+    component: {
+      handler(newVal) {
+        this.localComponent = cloneDeep(newVal);
+      },
+      immediate: true,
+    },
   },
   beforeMount() {
     this.retrieveLicenses();
@@ -675,33 +576,9 @@ export default {
   methods: {
     updateComponent: function () {
       this.$root.$emit('bv::hide::modal', 'componentDetailsModal');
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}`;
       this.axios
-        .post(url, {
-          uuid: this.component.uuid,
-          supplier: this.component.supplier,
-          name: this.component.name,
-          version: this.component.version,
-          group: this.component.group,
-          author: this.component.author,
-          description: this.component.description,
-          license: this.selectedLicense,
-          licenseExpression: this.component.licenseExpression,
-          licenseUrl: this.component.licenseUrl,
-          filename: this.component.filename,
-          classifier: this.component.classifier,
-          purl: this.component.purl,
-          cpe: this.component.cpe,
-          swidTagId: this.component.swidTagId,
-          copyright: this.component.copyright,
-          md5: this.component.md5,
-          sha1: this.component.sha1,
-          sha256: this.component.sha256,
-          sha512: this.component.sha512,
-          sha3_256: this.component.sha3_256,
-          sha3_512: this.component.sha3_512,
-          notes: this.component.notes,
-        })
+        .post(url, { ...this.localComponent, license: this.selectedLicense })
         .then((response) => {
           this.$emit('componentUpdated', response.data);
           this.$toastr.s(this.$t('message.component_updated'));
@@ -712,7 +589,7 @@ export default {
     },
     deleteComponent: function () {
       this.$root.$emit('bv::hide::modal', 'componentDetailsModal');
-      let url =
+      const url =
         `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/` +
         this.component.uuid;
       this.axios
@@ -728,7 +605,7 @@ export default {
         });
     },
     retrieveLicenses: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_CONCISE}`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_CONCISE}`;
       this.axios
         .get(url)
         .then((response) => {

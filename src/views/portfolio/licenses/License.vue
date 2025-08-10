@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn">
     <b-tabs
       class="body-bg-color"
       style="border-left: 0; border-right: 0; border-top: 0"
@@ -92,22 +92,27 @@
           {{ license.standardLicenseHeader }}
         </div>
       </b-tab>
+      <template #tabs-end>
+        <li
+          role="presentation"
+          class="nav-item action-group"
+          style="margin-left: auto"
+        >
+          <b-button
+            v-if="license.isCustomLicense"
+            variant="outline-danger"
+            @click="removeCustomLicense"
+            v-permission="PERMISSIONS.SYSTEM_CONFIGURATION"
+          >
+            {{ $t('message.delete') }}
+          </b-button>
+        </li>
+      </template>
     </b-tabs>
-    <b-button
-      v-if="license.isCustomLicense"
-      variant="outline-danger"
-      @click="removeCustomLicense"
-      v-permission:or="[
-        PERMISSIONS.SYSTEM_CONFIGURATION,
-        PERMISSIONS.SYSTEM_CONFIGURATION_DELETE,
-      ]"
-      >{{ $t('message.delete') }}</b-button
-    >
   </div>
 </template>
 
 <script>
-import common from '../../../shared/common';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
 import EventBus from '../../../shared/eventbus';
 import permissionsMixin from '../../../mixins/permissionsMixin';

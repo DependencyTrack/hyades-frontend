@@ -10,9 +10,9 @@
         size="md"
         variant="outline-primary"
         v-b-modal.projectUploadVexModal
-        v-permission:or="[
-          PERMISSIONS.VULNERABILITY_ANALYSIS,
-          PERMISSIONS.VULNERABILITY_ANALYSIS_CREATE,
+        v-permission:and="[
+          PERMISSIONS.PROJECT_READ,
+          PERMISSIONS.FINDING_UPDATE,
         ]"
       >
         <span class="fa fa-upload"></span> {{ $t('message.apply_vex') }}
@@ -26,11 +26,7 @@
         size="md"
         variant="outline-primary"
         @click="downloadVex()"
-        v-permission:or="[
-          PERMISSIONS.VIEW_VULNERABILITY,
-          PERMISSIONS.VULNERABILITY_ANALYSIS,
-          PERMISSIONS.VULNERABILITY_ANALYSIS_READ,
-        ]"
+        v-permission:or="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
       >
         <span class="fa fa-download"></span> {{ $t('message.export_vex') }}
       </b-button>
@@ -43,11 +39,7 @@
         size="md"
         variant="outline-primary"
         @click="downloadVdr()"
-        v-permission:or="[
-          PERMISSIONS.VIEW_VULNERABILITY,
-          PERMISSIONS.VULNERABILITY_ANALYSIS,
-          PERMISSIONS.VULNERABILITY_ANALYSIS_READ,
-        ]"
+        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
       >
         <span class="fa fa-download"></span> {{ $t('message.export_vdr') }}
       </b-button>
@@ -60,7 +52,7 @@
         size="md"
         variant="outline-primary"
         @click="reAnalyze()"
-        v-permission:or="[PERMISSIONS.VIEW_VULNERABILITY]"
+        v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]"
       >
         <span class="fa fa-refresh"></span>
         {{ $t('message.project_reanalyze') }}
@@ -70,7 +62,7 @@
       }}</b-tooltip>
 
       <!-- Future use when CSAF support is added
-      <b-dropdown variant="outline-primary" v-permission:or="[PERMISSIONS.VIEW_VULNERABILITY, PERMISSIONS.VULNERABILITY_ANALYSIS]">
+      <b-dropdown variant="outline-primary" v-permission:and="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ]">
         <template #button-content>
           <span class="fa fa-download"></span> {{ $t('message.export_vex') }}
         </template>

@@ -1,5 +1,8 @@
 <template>
-  <div class="componentSearch animated fadeIn" v-permission="'VIEW_PORTFOLIO'">
+  <div
+    class="componentSearch animated fadeIn"
+    v-permission="PERMISSIONS.PROJECT_READ"
+  >
     <portfolio-widget-row :fetch="true" />
     <div id="componentSearchToolbar">
       <b-row>

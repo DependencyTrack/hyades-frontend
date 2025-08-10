@@ -1,23 +1,10 @@
 <template>
-  <div
-    class="animated fadeIn"
-    v-permission:or="[
-      'POLICY_MANAGEMENT',
-      'POLICY_MANAGEMENT_CREATE',
-      'POLICY_MANAGEMENT_READ',
-      'POLICY_MANAGEMENT_UPDATE',
-      'POLICY_MANAGEMENT_DELETE',
-    ]"
-  >
+  <div class="animated fadeIn" v-permission="PERMISSIONS.POLICY_MANAGEMENT">
     <div id="licenseGroupsToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
         variant="outline-primary"
         v-b-modal.createLicenseGroupModal
-        v-permission:or="[
-          PERMISSIONS.POLICY_MANAGEMENT,
-          PERMISSIONS.POLICY_MANAGEMENT_CREATE,
-        ]"
       >
         <span class="fa fa-plus"></span>
         {{ $t('message.create_license_group') }}
@@ -39,12 +26,9 @@ import common from '../../shared/common';
 import xssFilters from 'xss-filters';
 import CreateLicenseGroupModal from './CreateLicenseGroupModal';
 import permissionsMixin from '../../mixins/permissionsMixin';
-import i18n from '../../i18n';
-import ActionableListGroupItem from '../components/ActionableListGroupItem';
 import EventBus from '../../shared/eventbus';
 import bootstrapTableMixin from '../../mixins/bootstrapTableMixin';
-import SelectLicenseModal from './SelectLicenseModal';
-import BInputGroupFormInput from '../../forms/BInputGroupFormInput';
+import LicenseGroupListDetails from '../components/detail-formatters/LicenseGroupListDetails.vue';
 
 export default {
   mixins: [permissionsMixin, bootstrapTableMixin],
@@ -114,125 +98,7 @@ export default {
         detailViewByClick: true,
         detailFormatter: (index, row) => {
           return this.vueFormatter({
-            i18n,
-            template: `
-                <div>
-                <b-row class="expanded-row">
-                  <b-col sm="6">
-                    <b-input-group-form-input id="input-license-group-name" :label="$t('message.name')" input-group-size="mb-3"
-                                              required="true" type="text" v-model="name" lazy="true" autofocus="true"
-                                              v-debounce:750ms="updateLicenseGroup" :debounce-events="'keyup'" />
-                  </b-col>
-                  <b-col sm="6">
-                  </b-col>
-                </b-row>
-                <b-row class="expanded-row">
-                  <b-col sm="12">
-                    <b-form-group :label="this.$t('message.licenses')">
-                      <div class="list-group">
-                        <span v-for="license in licenses">
-                          <actionable-list-group-item :value="license.name" v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :delete-icon="true" v-on:actionClicked="removeLicense(license)"/>
-                        </span>
-                        <actionable-list-group-item v-permission:or="[PERMISSIONS.POLICY_MANAGEMENT, PERMISSIONS.POLICY_MANAGEMENT_UPDATE]" :add-icon="true" v-on:actionClicked="$root.$emit('bv::show::modal', 'selectLicenseModal')"/>
-                      </div>
-                    </b-form-group>
-                    <div style="text-align:right">
-                       <b-button v-permission:or="['POLICY_MANAGEMENT', 'POLICY_MANAGEMENT_DELETE']" variant="outline-danger" @click="deleteLicenseGroup">{{ $t('message.delete_license_group') }}</b-button>
-                    </div>
-                  </b-col>
-                </b-row>
-                  <select-license-modal v-on:selection="updateLicenseSelection" />
-                </div>
-              `,
-            mixins: [permissionsMixin],
-            components: {
-              ActionableListGroupItem,
-              BInputGroupFormInput,
-              SelectLicenseModal,
-            },
-            data() {
-              return {
-                licenseGroup: row,
-                name: row.name,
-                licenses: row.licenses,
-              };
-            },
-            methods: {
-              updateLicenseGroup: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_GROUP}`;
-                this.axios
-                  .post(url, {
-                    uuid: this.licenseGroup.uuid,
-                    name: this.name,
-                  })
-                  .then((response) => {
-                    this.licenseGroup = response.data;
-                    EventBus.$emit(
-                      'policyManagement:licenseGroups:rowUpdate',
-                      index,
-                      this.licenseGroup,
-                    );
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
-              deleteLicenseGroup: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_GROUP}/${this.licenseGroup.uuid}`;
-                this.axios
-                  .delete(url)
-                  .then((response) => {
-                    EventBus.$emit(
-                      'policyManagement:licenseGroups:rowDeleted',
-                      index,
-                    );
-                    this.$toastr.s(this.$t('message.license_group_deleted'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
-              removeLicense: function (license) {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_GROUP}/${this.licenseGroup.uuid}/license/${license.uuid}`;
-                this.axios
-                  .delete(url)
-                  .then((response) => {
-                    this.syncVariables(response.data);
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
-              updateLicenseSelection: function (selections) {
-                this.$root.$emit('bv::hide::modal', 'selectLicenseModal');
-                for (let i = 0; i < selections.length; i++) {
-                  let selection = selections[i];
-                  let url = `${this.$api.BASE_URL}/${this.$api.URL_LICENSE_GROUP}/${this.licenseGroup.uuid}/license/${selection.uuid}`;
-                  this.axios
-                    .post(url)
-                    .then((response) => {
-                      this.syncVariables(response.data);
-                      this.$toastr.s(this.$t('message.updated'));
-                    })
-                    .catch((error) => {
-                      if (error.response.status === 304) {
-                        //this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                      } else {
-                        this.$toastr.w(
-                          this.$t('condition.unsuccessful_action'),
-                        );
-                      }
-                    });
-                }
-              },
-              syncVariables: function (licenseGroup) {
-                this.licenseGroup = licenseGroup;
-                this.name = licenseGroup.name;
-                this.licenses = licenseGroup.licenses;
-              },
-            },
+            render: () => <LicenseGroupListDetails row={row} index={index} />,
           });
         },
         onExpandRow: this.vueFormatterInit,

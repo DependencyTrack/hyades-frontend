@@ -1,15 +1,12 @@
 <template>
-  <div class="animated fadeIn" v-permission="'VIEW_PORTFOLIO'">
+  <div class="animated fadeIn">
     <portfolio-widget-row :fetch="true" />
     <div id="projectsToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
         variant="outline-primary"
         @click="initializeProjectCreateProjectModal"
-        v-permission:or="[
-          PERMISSIONS.PORTFOLIO_MANAGEMENT,
-          PERMISSIONS.PORTFOLIO_MANAGEMENT_CREATE,
-        ]"
+        v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
       >
         <span class="fa fa-plus"></span> {{ $t('message.create_project') }}
       </b-button>
@@ -264,7 +261,7 @@ export default {
           field: 'name',
           sortable: true,
           formatter(value, row, index) {
-            let url = xssFilters.uriInUnQuotedAttr('../projects/' + row.uuid);
+            const url = xssFilters.uriInUnQuotedAttr('../projects/' + row.uuid);
             return `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
           },
         },

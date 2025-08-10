@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="'VIEW_PORTFOLIO'">
+  <div class="animated fadeIn">
     <portfolio-widget-row ref="portfolioWidgetRow" />
     <b-card>
       <b-row>
@@ -11,15 +11,13 @@
             <!-- Change below v-permission back to PORTFOLIO_MANAGEMENT -->
             {{ $t('message.last_measurement') }}: {{ lastMeasurement
             }}<b-link
-              v-permission:or="[
-                'PORTFOLIO_MANAGEMENT',
-                'PORTFOLIO_MANAGEMENT_READ',
-              ]"
+              v-permission="PERMISSIONS.PORTFOLIO_MANAGEMENT"
               class="font-weight-bold"
               style="margin-left: 6px"
               v-on:click="refreshMetrics"
-              ><i class="fa fa-refresh"></i
-            ></b-link>
+            >
+              <i class="fa fa-refresh"></i>
+            </b-link>
           </div>
         </b-col>
         <b-col sm="5" class="d-none d-md-block" />
@@ -836,13 +834,13 @@ export default {
       );
     },
     refreshMetrics() {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/refresh`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/refresh`;
       this.axios.get(url).then((response) => {
         this.$toastr.s(this.$t('message.metric_refresh_requested'));
       });
     },
     fetchMetrics() {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${this.metricDays}/days`;
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_METRICS}/portfolio/${this.metricDays}/days`;
       this.axios.get(url).then((response) => {
         this.$refs.portfolioWidgetRow.render(response.data);
         this.$refs.chartPortfolioVulnerabilities.render(response.data);
@@ -871,7 +869,7 @@ export default {
         : 30;
   },
   mounted() {
-    if (this.isPermitted(this.PERMISSIONS.VIEW_PORTFOLIO)) {
+    if (this.hasPermission(this.PERMISSIONS.PROJECT_READ)) {
       this.fetchMetrics();
     }
   },

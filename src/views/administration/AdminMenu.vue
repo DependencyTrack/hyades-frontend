@@ -1,42 +1,38 @@
 <template>
   <div>
-    <b-card
-      no-body
-      class="admin-menu"
+    <div
       v-for="section in menu"
-      v-bind:key="section.id"
+      :key="section.id"
+      v-permission="section.permission"
     >
-      <div
-        slot="header"
-        v-if="isPermitted(section.permission)"
-        v-b-toggle="section.id"
-        style="cursor: pointer"
-      >
-        <i class="fa fa-align-justify"></i
-        ><strong>&nbsp;&nbsp;{{ section.name }}</strong>
-      </div>
-      <b-collapse
-        ref="accordion"
-        v-if="isPermitted(section.permission)"
-        :id="section.id"
-        accordion="admin-accordion"
-        role="tabpanel"
-      >
-        <div class="list-group" id="list-tab" role="tablist">
-          <router-link
-            :ref="item.id"
-            :key="item.id"
-            v-for="item in section.children"
-            class="list-group-item list-group-item-action"
-            data-toggle="list"
-            role="tab"
-            :to="'/admin/' + item.route"
-            @click="emitEvent(item)"
-            >{{ item.name }}</router-link
-          >
+      <b-card no-body class="admin-menu">
+        <div slot="header" v-b-toggle="section.id" style="cursor: pointer">
+          <i class="fa fa-align-justify"></i>
+          <strong>&nbsp;&nbsp;{{ section.name }}</strong>
         </div>
-      </b-collapse>
-    </b-card>
+        <b-collapse
+          ref="accordion"
+          :id="section.id"
+          accordion="admin-accordion"
+          role="tabpanel"
+        >
+          <div class="list-group" id="list-tab" role="tablist">
+            <router-link
+              :ref="item.id"
+              :key="item.id"
+              v-for="item in section.children"
+              class="list-group-item list-group-item-action"
+              data-toggle="list"
+              role="tab"
+              :to="'/admin/' + item.route"
+              @click="emitEvent(item)"
+            >
+              {{ item.name }}
+            </router-link>
+          </div>
+        </b-collapse>
+      </b-card>
+    </div>
   </div>
 </template>
 
@@ -45,22 +41,11 @@ import permissionsMixin from '../../mixins/permissionsMixin';
 import EventBus from '../../shared/eventbus';
 import {
   ACCESS_MANAGEMENT,
-  ACCESS_MANAGEMENT_CREATE,
-  ACCESS_MANAGEMENT_READ,
-  ACCESS_MANAGEMENT_UPDATE,
-  ACCESS_MANAGEMENT_DELETE,
   SYSTEM_CONFIGURATION,
-  SYSTEM_CONFIGURATION_CREATE,
-  SYSTEM_CONFIGURATION_READ,
-  SYSTEM_CONFIGURATION_UPDATE,
-  SYSTEM_CONFIGURATION_DELETE,
 } from '../../shared/permissions';
 
 export default {
   mixins: [permissionsMixin],
-  components: {
-    EventBus,
-  },
   methods: {
     emitEvent: function (plugin) {
       EventBus.$emit('admin:plugin', plugin);
@@ -86,13 +71,7 @@ export default {
         {
           name: this.$t('admin.configuration'),
           id: 'configuration',
-          permission: [
-            SYSTEM_CONFIGURATION,
-            SYSTEM_CONFIGURATION_CREATE,
-            SYSTEM_CONFIGURATION_READ,
-            SYSTEM_CONFIGURATION_UPDATE,
-            SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: [SYSTEM_CONFIGURATION],
           children: [
             {
               component: 'General',
@@ -149,13 +128,7 @@ export default {
         {
           name: this.$t('admin.analyzers'),
           id: 'analyzers',
-          permission: [
-            SYSTEM_CONFIGURATION,
-            SYSTEM_CONFIGURATION_CREATE,
-            SYSTEM_CONFIGURATION_READ,
-            SYSTEM_CONFIGURATION_UPDATE,
-            SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: [SYSTEM_CONFIGURATION],
           children: [
             {
               component: 'InternalAnalyzer',
@@ -187,13 +160,7 @@ export default {
         {
           name: this.$t('admin.vuln_sources'),
           id: 'vulnerabilitysources',
-          permission: [
-            SYSTEM_CONFIGURATION,
-            SYSTEM_CONFIGURATION_CREATE,
-            SYSTEM_CONFIGURATION_READ,
-            SYSTEM_CONFIGURATION_UPDATE,
-            SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: [SYSTEM_CONFIGURATION],
           children: [
             {
               component: 'VulnSourceNvd',
@@ -215,13 +182,7 @@ export default {
         {
           name: this.$t('admin.repositories'),
           id: 'repositories',
-          permission: [
-            SYSTEM_CONFIGURATION,
-            SYSTEM_CONFIGURATION_CREATE,
-            SYSTEM_CONFIGURATION_READ,
-            SYSTEM_CONFIGURATION_UPDATE,
-            SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: [SYSTEM_CONFIGURATION],
           children: [
             {
               component: 'Cargo',
@@ -293,13 +254,7 @@ export default {
         {
           name: this.$t('admin.notifications'),
           id: 'notifications',
-          permission: [
-            SYSTEM_CONFIGURATION,
-            SYSTEM_CONFIGURATION_CREATE,
-            SYSTEM_CONFIGURATION_READ,
-            SYSTEM_CONFIGURATION_UPDATE,
-            SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: [SYSTEM_CONFIGURATION],
           children: [
             {
               component: 'Alerts',
@@ -316,13 +271,7 @@ export default {
         {
           name: this.$t('admin.integrations'),
           id: 'integrations',
-          permission: [
-            SYSTEM_CONFIGURATION,
-            SYSTEM_CONFIGURATION_CREATE,
-            SYSTEM_CONFIGURATION_READ,
-            SYSTEM_CONFIGURATION_UPDATE,
-            SYSTEM_CONFIGURATION_DELETE,
-          ],
+          permission: [SYSTEM_CONFIGURATION],
           children: [
             {
               component: 'DefectDojo',
@@ -349,13 +298,7 @@ export default {
         {
           name: this.$t('admin.access_management'),
           id: 'accessmanagement',
-          permission: [
-            ACCESS_MANAGEMENT,
-            ACCESS_MANAGEMENT_CREATE,
-            ACCESS_MANAGEMENT_READ,
-            ACCESS_MANAGEMENT_UPDATE,
-            ACCESS_MANAGEMENT_DELETE,
-          ],
+          permission: [ACCESS_MANAGEMENT],
           children: [
             {
               component: 'LdapUsers',
@@ -405,16 +348,18 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .admin-menu {
   margin-bottom: 0.3rem;
 }
-.list-group-item:first-child,
-.list-group-item:last-child {
-  border-radius: 0;
-}
+
 .list-group-item {
   border-left: 0;
   border-right: 0;
+
+  &:first-child,
+  &:last-child {
+    border-radius: 0;
+  }
 }
 </style>

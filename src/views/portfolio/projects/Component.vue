@@ -1,5 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_PORTFOLIO">
+  <div class="animated fadeIn" v-permission="PERMISSIONS.PROJECT_READ">
     <b-card :no-body="true" footer-class="px-3 py-2 card-footer-action">
       <b-card-body class="p-3 clearfix">
         <b-row>
@@ -159,7 +159,7 @@
       </b-tab>
     </b-tabs>
     <component-details-modal
-      :component="cloneDeep(component)"
+      :component="component"
       v-on:componentUpdated="syncComponentFields"
     />
     <component-properties-modal :uuid="this.uuid" />
@@ -169,7 +169,6 @@
 
 <script>
 import common from '../../../shared/common';
-import { cloneDeep } from 'lodash-es';
 import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
 import VueEasyPieChart from 'vue-easy-pie-chart';
 import PortfolioWidgetRow from '../../dashboard/PortfolioWidgetRow';
@@ -199,7 +198,7 @@ export default {
   title: '',
   computed: {
     projectLabel() {
-      if (this.component.hasOwnProperty('project')) {
+      if (Object.prototype.hasOwnProperty.call(this.component, 'project')) {
         if (this.component.project.name && this.component.project.version) {
           return (
             this.component.project.name + ' ▸ ' + this.component.project.version
@@ -208,6 +207,7 @@ export default {
           return this.component.project.name;
         }
       }
+      return null;
     },
     componentLabel() {
       let label = this.component.name;
@@ -245,9 +245,6 @@ export default {
     };
   },
   methods: {
-    cloneDeep: function (component) {
-      return cloneDeep(component);
-    },
     getStyle: function (style) {
       return getStyle(style);
     },

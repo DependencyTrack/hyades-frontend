@@ -130,12 +130,7 @@
       </b-form-group>
       <b-form-group
         id="fieldset-8"
-        v-if="
-          this.isPermitted([
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS,
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS_UPDATE,
-          ])
-        "
+        v-permission="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_UPDATE]"
         :label="this.$t('message.comment')"
         label-for="input-8"
       >
@@ -155,12 +150,7 @@
       </b-form-group>
       <b-form-group
         id="fieldset-9"
-        v-if="
-          this.isPermitted([
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS,
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS_UPDATE,
-          ])
-        "
+        v-permission="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_UPDATE]"
         :label="this.$t('message.analysis')"
         label-for="input-9"
       >
@@ -186,12 +176,7 @@
         </b-input-group>
       </b-form-group>
       <b-row
-        v-if="
-          this.isPermitted([
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS,
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS_UPDATE,
-          ])
-        "
+        v-permission="[PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_UPDATE]"
       >
         <b-col sm="6">
           <b-form-group
@@ -234,12 +219,7 @@
       </b-row>
       <b-form-group
         id="fieldset-12"
-        v-if="
-          this.isPermitted([
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS,
-            this.PERMISSIONS.VULNERABILITY_ANALYSIS_UPDATE,
-          ])
-        "
+        v-permission="PERMISSIONS.PROJECT_READ"
         :label="this.$t('message.details')"
         label-for="analysisDetailsField"
       >
@@ -248,19 +228,14 @@
           v-model="analysisDetails"
           rows="7"
           class="form-control"
-          :disabled="
-            analysisState === null ||
-            !this.isPermitted([
-              this.PERMISSIONS.VULNERABILITY_ANALYSIS,
-              this.PERMISSIONS.VULNERABILITY_ANALYSIS_UPDATE,
-            ])
-          "
+          :disabled="analysisState === null"
+          v-permission.disabled="PERMISSIONS.FINDING_UPDATE"
           v-b-tooltip.hover
           :title="this.$t('message.analysis_details_tooltip')"
         />
         <div class="pull-right">
           <b-button
-            v-if="this.isPermitted(this.PERMISSIONS.VULNERABILITY_ANALYSIS)"
+            v-permission="PERMISSIONS.FINDING_UPDATE"
             :disabled="analysisState === null"
             size="sm"
             variant="outline-primary"

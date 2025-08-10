@@ -14,16 +14,9 @@
     >
     </bootstrap-table>
     <template v-slot:modal-footer="{ cancel }">
-      <b-button
-        v-permission:or="[
-          'PORTFOLIO_MANAGEMENT',
-          'PORTFOLIO_MANAGEMENT_DELETE',
-        ]"
-        size="md"
-        variant="outline-danger"
-        @click="deleteProperty"
-        >{{ $t('message.delete') }}</b-button
-      >
+      <b-button size="md" variant="outline-danger" @click="deleteProperty">{{
+        $t('message.delete')
+      }}</b-button>
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
