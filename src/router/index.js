@@ -840,7 +840,7 @@ function configRoutes() {
             i18n: 'message.vulnerability_audit',
             sectionPath: '/vulnerabilityAudit',
             sectionName: 'Vulnerability Audit',
-            permission: {
+            complexPermission: {
               or: [PERMISSIONS.PROJECT_READ, PERMISSIONS.FINDING_READ],
             },
           },
