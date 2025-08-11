@@ -38,8 +38,7 @@ import DefaultFooter from './DefaultFooter';
 import EventBus from '../shared/eventbus';
 import ProfileEditModal from '../views/components/ProfileEditModal';
 import PERMISSIONS, {
-  getToken,
-  decodeToken,
+  hasComplexPermission,
   hasPermission,
 } from '../shared/permissions';
 
@@ -243,8 +242,18 @@ export default {
     },
     permissibleNav() {
       return this.nav.filter((item) => {
-        const perms = item.permission ?? item.permissions;
-        if (perms) return hasPermission(perms);
+        if (item.permission && !hasPermission(item.permission)) {
+          return false;
+        }
+        if (item.permissions && !hasPermission(item.permissions)) {
+          return false;
+        }
+        if (
+          item.complexPermission &&
+          !hasComplexPermission(item.complexPermission)
+        ) {
+          return false;
+        }
         return true;
       });
     },
