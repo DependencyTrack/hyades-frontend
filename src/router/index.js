@@ -2,14 +2,9 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import i18n from '../i18n';
 import EventBus from '../shared/eventbus';
-import PERMISSIONS, {
-  getToken,
-  hasComplexPermission,
-  hasPermission,
-} from '../shared/permissions';
+import PERMISSIONS, { getToken } from '../shared/permissions';
 import { getContextPath } from '../shared/utils';
 import { canAccessDashboard, resolveAuthorization } from './routerGuard';
-import permissions from '../shared/permissions';
 
 // Containers
 const DefaultContainer = () => import('@/containers/DefaultContainer');
