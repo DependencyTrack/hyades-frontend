@@ -38,6 +38,7 @@ import DefaultFooter from './DefaultFooter';
 import EventBus from '../shared/eventbus';
 import ProfileEditModal from '../views/components/ProfileEditModal';
 import * as permissions from '../shared/permissions';
+import * as featureFlags from '@/shared/featureFlags';
 
 export default {
   name: 'DefaultContainer',
@@ -118,18 +119,24 @@ export default {
             permissions.VIEW_VULNERABILITY,
             permissions.VIEW_POLICY_VIOLATION,
           ],
+          featureFlags: [
+            featureFlags.GLOBAL_POLICY_VIOLATION_AUDIT,
+            featureFlags.GLOBAL_VULNERABILITY_AUDIT,
+          ],
         },
         {
           name: this.$t('message.vulnerability_audit'),
           url: '/vulnerabilityAudit',
           icon: 'fa fa-tasks',
           permission: permissions.VIEW_VULNERABILITY,
+          featureFlags: [featureFlags.GLOBAL_VULNERABILITY_AUDIT],
         },
         {
           name: this.$t('message.policy_violation_audit'),
           url: '/policyViolationAudit',
           icon: 'fa fa-fire',
           permission: permissions.VIEW_POLICY_VIOLATION,
+          featureFlags: [featureFlags.GLOBAL_POLICY_VIOLATION_AUDIT],
         },
         {
           title: true,
@@ -262,6 +269,14 @@ export default {
       let decodedToken = permissions.decodeToken(permissions.getToken());
       let array = [];
       for (const item of this.nav) {
+        if (
+          item.featureFlags &&
+          Array.isArray(item.featureFlags) &&
+          !this.$isAnyFeatureEnabled(item.featureFlags)
+        ) {
+          continue;
+        }
+
         if (
           (item.permission !== null &&
             permissions.hasPermission(item.permission, decodedToken)) ||
