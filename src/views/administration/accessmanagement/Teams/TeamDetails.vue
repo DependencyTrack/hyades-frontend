@@ -279,14 +279,16 @@ export default {
       });
     },
     async createApiKey() {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_TEAM}/${this.team.uuid}/key`;
+      const endpoint = `${this.$api.BASE_URL}/api/v2/teams/${encodeURIComponent(this.team.name)}/api-keys`;
       try {
-        const response = await this.axios.put(endpoint);
+        const response = await this.axios.post(endpoint, {});
+        const responseData = await response.data;
+
         this.$toastr.s(this.$t('message.updated'));
         await this.popup(
           this.$t('admin.new_api_key_title'),
           this.$t('admin.new_api_key'),
-          response.data.key,
+          responseData.key,
         );
         this.syncVariables('addKey', response.data);
       } catch (error) {
