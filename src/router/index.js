@@ -101,6 +101,8 @@ const Permissions = () =>
 const PortfolioAccessControl = () =>
   import('@/views/administration/accessmanagement/PortfolioAccessControl');
 
+const WorkflowRunList = () => import('@/views/workflowRuns/WorkflowRunList');
+
 const Component = () => import('@/views/portfolio/projects/Component');
 const Service = () => import('@/views/portfolio/projects/Service');
 const Vulnerability = () =>
@@ -357,6 +359,21 @@ function configRoutes() {
             i18n: 'message.policy_violation_audit',
             sectionPath: '/audit',
             permission: 'VIEW_POLICY_VIOLATION',
+          },
+        },
+        {
+          path: 'workflowRuns',
+          name: 'Workflow Runs',
+          component: WorkflowRunList,
+          meta: {
+            title: 'WorkflowRunList',
+            i18n: 'message.workflow_runs',
+            sectionPath: '/workflowRuns',
+            permissions: [
+              // TODO: Workflow permissions.
+              'SYSTEM_CONFIGURATION',
+              'SYSTEM_CONFIGURATION_READ',
+            ],
           },
         },
         {
