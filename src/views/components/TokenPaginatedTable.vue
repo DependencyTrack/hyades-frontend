@@ -14,7 +14,7 @@
           class="pagination-button"
           :disabled="!hasPreviousPage"
           @click="goToPrevPage"
-        >‹ Previous
+          >‹ Previous
         </b-button>
       </div>
       <div>
@@ -31,7 +31,7 @@
               v-for="pageSize in allowedPageSizes"
               :key="`pageSize-${pageSize}`"
               :value="pageSize"
-            >{{ pageSize }}
+              >{{ pageSize }}
             </b-form-select-option>
           </b-form-select>
         </b-form-group>
@@ -42,7 +42,7 @@
           class="pagination-button"
           :disabled="!hasNextPage"
           @click="goToNextPage"
-        >Next ›
+          >Next ›
         </b-button>
       </div>
     </div>
@@ -138,12 +138,12 @@ export default {
         url.searchParams.set('limit', this.currentPageSize);
 
         const response = await this.axios.get(url.toString());
-        const responseData = await response.data;
 
-        this.tableData = responseData[this.responseDataField] || [];
+        this.tableData = response.data[this.responseDataField] || [];
         this.currentPageUrl = pageUrl;
-        this.nextPageUrl = responseData._pagination.links.next;
+        this.nextPageUrl = response.data._pagination.links.next;
       } catch (err) {
+        console.error(`Failed to load page ${pageUrl}: ${err}`);
         this.tableData = [];
         this.currentPageNumber = 1;
         this.nextPageUrl = null;
