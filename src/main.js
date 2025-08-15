@@ -60,6 +60,21 @@ axios
     } else {
       Vue.prototype.$oidc.LOGIN_BUTTON_TEXT = '';
     }
+
+    // Feature flags
+    Vue.prototype.$featureFlags = response.data.FEATURE_FLAGS;
+    Vue.prototype.$isFeatureEnabled = (featureName) => {
+      const flags = Vue.prototype.$featureFlags;
+      return (
+        flags &&
+        Object.prototype.hasOwnProperty.call(flags, featureName) &&
+        flags[featureName] === true
+      );
+    };
+    Vue.prototype.$isAnyFeatureEnabled = (featureNames) => {
+      return featureNames.some((name) => Vue.prototype.$isFeatureEnabled(name));
+    };
+
     createVueApp();
   })
   .catch(function (error) {

@@ -60,7 +60,7 @@
         size="md"
         variant="outline-primary"
         @click="reAnalyze()"
-        v-permission:or="[PERMISSIONS.VIEW_VULNERABILITY]"
+        v-permission:or="[PERMISSIONS.VULNERABILITY_ANALYSIS]"
       >
         <span class="fa fa-refresh"></span>
         {{ $t('message.project_reanalyze') }}
