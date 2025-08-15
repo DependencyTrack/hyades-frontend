@@ -7,7 +7,7 @@
       :options="tableOptions"
     >
     </bootstrap-table>
-    <div class="mt-2 d-flex justify-content-between">
+    <div class="mt-2 d-flex justify-content-between align-items-center">
       <div>
         <b-button
           id="pagination-button-prev"
@@ -17,11 +17,16 @@
           >‹ Previous
         </b-button>
       </div>
-      <div>
+      <div class="d-flex align-items-center">
+        <span v-if="totalCountDisplay" class="total-count-indicator mr-3">
+          {{ totalCountDisplay }} records
+        </span>
+        <span class="page-indicator mr-3">Page {{ currentPageNumber }}</span>
         <b-form-group
           label="Rows per page:"
           label-for="pagination-page-size-select"
           label-cols="auto"
+          class="mb-0"
         >
           <b-form-select
             id="pagination-page-size-select"
@@ -51,6 +56,15 @@
 
 <style lang="scss" scoped>
 @import '@/assets/scss/style';
+
+.page-indicator {
+  font-weight: 500;
+  color: $pagination-color;
+}
+
+.total-count-indicator {
+  color: $pagination-color;
+}
 
 .pagination-button {
   position: relative;
@@ -98,11 +112,20 @@ export default {
     responseDataField: String,
     columns: Array,
     options: {},
+    defaultPageSize: {
+      type: Number,
+      default: 10,
+      validator: (value) => [5, 10, 15, 20].includes(value),
+    },
+    debounceMs: {
+      type: Number,
+      default: 300,
+    },
   },
   data() {
     return {
       currentPageNumber: 1,
-      currentPageSize: 10,
+      currentPageSize: this.defaultPageSize,
       currentPageUrl: null,
       allowedPageSizes: [5, 10, 15, 20],
       nextPageUrl: null,
@@ -119,6 +142,10 @@ export default {
         },
         ...this.options,
       },
+      currentRequestId: 0,
+      debounceTimer: null,
+      totalCount: null,
+      totalCountType: null,
     };
   },
   computed: {
@@ -128,10 +155,20 @@ export default {
     hasPreviousPage() {
       return this.pageUrlHistory.length > 0;
     },
+    totalCountDisplay() {
+      if (this.totalCount === null) {
+        return null;
+      }
+      return this.totalCountType === 'AT_LEAST'
+        ? `${this.totalCount}+`
+        : `${this.totalCount}`;
+    },
   },
   methods: {
     async loadPage(pageUrl) {
       this.$refs.table.showLoading();
+
+      const requestId = ++this.currentRequestId;
 
       try {
         const url = new URL(pageUrl);
@@ -139,16 +176,44 @@ export default {
 
         const response = await this.axios.get(url.toString());
 
+        if (requestId !== this.currentRequestId) {
+          return;
+        }
+
         this.tableData = response.data[this.responseDataField] || [];
         this.currentPageUrl = pageUrl;
         this.nextPageUrl = response.data._pagination.links.next;
+
+        const total = response.data._pagination.total;
+        if (total) {
+          this.totalCount = total.count;
+          this.totalCountType = total.type;
+        }
       } catch (err) {
+        if (requestId !== this.currentRequestId) {
+          return;
+        }
+
         console.error(`Failed to load page ${pageUrl}: ${err}`);
+        this.$bvToast.toast(
+          `Failed to load data: ${err.response?.data?.message || err.message}`,
+          {
+            title: 'Error',
+            variant: 'danger',
+            solid: true,
+          },
+        );
         this.tableData = [];
         this.currentPageNumber = 1;
+        this.currentPageUrl = null;
         this.nextPageUrl = null;
+        this.pageUrlHistory = [];
+        this.totalCount = null;
+        this.totalCountType = null;
       } finally {
-        this.$refs.table.hideLoading();
+        if (requestId === this.currentRequestId) {
+          this.$refs.table.hideLoading();
+        }
       }
     },
     async goToPrevPage() {
@@ -183,15 +248,27 @@ export default {
       this.currentPageNumber = 1;
       this.pageUrlHistory = [];
       this.nextPageUrl = null;
+      this.totalCount = null;
+      this.totalCountType = null;
       await this.loadPage(this.baseUrl);
     },
   },
   mounted() {
     this.loadPage(this.baseUrl);
   },
+  beforeDestroy() {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+  },
   watch: {
-    async baseUrl() {
-      await this.reset();
+    baseUrl() {
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        this.reset();
+      }, this.debounceMs);
     },
     async currentPageSize() {
       await this.reset();

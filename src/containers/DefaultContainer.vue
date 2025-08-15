@@ -167,6 +167,17 @@ export default {
           ],
         },
         {
+          name: 'Workflow Runs', // TODO: i18n
+          url: '/workflowRuns',
+          icon: 'fa fa-list',
+          featureFlags: [featureFlags.WORKFLOW_ENGINE],
+          permission: [
+            // TODO: Workflow permissions.
+            permissions.SYSTEM_CONFIGURATION,
+            permissions.SYSTEM_CONFIGURATION_READ,
+          ],
+        },
+        {
           name: this.$t('message.administration'),
           url: '/admin',
           icon: 'fa fa-cogs',
