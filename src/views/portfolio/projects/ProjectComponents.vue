@@ -490,7 +490,7 @@ export default {
       };
       const queryString = Object.entries(queryParams)
         .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-        .join("&");
+        .join('&');
       return `${url}?${queryString}`;
     },
   },
