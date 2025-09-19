@@ -110,14 +110,14 @@
         }}</b-tooltip>
       </div>
     </div>
-    <bootstrap-table
+    <token-paginated-table
       ref="table"
+      :base-url="tableDataUrl"
       :columns="columns"
-      :data="data"
       :options="options"
       @on-load-success="tableLoaded"
-    >
-    </bootstrap-table>
+      :response-data-field="'components'"
+    />
     <project-upload-bom-modal :uuid="this.uuid" />
     <project-add-component-modal
       :uuid="this.uuid"
@@ -144,12 +144,14 @@ import SeverityProgressBar from '../../components/SeverityProgressBar';
 import { get } from 'lodash-es';
 import i18n from '@/i18n';
 import bootstrapTableMixin from '@/mixins/bootstrapTableMixin';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 
 export default {
   components: {
     cSwitch,
     ProjectUploadBomModal,
     ProjectAddComponentModal,
+    TokenPaginatedTable,
   },
   mixins: [bootstrapTableMixin, permissionsMixin],
   comments: {
@@ -259,7 +261,7 @@ export default {
         },
         {
           title: this.$t('message.internal'),
-          field: 'isInternal',
+          field: 'internal',
           sortable: false,
           align: 'center',
           class: 'tight',
@@ -381,7 +383,7 @@ export default {
         },
         {
           title: this.$t('message.occurrences'),
-          field: 'occurrenceCount',
+          field: 'occurrence_count',
           sortable: true,
           class: 'tight',
           visible: false,
@@ -413,7 +415,7 @@ export default {
         },
         {
           title: this.$t('message.risk_score'),
-          field: 'lastInheritedRiskScore',
+          field: 'last_inherited_risk_score',
           sortable: true,
           class: 'tight',
         },
@@ -444,23 +446,9 @@ export default {
           }.bind(this),
         },
       ],
-      data: [],
       options: {
         onPostBody: this.initializeTooltips,
-        search: true,
-        showColumns: true,
-        showRefresh: true,
-        pagination: true,
-        silentSort: false,
-        sidePagination: 'server',
         toolbar: '#componentsToolbar',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize:
-          localStorage &&
-          localStorage.getItem('ProjectComponentsPageSize') !== null
-            ? Number(localStorage.getItem('ProjectComponentsPageSize'))
-            : 10,
         sortName:
           localStorage &&
           localStorage.getItem('ProjectComponentsSortName') !== null
@@ -471,14 +459,6 @@ export default {
           localStorage.getItem('ProjectComponentsSortOrder') !== null
             ? localStorage.getItem('ProjectComponentsSortOrder')
             : undefined,
-        icons: {
-          refresh: 'fa-refresh',
-        },
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: this.apiUrl(),
         onPageChange: (number, size) => {
           if (localStorage) {
             localStorage.setItem('ProjectComponentsPageSize', size.toString());
@@ -500,6 +480,19 @@ export default {
         },
       },
     };
+  },
+  computed: {
+    tableDataUrl() {
+      const url = `${this.$api.BASE_URL}/api/v2/projects/${this.uuid}/components`;
+      const queryParams = {
+        onlyOutdated: this.onlyOutdated ?? false,
+        onlyDirect: this.onlyDirect ?? false,
+      };
+      const queryString = Object.entries(queryParams)
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
+      return `${url}?${queryString}`;
+    },
   },
   methods: {
     initializeTooltips: function () {
@@ -610,26 +603,8 @@ export default {
       this.$refs.table.hideLoading();
       this.vueFormatterInit();
     },
-    apiUrl: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/project/${this.uuid}`;
-      if (this.onlyOutdated === undefined) {
-        url += '?onlyOutdated=false';
-      } else {
-        url += '?onlyOutdated=' + this.onlyOutdated;
-      }
-      if (this.onlyDirect === undefined) {
-        url += '&onlyDirect=false';
-      } else {
-        url += '&onlyDirect=' + this.onlyDirect;
-      }
-      return url;
-    },
-    refreshTable: function () {
-      this.$refs.table.refresh({
-        url: this.apiUrl(),
-        pageNumber: 1,
-        silent: true,
-      });
+    refreshTable: async function () {
+      await this.$refs.table.refreshCurrentPage();
     },
   },
   watch: {

@@ -134,11 +134,9 @@ export default {
       this.$refs.table.showLoading();
 
       try {
-        const url = new URL(pageUrl);
-        url.searchParams.set('limit', this.currentPageSize);
-
-        const response = await this.axios.get(url.toString());
-
+        const connector = pageUrl.includes("?") ? "&" : "?";
+        const url = `${pageUrl}${connector}limit=${this.currentPageSize}`;
+        const response = await this.axios.get(url);
         this.tableData = response.data[this.responseDataField] || [];
         this.currentPageUrl = pageUrl;
         this.nextPageUrl = response.data._pagination.links.next;
