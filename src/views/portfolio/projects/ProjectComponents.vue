@@ -278,55 +278,39 @@ export default {
             if (row.integrity_check_status != null) {
               var lastFetchMessage = 'Last fetch unknown.';
               if (
-                typeof row.last_fetched !==
-                  'undefined' &&
+                typeof row.last_fetched !== 'undefined' &&
                 row.last_fetched != null
               ) {
                 lastFetchMessage =
                   'Last fetched on ' +
-                  common.formatTimestamp(
-                    row.last_fetched,
-                  ) +
+                  common.formatTimestamp(row.last_fetched) +
                   '.';
               }
 
-              if (
-                typeof row.integrity_repo_url != null
-              ) {
-                lastFetchMessage +=
-                  ' Source:  ' + row.integrity_repo_url;
+              if (typeof row.integrity_repo_url != null) {
+                lastFetchMessage += ' Source:  ' + row.integrity_repo_url;
               }
-              if (
-                row.integrity_check_status ==
-                'HASH_MATCH_PASSED'
-              ) {
+              if (row.integrity_check_status == 'HASH_MATCH_PASSED') {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes match. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-check status-passed" aria-hidden="true"></i></span> '
                 );
-              } else if (
-                row.integrity_check_status ===
-                'HASH_MATCH_FAILED'
-              ) {
+              } else if (row.integrity_check_status === 'HASH_MATCH_FAILED') {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes do not match. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.integrity_check_status ===
-                'COMPONENT_MISSING_HASH'
+                row.integrity_check_status === 'COMPONENT_MISSING_HASH'
               ) {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component hashes are missing. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
-              } else if (
-                row.integrity_check_status ===
-                'HASH_MATCH_UNKNOWN'
-              ) {
+              } else if (row.integrity_check_status === 'HASH_MATCH_UNKNOWN') {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Repository hashes are missing. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
@@ -414,7 +398,6 @@ export default {
           field: 'vulnerabilities',
           sortable: false,
           formatter: function (value, row, index) {
-
             // Programmatically instantiate SeverityProgressBar Vue component
             let ComponentClass = Vue.extend(SeverityProgressBar);
             let progressBar = new ComponentClass({
