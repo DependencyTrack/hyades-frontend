@@ -234,7 +234,7 @@ export default {
         },
         {
           title: this.$t('message.published'),
-          field: 'componentMetaInformation.publishedDate',
+          field: 'published',
           sortable: true,
           formatter(value, row, index) {
             if (value != null) {
@@ -244,7 +244,7 @@ export default {
         },
         {
           title: this.$t('message.latest_version'),
-          field: 'latestVersion',
+          field: 'latest_version',
           sortable: false,
           visible: false,
           formatter(value, row, index) {
@@ -271,43 +271,33 @@ export default {
         },
         {
           title: this.$t('message.integrity'),
-          field: 'componentMetaInformation.integrityMatchStatus',
+          field: 'integrity_check_status',
           sortable: true,
           visible: false,
           formatter: (value, row, index) => {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                row,
-                'componentMetaInformation',
-              ) &&
-              Object.prototype.hasOwnProperty.call(
-                row.componentMetaInformation,
-                'integrityMatchStatus',
-              ) &&
-              row.componentMetaInformation.integrityMatchStatus != null
-            ) {
+            if (row.integrity_check_status != null) {
               var lastFetchMessage = 'Last fetch unknown.';
               if (
-                typeof row.componentMetaInformation.lastFetched !==
+                typeof row.last_fetched !==
                   'undefined' &&
-                row.componentMetaInformation.lastFetched != null
+                row.last_fetched != null
               ) {
                 lastFetchMessage =
                   'Last fetched on ' +
                   common.formatTimestamp(
-                    row.componentMetaInformation.lastFetched,
+                    row.last_fetched,
                   ) +
                   '.';
               }
 
               if (
-                typeof row.componentMetaInformation.integrityRepoUrl != null
+                typeof row.integrity_repo_url != null
               ) {
                 lastFetchMessage +=
-                  ' Source:  ' + row.componentMetaInformation.integrityRepoUrl;
+                  ' Source:  ' + row.integrity_repo_url;
               }
               if (
-                row.componentMetaInformation.integrityMatchStatus ==
+                row.integrity_check_status ==
                 'HASH_MATCH_PASSED'
               ) {
                 return (
@@ -316,7 +306,7 @@ export default {
                   '"><i class="fa fa-check status-passed" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
+                row.integrity_check_status ===
                 'HASH_MATCH_FAILED'
               ) {
                 return (
@@ -325,7 +315,7 @@ export default {
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
+                row.integrity_check_status ===
                 'COMPONENT_MISSING_HASH'
               ) {
                 return (
@@ -334,7 +324,7 @@ export default {
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
+                row.integrity_check_status ===
                 'HASH_MATCH_UNKNOWN'
               ) {
                 return (
@@ -343,7 +333,7 @@ export default {
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
+                row.integrity_check_status ===
                 'COMPONENT_MISSING_HASH_AND_MATCH_UNKNOWN'
               ) {
                 return (
@@ -360,21 +350,21 @@ export default {
           field: 'license',
           sortable: false,
           formatter(value, row, index) {
-            if (Object.prototype.hasOwnProperty.call(row, 'resolvedLicense')) {
+            if (Object.prototype.hasOwnProperty.call(row, 'resolved_license')) {
               let licenseurl =
-                '../../../licenses/' + row.resolvedLicense.licenseId;
+                '../../../licenses/' + row.resolved_license.license_id;
               return (
                 '<a href="' +
                 licenseurl +
                 '">' +
-                xssFilters.inHTMLData(row.resolvedLicense.licenseId) +
+                xssFilters.inHTMLData(row.resolved_license.license_id) +
                 '</a>'
               );
             } else if (value) {
               return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
-            } else if (row.licenseExpression) {
+            } else if (row.license_expression) {
               return xssFilters.inHTMLData(
-                common.valueWithDefault(row.licenseExpression, ''),
+                common.valueWithDefault(row.license_expression, ''),
               );
             } else {
               return '';
@@ -421,23 +411,20 @@ export default {
         },
         {
           title: this.$t('message.vulnerabilities'),
-          field: 'metrics',
+          field: 'vulnerabilities',
           sortable: false,
-          formatter: function (metrics, row, index) {
-            if (typeof metrics === 'undefined') {
-              return '-'; // No vulnerability info available
-            }
+          formatter: function (value, row, index) {
 
             // Programmatically instantiate SeverityProgressBar Vue component
             let ComponentClass = Vue.extend(SeverityProgressBar);
             let progressBar = new ComponentClass({
               propsData: {
-                vulnerabilities: metrics.vulnerabilities,
-                critical: metrics.critical,
-                high: metrics.high,
-                medium: metrics.medium,
-                low: metrics.low,
-                unassigned: metrics.unassigned,
+                vulnerabilities: row.vulnerabilities,
+                critical: row.critical,
+                high: row.high,
+                medium: row.medium,
+                low: row.low,
+                unassigned: row.unassigned,
                 $t: this.$t.bind(this),
               },
             });
