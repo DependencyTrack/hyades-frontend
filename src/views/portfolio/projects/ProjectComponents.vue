@@ -49,6 +49,11 @@
           }}</b-dropdown-item>
           <b-dropdown-item
             @click="downloadBom('withVulnerabilities')"
+            v-permission:or="[
+              PERMISSIONS.VIEW_VULNERABILITY,
+              PERMISSIONS.VULNERABILITY_ANALYSIS,
+              PERMISSIONS.VULNERABILITY_ANALYSIS_READ,
+            ]"
             href="#"
             >{{ $t('message.inventory_with_vulnerabilities') }}</b-dropdown-item
           >

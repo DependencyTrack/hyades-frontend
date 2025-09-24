@@ -86,10 +86,16 @@ export default {
           );
         }
       } else {
-        this.$toastr.e(
-          error.response.statusText + ' (' + error.response.status + ')',
-          this.$t('condition.server_error'),
-        );
+        if (
+          error.response.headers['content-type'] === 'application/problem+json'
+        ) {
+          this.$toastr.w(error.response.data.detail, error.response.data.title);
+        } else {
+          this.$toastr.e(
+            error.response.statusText + ' (' + error.response.status + ')',
+            this.$t('condition.server_error'),
+          );
+        }
       }
       return Promise.reject(error);
     });
