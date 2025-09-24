@@ -97,7 +97,6 @@
     </b-card-footer>
   </b-card>
 </template>
-
 <script>
 import { Switch as cSwitch } from '@coreui/vue';
 import common from '../../../shared/common';
