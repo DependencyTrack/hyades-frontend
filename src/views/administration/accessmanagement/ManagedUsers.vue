@@ -5,7 +5,7 @@
         <b-button
           size="md"
           variant="outline-primary"
-          v-b-modal.createOidcUserModal
+          v-b-modal.createManagedUserModal
         >
           <span class="fa fa-plus"></span> {{ $t('admin.create_user') }}
         </b-button>
@@ -18,28 +18,28 @@
       >
       </bootstrap-table>
     </b-card-body>
-    <create-oidc-user-modal v-on:refreshTable="refreshTable" />
+    <create-managed-user-modal v-on:refreshTable="refreshTable" />
   </b-card>
 </template>
 
 <script>
 import xssFilters from 'xss-filters';
-import common from '../../../../shared/common';
-import CreateOidcUserModal from '../CreateOidcUserModal';
-import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
-import EventBus from '../../../../shared/eventbus';
-import UserDetails from './UserDetails.vue';
-import i18n from '../../../../i18n';
+import common from '../../../shared/common';
+import CreateManagedUserModal from './CreateManagedUserModal.vue';
+import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
+import EventBus from '../../../shared/eventbus';
+import UserDetails from '../../components/detail-formatters/UserDetails.vue';
+import i18n from '../../../i18n';
 
 export default {
-  name: 'OidcUsersView',
   i18n,
+  name: 'ManagedUsersView',
   props: {
     header: String,
   },
   mixins: [bootstrapTableMixin],
   components: {
-    CreateOidcUserModal,
+    CreateManagedUserModal,
   },
   mounted() {
     EventBus.$on(this.rowEvents.update, (index, row) => {
@@ -57,8 +57,16 @@ export default {
   data() {
     return {
       rowEvents: {
-        update: 'admin:oidcusers:rowUpdate',
-        delete: 'admin:oidcusers:rowDeleted',
+        userType: 'managed',
+        get cacheKey() {
+          return `${this.userType}user`;
+        },
+        get update() {
+          return `admin:${this.cacheKey}:rowUpdate`;
+        },
+        get delete() {
+          return `admin:${this.cacheKey}:rowDeleted`;
+        },
       },
       columns: [
         {
@@ -70,8 +78,16 @@ export default {
           },
         },
         {
-          title: this.$t('admin.subject_identifier'),
-          field: 'subjectIdentifier',
+          title: this.$t('message.fullname'),
+          field: 'fullname',
+          sortable: false,
+          formatter(value) {
+            return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
+          },
+        },
+        {
+          title: this.$t('message.email'),
+          field: 'email',
           sortable: false,
           formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
@@ -110,17 +126,24 @@ export default {
         detailFormatter: (index, row) => {
           return this.vueFormatter({
             render: () => (
-              <UserDetails row={row} index={index} rowEvents={this.rowEvents} />
+              <UserDetails
+                userType="managed"
+                row={row}
+                index={index}
+                rowEvents={this.rowEvents}
+              />
             ),
           });
         },
         onExpandRow: this.vueFormatterInit,
+        onRefresh: this.clearSessionCache,
+        onLoadSuccess: this.clearSessionCache,
         toolbar: '#customToolbar',
         responseHandler: function (res, xhr) {
           res.total = xhr.getResponseHeader('X-Total-Count');
           return res;
         },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_USER_OIDC}`,
+        url: `${this.$api.BASE_URL}/${this.$api.URL_USER_MANAGED}`,
       },
     };
   },
@@ -129,6 +152,12 @@ export default {
       this.$refs.table.refresh({
         silent: true,
       });
+      this.clearSessionCache();
+    },
+    clearSessionCache: function () {
+      Object.entries(sessionStorage)
+        .filter(([key]) => key.startsWith(this.rowEvents.cacheKey))
+        .forEach(([key]) => sessionStorage.removeItem(key));
     },
   },
 };
