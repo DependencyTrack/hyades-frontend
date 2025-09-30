@@ -25,13 +25,15 @@
 
 <script>
 import xssFilters from 'xss-filters';
-import common from '../../../../shared/common';
-import CreateLdapUserModal from '../CreateLdapUserModal';
-import bootstrapTableMixin from '../../../../mixins/bootstrapTableMixin';
-import EventBus from '../../../../shared/eventbus';
-import UserDetails from './UserDetails.vue';
+import common from '../../../shared/common';
+import CreateLdapUserModal from './CreateLdapUserModal.vue';
+import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
+import EventBus from '../../../shared/eventbus';
+import UserDetails from '../../components/detail-formatters/UserDetails.vue';
+import i18n from '../../../i18n';
 
 export default {
+  i18n,
   name: 'LdapUsersView',
   props: {
     header: String,
@@ -56,8 +58,16 @@ export default {
   data() {
     return {
       rowEvents: {
-        update: 'admin:ldapusers:rowUpdate',
-        delete: 'admin:ldapusers:rowDeleted',
+        userType: 'ldap',
+        get cacheKey() {
+          return `${this.userType}user`;
+        },
+        get update() {
+          return `admin:${this.cacheKey}:rowUpdate`;
+        },
+        get delete() {
+          return `admin:${this.cacheKey}:rowDeleted`;
+        },
       },
       columns: [
         {
@@ -109,11 +119,18 @@ export default {
         detailFormatter: (index, row) => {
           return this.vueFormatter({
             render: () => (
-              <UserDetails row={row} index={index} rowEvents={this.rowEvents} />
+              <UserDetails
+                userType="ldap"
+                row={row}
+                index={index}
+                rowEvents={this.rowEvents}
+              />
             ),
           });
         },
         onExpandRow: this.vueFormatterInit,
+        onRefresh: this.clearSessionCache,
+        onLoadSuccess: this.clearSessionCache,
         toolbar: '#customToolbar',
         responseHandler: function (res, xhr) {
           res.total = xhr.getResponseHeader('X-Total-Count');
@@ -128,6 +145,12 @@ export default {
       this.$refs.table.refresh({
         silent: true,
       });
+      this.clearSessionCache();
+    },
+    clearSessionCache: function () {
+      Object.entries(sessionStorage)
+        .filter(([key]) => key.startsWith(this.rowEvents.cacheKey))
+        .forEach(([key]) => sessionStorage.removeItem(key));
     },
   },
 };
