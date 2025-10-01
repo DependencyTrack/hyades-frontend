@@ -136,6 +136,7 @@ export default {
           return 'ExtensionConfigBooleanInput';
         case 'INSTANT':
           return 'ExtensionConfigInstantInput';
+        case 'STRING_LIST':
         case 'STRING':
         case 'URL':
           return 'ExtensionConfigStringInput';
