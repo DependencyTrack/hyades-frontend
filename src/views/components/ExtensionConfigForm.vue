@@ -34,6 +34,7 @@
 <script>
 import ExtensionConfigBooleanInput from '@/views/components/ExtensionConfigBooleanInput.vue';
 import ExtensionConfigStringInput from '@/views/components/ExtensionConfigStringInput.vue';
+import ExtensionConfigStringListInput from '@/views/components/ExtensionConfigStringListInput.vue';
 import ExtensionConfigInstantInput from '@/views/components/ExtensionConfigInstantInput.vue';
 
 export default {
@@ -50,6 +51,7 @@ export default {
   components: {
     ExtensionConfigBooleanInput,
     ExtensionConfigInstantInput,
+    ExtensionConfigStringListInput,
     ExtensionConfigStringInput,
   },
   data() {
@@ -137,6 +139,7 @@ export default {
         case 'INSTANT':
           return 'ExtensionConfigInstantInput';
         case 'STRING_LIST':
+          return 'ExtensionConfigStringListInput';
         case 'STRING':
         case 'URL':
           return 'ExtensionConfigStringInput';
