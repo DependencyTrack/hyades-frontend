@@ -18,11 +18,7 @@
       <b-button size="md" variant="secondary" @click="cancel()">
         {{ $t('message.cancel') }}
       </b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="selectValues"
-      >
+      <b-button size="md" variant="primary" @click="selectValues">
         {{ $t('message.select') }}
       </b-button>
     </template>
@@ -95,7 +91,9 @@ export default {
   },
   methods: {
     selectValues() {
-      const selections = this.$refs.table.getSelections().map((row) => row.name);
+      const selections = this.$refs.table
+        .getSelections()
+        .map((row) => row.name);
       this.$emit('selection', selections);
     },
   },
