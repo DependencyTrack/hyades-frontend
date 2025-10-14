@@ -11,6 +11,12 @@
             :invalidFeedback="getValidationFeedback(config.name)"
             :value="config.value"
             @input="onConfigValueChange(config.name, $event)"
+            @show-modal="
+              $emit('show-modal', {
+                configDef: config,
+                update: (newVal) => onConfigValueChange(config.name, newVal),
+              })
+            "
           />
           <b-alert v-else variant="warning" show dismissible>
             Configuration <code>{{ config.name }}</code> could not be rendered
@@ -86,11 +92,13 @@ export default {
       }
     },
     async onConfigValueChange(configName, value) {
-      for (let configValue of this.configValues) {
-        if (configName === configValue.name) {
-          configValue.value = value;
-          break;
-        }
+      const index = this.configValues.findIndex((c) => c.name === configName);
+      if (index !== -1) {
+        const updated = { ...this.configValues[index], value };
+        this.configValues.splice(index, 1, updated);
+        this.configs = this.configs.map((cfg) =>
+          cfg.name === configName ? { ...cfg, value } : cfg,
+        );
       }
     },
     async updateConfigs() {
