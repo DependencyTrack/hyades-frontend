@@ -11,18 +11,26 @@
 
       <actionable-list-group-item
         :add-icon="true"
-        @actionClicked="$emit('show-modal', configDef)"
+        @actionClicked="$root.$emit('bv::show::modal', modalId)"
       />
     </div>
 
     <p v-if="configDef.description" class="font-sm text-muted mt-1 mb-0">
       {{ configDef.description }}
     </p>
+
+    <ecosystem-modal
+      :id="modalId"
+      :allowed-values="configDef.allowed_values"
+      :selected-values="selectedValues"
+      @selection="updateValues"
+    />
   </b-form-group>
 </template>
 
 <script>
 import ActionableListGroupItem from './ActionableListGroupItem.vue';
+import EcosystemModal from '../administration/vuln-sources/EcosystemModal.vue';
 
 export default {
   props: {
@@ -35,10 +43,14 @@ export default {
       default: '',
     },
   },
-  components: { ActionableListGroupItem },
+  components: {
+    ActionableListGroupItem,
+    EcosystemModal,
+  },
   data() {
     return {
       selectedValues: this.value ? this.value.split(',') : [],
+      modalId: `${this.configDef.name}-modal`,
     };
   },
   watch: {
@@ -49,6 +61,12 @@ export default {
   methods: {
     removeValue(val) {
       this.selectedValues = this.selectedValues.filter((v) => v !== val);
+      this.emitUpdate();
+    },
+    updateValues(values) {
+      this.$root.$emit('bv::hide::modal', this.modalId);
+      // Update selected values
+      this.selectedValues = values;
       this.emitUpdate();
     },
     emitUpdate() {
