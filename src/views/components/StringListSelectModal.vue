@@ -4,7 +4,6 @@
     size="lg"
     hide-header-close
     no-stacking
-    :title="$t('admin.select_ecosystem')"
   >
     <bootstrap-table
       ref="table"
@@ -27,7 +26,7 @@
 
 <script>
 import xssFilters from 'xss-filters';
-import common from '../../../shared/common';
+import common from '../../shared/common';
 
 export default {
   props: {
@@ -99,3 +98,4 @@ export default {
   },
 };
 </script>
+../../shared/common

@@ -253,7 +253,6 @@
     "role_updated": "角色更新",
     "roles": "角色",
     "scope": "范围",
-    "select_ecosystem": "选择生态系统",
     "select_ldap_group": "选择 LDAP 组",
     "select_oidc_group": "选择 OpenID Connect 组",
     "select_permission": "选择权限",

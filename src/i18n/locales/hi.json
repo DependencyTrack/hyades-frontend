@@ -253,7 +253,6 @@
     "role_updated": "अद्यतन की गई भूमिका",
     "roles": "भूमिकाएँ",
     "scope": "दायरा",
-    "select_ecosystem": "पारिस्थितिकी तंत्र का चयन करें",
     "select_ldap_group": "LDAP समूह चुनें",
     "select_oidc_group": "OpenID कनेक्ट समूह का चयन करें",
     "select_permission": "अनुमति चुनें",

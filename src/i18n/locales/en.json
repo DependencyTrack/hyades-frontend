@@ -253,7 +253,6 @@
     "role_updated": "Role Updated",
     "roles": "Roles",
     "scope": "Scope",
-    "select_ecosystem": "Select Ecosystems",
     "select_ldap_group": "Select LDAP Group",
     "select_oidc_group": "Select OpenID Connect Group",
     "select_permission": "Select permission",

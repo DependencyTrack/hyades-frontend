@@ -36,7 +36,6 @@
   "URL_OIDC_AVAILABLE": "api/v1/oidc/available",
   "URL_OIDC_GROUP": "api/v1/oidc/group",
   "URL_OIDC_MAPPING": "api/v1/oidc/mapping",
-  "URL_OSV_ECOSYSTEM": "api/v1/integration/osv/ecosystem",
   "URL_PERMISSION": "api/v1/permission",
   "URL_POLICY": "api/v1/policy",
   "URL_POLICY_VIOLATION": "api/v1/violation",

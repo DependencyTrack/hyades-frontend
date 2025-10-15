@@ -19,7 +19,7 @@
       {{ configDef.description }}
     </p>
 
-    <ecosystem-modal
+    <string-list-select-modal
       :id="modalId"
       :allowed-values="configDef.allowed_values"
       :selected-values="selectedValues"
@@ -30,7 +30,7 @@
 
 <script>
 import ActionableListGroupItem from './ActionableListGroupItem.vue';
-import EcosystemModal from '../administration/vuln-sources/EcosystemModal.vue';
+import StringListSelectModal from './StringListSelectModal.vue';
 
 export default {
   props: {
@@ -45,7 +45,7 @@ export default {
   },
   components: {
     ActionableListGroupItem,
-    EcosystemModal,
+    StringListSelectModal,
   },
   data() {
     return {
