@@ -1,10 +1,5 @@
 <template>
-  <b-modal
-    :id="id"
-    size="lg"
-    hide-header-close
-    no-stacking
-  >
+  <b-modal :id="id" size="lg" hide-header-close no-stacking>
     <bootstrap-table
       ref="table"
       :columns="columns"
