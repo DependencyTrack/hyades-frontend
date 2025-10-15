@@ -1,11 +1,5 @@
 <template>
-  <b-modal
-    id="ecosystemModal"
-    size="lg"
-    hide-header-close
-    no-stacking
-    :title="$t('admin.select_ecosystem')"
-  >
+  <b-modal :id="id" size="lg" hide-header-close no-stacking>
     <bootstrap-table
       ref="table"
       :columns="columns"
@@ -13,26 +7,37 @@
       :options="options"
     >
     </bootstrap-table>
+
     <template v-slot:modal-footer="{ cancel }">
-      <b-button size="md" variant="secondary" @click="cancel()">{{
-        $t('message.cancel')
-      }}</b-button>
-      <b-button
-        size="md"
-        variant="primary"
-        @click="$emit('selection', $refs.table.getSelections())"
-        >{{ $t('message.select') }}</b-button
-      >
+      <b-button size="md" variant="secondary" @click="cancel()">
+        {{ $t('message.cancel') }}
+      </b-button>
+      <b-button size="md" variant="primary" @click="selectValues">
+        {{ $t('message.select') }}
+      </b-button>
     </template>
   </b-modal>
 </template>
 
 <script>
 import xssFilters from 'xss-filters';
-import common from '../../../shared/common';
+import common from '../../shared/common';
 
 export default {
-  mixins: [],
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+    allowedValues: {
+      type: Array,
+      required: true,
+    },
+    selectedValues: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       labelIcon: {
@@ -54,29 +59,38 @@ export default {
           },
         },
       ],
-      data: [],
       options: {
         search: true,
         showColumns: true,
-        showRefresh: true,
+        showRefresh: false,
         pagination: true,
         silentSort: false,
         sidePagination: 'client',
-        queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,
         icons: {
           refresh: 'fa-refresh',
         },
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res.map((ecosystem) => ({
-            name: ecosystem,
-          }));
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_OSV_ECOSYSTEM}/inactive`,
       },
     };
   },
+  computed: {
+    // Build table data from allowedValues
+    data() {
+      return this.allowedValues.map((val) => ({
+        name: val,
+        state: this.selectedValues.includes(val),
+      }));
+    },
+  },
+  methods: {
+    selectValues() {
+      const selections = this.$refs.table
+        .getSelections()
+        .map((row) => row.name);
+      this.$emit('selection', selections);
+    },
+  },
 };
 </script>
+../../shared/common
