@@ -42,6 +42,8 @@ const RiskScore = () =>
   import('@/views/administration/configuration/RiskScore');
 const Experimental = () =>
   import('@/views/administration/configuration/Experimental');
+const SecretsManagement = () =>
+  import('@/views/administration/secrets/SecretsManagement.vue');
 
 const InternalAnalyzer = () =>
   import('@/views/administration/analyzers/InternalAnalyzer');
@@ -557,6 +559,23 @@ function configRoutes() {
                   'SYSTEM_CONFIGURATION_READ',
                   'SYSTEM_CONFIGURATION_UPDATE',
                   'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'secrets/management',
+              component: SecretsManagement,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                sectionName: 'Admin',
+                permissions: [
+                  'SECRET_MANAGEMENT',
+                  'SECRET_MANAGEMENT_CREATE',
+                  'SECRET_MANAGEMENT_READ',
+                  'SECRET_MANAGEMENT_UPDATE',
+                  'SECRET_MANAGEMENT_DELETE',
                 ],
               },
             },
