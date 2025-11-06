@@ -83,6 +83,7 @@ const FortifySsc = () =>
   import('@/views/administration/integrations/FortifySsc');
 const DefectDojo = () =>
   import('@/views/administration/integrations/DefectDojo');
+const GitLab = () => import('@/views/administration/integrations/GitLab');
 const KennaSecurity = () =>
   import('@/views/administration/integrations/KennaSecurity');
 
@@ -976,6 +977,23 @@ function configRoutes() {
             {
               path: 'integrations/defectDojo',
               component: DefectDojo,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                sectionName: 'Admin',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'integrations/gitlab',
+              component: GitLab,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
