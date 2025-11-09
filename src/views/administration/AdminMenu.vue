@@ -54,6 +54,11 @@ import {
   SYSTEM_CONFIGURATION_READ,
   SYSTEM_CONFIGURATION_UPDATE,
   SYSTEM_CONFIGURATION_DELETE,
+  SECRET_MANAGEMENT,
+  SECRET_MANAGEMENT_CREATE,
+  SECRET_MANAGEMENT_UPDATE,
+  SECRET_MANAGEMENT_DELETE,
+  SECRET_MANAGEMENT_READ,
 } from '../../shared/permissions';
 
 export default {
@@ -143,6 +148,24 @@ export default {
               component: 'Experimental',
               name: this.$t('admin.experimental'),
               route: 'configuration/experimental',
+            },
+          ],
+        },
+        {
+          name: this.$t('admin.secrets'),
+          id: 'secrets',
+          permission: [
+            SECRET_MANAGEMENT,
+            SECRET_MANAGEMENT_CREATE,
+            SECRET_MANAGEMENT_READ,
+            SECRET_MANAGEMENT_UPDATE,
+            SECRET_MANAGEMENT_DELETE,
+          ],
+          children: [
+            {
+              component: 'SecretsManagement',
+              name: this.$t('admin.secrets_management'),
+              route: 'secrets/management',
             },
           ],
         },

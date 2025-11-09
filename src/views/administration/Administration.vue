@@ -38,6 +38,8 @@ import TaskScheduler from './configuration/TaskScheduler.vue';
 import RiskScore from './configuration/RiskScore.vue';
 import Experimental from './configuration/Experimental.vue';
 import WelcomeMessage from './configuration/WelcomeMessage.vue';
+// Secrets plugins
+import SecretsManagement from './secrets/SecretsManagement.vue';
 // Analyzer plugins
 import InternalAnalyzer from './analyzers/InternalAnalyzer';
 import OssIndexAnalyzer from './analyzers/OssIndexAnalyzer';
@@ -93,6 +95,7 @@ export default {
     Search,
     RiskScore,
     Experimental,
+    SecretsManagement,
     InternalAnalyzer,
     OssIndexAnalyzer,
     VulnDbAnalyzer,
