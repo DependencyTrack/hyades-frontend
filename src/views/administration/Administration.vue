@@ -70,6 +70,7 @@ import Templates from './notifications/Templates';
 // Integration plugins
 import DefectDojo from './integrations/DefectDojo';
 import FortifySsc from './integrations/FortifySsc';
+import GitLabProjectSync from './integrations/GitLabProjectSync';
 import KennaSecurity from './integrations/KennaSecurity';
 // Access Management plugins
 import LdapUsers from './accessmanagement/LdapUsers';
@@ -108,6 +109,7 @@ export default {
     Composer,
     Gem,
     GitHub,
+    GitLabProjectSync,
     GoModules,
     Hackage,
     Hex,
