@@ -364,8 +364,8 @@ export default {
         },
         {
           title: this.$t('message.risk_score'),
-          field: 'metrics.inheritedRiskScore',
-          sortable: false,
+          field: 'lastRiskScore',
+          sortable: true,
         },
         {
           title: this.$t('message.active'),
