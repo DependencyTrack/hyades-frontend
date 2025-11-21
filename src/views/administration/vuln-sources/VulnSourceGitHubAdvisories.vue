@@ -1,16 +1,16 @@
 <template>
-  <extension-config-form
+  <extension-config
     extension-name="github"
     extension-point-name="vuln.datasource"
   />
 </template>
 
 <script>
-import ExtensionConfigForm from '@/views/components/ExtensionConfigForm.vue';
+import ExtensionConfig from '@/views/components/ExtensionConfig.vue';
 
 export default {
   components: {
-    ExtensionConfigForm,
+    ExtensionConfig,
   },
 };
 </script>
