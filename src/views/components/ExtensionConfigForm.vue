@@ -2,26 +2,37 @@
   <b-card no-body :header="extensionName">
     <b-form @submit="onSubmit">
       <b-card-body>
-        <div v-for="config in configs" :key="config.name" class="form-group">
-          <component
-            v-if="getComponentName(config.type)"
-            :ref="config.name"
-            :is="getComponentName(config.type)"
-            :configDef="config"
-            :invalidFeedback="getValidationFeedback(config.name)"
-            :value="config.value"
-            @input="onConfigValueChange(config.name, $event)"
-          />
-          <b-alert v-else variant="warning" show dismissible>
-            Configuration <code>{{ config.name }}</code> could not be rendered
-          </b-alert>
+        <b-alert v-if="loadError" variant="danger" show>
+          {{ loadError }}
+        </b-alert>
+
+        <div v-if="!loadError && schema">
+          <div
+            v-for="(propSchema, propName) in schema.properties"
+            :key="propName"
+            class="form-group"
+          >
+            <json-schema-form-field
+              :schema="enrichSchema(propSchema, propName)"
+              :property-name="propName"
+              :value="formData[propName]"
+              :validation-error="getValidationError(propName)"
+              :validation-errors="getNestedValidationErrors(propName)"
+              @input="onFieldChange(propName, $event)"
+            />
+          </div>
+        </div>
+
+        <div v-if="!schema && !loadError" class="text-center">
+          <b-spinner />
+          <p class="mt-2">{{ this.$t('message.loading') }}</p>
         </div>
       </b-card-body>
       <b-card-footer>
         <b-button
           variant="outline-primary"
           type="submit"
-          :disabled="isSavingInProgress"
+          :disabled="isSavingInProgress || !schema"
         >
           <b-spinner v-show="isSavingInProgress" small />
           {{ this.$t('admin.submit') }}
@@ -32,12 +43,14 @@
 </template>
 
 <script>
-import ExtensionConfigBooleanInput from '@/views/components/ExtensionConfigBooleanInput.vue';
-import ExtensionConfigStringInput from '@/views/components/ExtensionConfigStringInput.vue';
-import ExtensionConfigStringListInput from '@/views/components/ExtensionConfigStringListInput.vue';
-import ExtensionConfigInstantInput from '@/views/components/ExtensionConfigInstantInput.vue';
+import Ajv from 'ajv/dist/2020';
+import addFormats from 'ajv-formats';
+import JsonSchemaFormField from './JsonSchemaFormField.vue';
 
 export default {
+  components: {
+    JsonSchemaFormField,
+  },
   props: {
     extensionPointName: {
       type: String,
@@ -48,81 +61,209 @@ export default {
       required: true,
     },
   },
-  components: {
-    ExtensionConfigBooleanInput,
-    ExtensionConfigInstantInput,
-    ExtensionConfigStringListInput,
-    ExtensionConfigStringInput,
-  },
   data() {
     return {
-      configs: [],
-      configValues: [],
-      validationFailureByName: new Map(),
+      schema: null,
+      formData: {},
+      validationErrors: {},
       isSavingInProgress: false,
+      loadError: null,
+      ajv: null,
     };
   },
   async mounted() {
-    await this.fetchConfigs();
+    this.ajv = new Ajv({
+      allErrors: true,
+      strict: false,
+      validateFormats: true,
+    });
+    addFormats(this.ajv);
+    await this.fetchSchemaAndConfig();
   },
   methods: {
-    async fetchConfigs() {
+    async fetchSchemaAndConfig() {
       try {
-        const response = await this.axios.get(
-          `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/configs`,
+        const [schemaResponse, configResponse] = await Promise.all([
+          this.axios.get(
+            `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config-schema`,
+          ),
+          this.axios.get(
+            `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config`,
+          ),
+        ]);
+
+        this.schema = schemaResponse.data;
+        const configData = configResponse.data.config || {};
+        this.formData = this.initializeFormData(configData);
+      } catch (err) {
+        console.error(`Failed to load schema or config: ${err}`);
+        this.loadError = `Failed to load extension configuration: ${err.message}`;
+      }
+    },
+    initializeFormData(configData) {
+      const data = { ...configData };
+
+      if (this.schema?.properties) {
+        Object.entries(this.schema.properties).forEach(
+          ([propName, propSchema]) => {
+            if (data[propName] === undefined) {
+              data[propName] = this.getDefaultValue(propSchema);
+            }
+          },
+        );
+      }
+
+      return data;
+    },
+    getDefaultValue(schema) {
+      // Deep clone default values to avoid shared references.
+      if (schema.default !== undefined) {
+        return JSON.parse(JSON.stringify(schema.default));
+      }
+
+      switch (schema.type) {
+        case 'string':
+          return '';
+        case 'number':
+        case 'integer':
+          return 0;
+        case 'boolean':
+          return false;
+        case 'array':
+          return [];
+        case 'object':
+          return {};
+        default:
+          return null;
+      }
+    },
+    onFieldChange(propName, value) {
+      this.$set(this.formData, propName, value);
+
+      if (this.validationErrors[propName]) {
+        this.$set(this.validationErrors, propName, null);
+      }
+    },
+    validateForm() {
+      if (!this.schema) {
+        return false;
+      }
+
+      const validate = this.ajv.compile(this.schema);
+      const valid = validate(this.formData);
+
+      if (!valid) {
+        this.validationErrors = {};
+        validate.errors?.forEach((error) => {
+          const field = error.instancePath
+            .replace(/^\//, '')
+            .replace(/\//g, '.');
+          const message = this.formatValidationError(error);
+
+          // For root-level errors (empty field path), show on the offending property.
+          if (!field && error.params?.missingProperty) {
+            this.validationErrors[error.params.missingProperty] = message;
+          } else if (field) {
+            this.validationErrors[field] = message;
+          }
+        });
+        return false;
+      }
+
+      this.validationErrors = {};
+      return true;
+    },
+    formatValidationError(error) {
+      const { keyword, params, message } = error;
+
+      switch (keyword) {
+        case 'required':
+          return this.$t('validation.schema.required', {
+            property: params.missingProperty,
+          });
+        case 'type':
+          return this.$t('validation.schema.type', { type: params.type });
+        case 'format':
+          return this.$t('validation.schema.format', { format: params.format });
+        case 'minLength':
+          return this.$t('validation.schema.min_length', {
+            limit: params.limit,
+          });
+        case 'maxLength':
+          return this.$t('validation.schema.max_length', {
+            limit: params.limit,
+          });
+        case 'minimum':
+          return this.$t('validation.schema.minimum', { limit: params.limit });
+        case 'maximum':
+          return this.$t('validation.schema.maximum', { limit: params.limit });
+        case 'minItems':
+          return this.$t('validation.schema.min_items', {
+            limit: params.limit,
+          });
+        case 'maxItems':
+          return this.$t('validation.schema.max_items', {
+            limit: params.limit,
+          });
+        case 'pattern':
+          return this.$t('validation.schema.pattern');
+        case 'enum':
+          return this.$t('validation.schema.enum', {
+            values: params.allowedValues?.join(', '),
+          });
+        case 'uniqueItems':
+          return this.$t('validation.schema.unique_items');
+        default:
+          return message || this.$t('validation.schema.invalid');
+      }
+    },
+    async updateConfig() {
+      if (this.isSavingInProgress) {
+        return;
+      }
+
+      if (!this.validateForm()) {
+        const errorCount = Object.keys(this.validationErrors).length;
+        const errorSummary =
+          errorCount === 1
+            ? this.$t('validation.schema.validation_failed')
+            : this.$t('validation.schema.validation_failed_plural', {
+                count: errorCount,
+              });
+        await this.$toastr.e(
+          errorSummary,
+          this.$t('message.input_validation_failed'),
         );
 
-        this.configs = response.data.configs;
-        this.configValues = this.configs.map((config) => {
-          return {
-            name: config.name,
-            value: config.value !== undefined ? config.value : null,
-          };
-        });
-      } catch (err) {
-        console.error(`Failed to load configs : ${err}`);
-        this.configs = [];
-        this.configValues = [];
-      }
-    },
-    async onConfigValueChange(configName, value) {
-      for (let configValue of this.configValues) {
-        if (configName === configValue.name) {
-          configValue.value = value;
-          break;
-        }
-      }
-    },
-    async updateConfigs() {
-      if (this.isSavingInProgress) {
         return;
       }
 
       try {
         this.isSavingInProgress = true;
-        await this.axios.put(
-          `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/configs`,
+        const response = await this.axios.put(
+          `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config`,
           {
-            configs: this.configValues,
+            config: this.formData,
+          },
+          {
+            validateStatus: function (status) {
+              return status === 204 || status === 304;
+            },
           },
         );
-        this.validationFailureByName.clear();
-        await this.$toastr.s(this.$t('message.updated'));
-      } catch (err) {
-        if (
-          err.response &&
-          err.response.status === 400 &&
-          err.response.headers['content-type'] === 'application/problem+json' &&
-          err.response.data.invalid_configs
-        ) {
-          for (const invalidConfig of err.response.data.invalid_configs) {
-            this.validationFailureByName.set(
-              invalidConfig.name,
-              invalidConfig.message,
-            );
-          }
-        } else {
-          console.error(`Failed to update configs: ${err}`);
+
+        this.validationErrors = {};
+
+        if (response.status === 204) {
+          await this.$toastr.s(
+            this.$t('message.record_updated_message'),
+            this.$t('message.record_updated_title'),
+          );
+        } else if (response.status === 304) {
+          await this.$toastr.i(
+            this.$t('message.record_unchanged_message'),
+            this.$t('message.record_unchanged_title'),
+          );
         }
       } finally {
         this.isSavingInProgress = false;
@@ -130,25 +271,33 @@ export default {
     },
     async onSubmit(event) {
       event.preventDefault();
-      await this.updateConfigs();
+      await this.updateConfig();
     },
-    getComponentName(configType) {
-      switch (configType) {
-        case 'BOOLEAN':
-          return 'ExtensionConfigBooleanInput';
-        case 'INSTANT':
-          return 'ExtensionConfigInstantInput';
-        case 'STRING_LIST':
-          return 'ExtensionConfigStringListInput';
-        case 'STRING':
-        case 'URL':
-          return 'ExtensionConfigStringInput';
-        default:
-          return null;
-      }
+    getValidationError(propName) {
+      return this.validationErrors[propName] || null;
     },
-    getValidationFeedback(configName) {
-      return this.validationFailureByName.get(configName);
+    // Extract nested validation errors for arrays and objects,
+    // e.g. "ecosystems.0" -> { 0: "error message" }.
+    getNestedValidationErrors(propName) {
+      const prefix = `${propName}.`;
+      const nestedErrors = {};
+
+      Object.keys(this.validationErrors).forEach((key) => {
+        if (key.startsWith(prefix)) {
+          const nestedKey = key.substring(prefix.length);
+          nestedErrors[nestedKey] = this.validationErrors[key];
+        }
+      });
+
+      return nestedErrors;
+    },
+    // Make it easier to detect whether a field is required
+    // by attaching the required property directly to it.
+    enrichSchema(propSchema, propName) {
+      return {
+        ...propSchema,
+        isRequired: this.schema.required?.includes(propName) || false,
+      };
     },
   },
 };
