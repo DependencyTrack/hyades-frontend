@@ -34,7 +34,6 @@ import General from './configuration/General';
 import InternalComponents from './configuration/InternalComponents';
 import Jira from './configuration/JiraConfig';
 import Search from './configuration/Search.vue';
-import TaskScheduler from './configuration/TaskScheduler.vue';
 import RiskScore from './configuration/RiskScore.vue';
 import WelcomeMessage from './configuration/WelcomeMessage.vue';
 // Secrets plugins
@@ -90,7 +89,6 @@ export default {
     Email,
     Jira,
     InternalComponents,
-    TaskScheduler,
     Search,
     RiskScore,
     SecretsManagement,
