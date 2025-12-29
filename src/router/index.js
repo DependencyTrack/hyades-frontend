@@ -40,8 +40,6 @@ const TaskScheduler = () =>
 const Search = () => import('@/views/administration/configuration/Search');
 const RiskScore = () =>
   import('@/views/administration/configuration/RiskScore');
-const Experimental = () =>
-  import('@/views/administration/configuration/Experimental');
 const SecretsManagement = () =>
   import('@/views/administration/secrets/SecretsManagement.vue');
 
@@ -531,23 +529,6 @@ function configRoutes() {
             {
               path: 'configuration/riskscore',
               component: RiskScore,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'configuration/experimental',
-              component: Experimental,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
