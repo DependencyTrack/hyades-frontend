@@ -130,24 +130,9 @@ export default {
               route: 'configuration/maintenance',
             },
             {
-              component: 'TaskScheduler',
-              name: this.$t('admin.task_scheduler'),
-              route: 'configuration/taskScheduler',
-            },
-            {
-              component: 'Search',
-              name: this.$t('message.search'),
-              route: 'configuration/search',
-            },
-            {
               component: 'RiskScore',
               name: this.$t('message.risk_score'),
               route: 'configuration/RiskScore',
-            },
-            {
-              component: 'Experimental',
-              name: this.$t('admin.experimental'),
-              route: 'configuration/experimental',
             },
           ],
         },

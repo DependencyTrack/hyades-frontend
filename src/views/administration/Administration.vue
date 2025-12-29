@@ -33,10 +33,7 @@ import Email from './configuration/Email';
 import General from './configuration/General';
 import InternalComponents from './configuration/InternalComponents';
 import Jira from './configuration/JiraConfig';
-import Search from './configuration/Search.vue';
-import TaskScheduler from './configuration/TaskScheduler.vue';
 import RiskScore from './configuration/RiskScore.vue';
-import Experimental from './configuration/Experimental.vue';
 import WelcomeMessage from './configuration/WelcomeMessage.vue';
 // Secrets plugins
 import SecretsManagement from './secrets/SecretsManagement.vue';
@@ -91,10 +88,7 @@ export default {
     Email,
     Jira,
     InternalComponents,
-    TaskScheduler,
-    Search,
     RiskScore,
-    Experimental,
     SecretsManagement,
     InternalAnalyzer,
     OssIndexAnalyzer,
