@@ -177,7 +177,6 @@
     "notifications": "Notificaciones",
     "npm": "MNP",
     "nuget": "NuGet",
-    "nvd": "NVD",
     "oidc_group_created": "Grupo OpenID Connect creado",
     "oidc_group_deleted": "oidc_group_deleted",
     "oidc_group_name": "Nombre del grupo",

@@ -177,7 +177,6 @@
     "notifications": "通知",
     "npm": "NPM",
     "nuget": "NuGet",
-    "nvd": "NVD",
     "oidc_group_created": "OpenID Connect 组已创建",
     "oidc_group_deleted": "OpenID Connect 组已删除",
     "oidc_group_name": "OpenID Connect 组名称",

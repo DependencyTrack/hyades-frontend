@@ -177,7 +177,6 @@
     "notifications": "通知",
     "npm": "NPM",
     "nuget": "NuGet",
-    "nvd": "NVD",
     "oidc_group_created": "OpenID Connect グループが作成されました",
     "oidc_group_deleted": "oidc_group_deleted",
     "oidc_group_name": "グループ名",
