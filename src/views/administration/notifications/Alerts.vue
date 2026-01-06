@@ -37,6 +37,7 @@ import BToggleableDisplayButton from '../../components/BToggleableDisplayButton'
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import VueTagsInput from '@johmun/vue-tags-input';
 import { Switch as cSwitch } from '@coreui/vue';
+import ExtensionConfigForm from '../../components/ExtensionConfigForm';
 
 export default {
   props: {
@@ -51,7 +52,7 @@ export default {
       this.$refs.table.updateRow({ index: index, row: row });
       this.$refs.table.expandRow(index);
     });
-    EventBus.$on('admin:alerts:rowDeleted', (index, row) => {
+    EventBus.$on('admin:alerts:rowDeleted', () => {
       this.refreshTable();
     });
   },
@@ -66,7 +67,7 @@ export default {
           title: this.$t('message.name'),
           field: 'name',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -74,7 +75,7 @@ export default {
           title: this.$t('admin.publisher'),
           field: 'publisher.name',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -82,7 +83,7 @@ export default {
           title: this.$t('admin.scope'),
           field: 'scope',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -90,7 +91,7 @@ export default {
           title: this.$t('admin.notification_level'),
           field: 'notificationLevel',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -99,7 +100,7 @@ export default {
           field: 'enabled',
           sortable: false,
           align: 'center',
-          formatter: function (value, row, index) {
+          formatter: function (value) {
             return value === true ? '<i class="fa fa-check-square-o" />' : '';
           },
         },
@@ -136,24 +137,18 @@ export default {
                       <c-switch id="notificationLogSuccessfulPublish" color="primary" v-model="logSuccessfulPublish" label v-bind="labelIcon" :title="$t('admin.alert_log_successful_publish_help')" />
                       {{ $t('admin.alert_log_successful_publish') }}
                     </b-form-group>
-                    <b-form-group id="fieldset-2" :label="this.$t('admin.publisher')" label-for="input-2">
-                      <b-form-input id="input-2" v-model="publisherName" disabled class="form-control disabled" readonly trim />
-                    </b-form-group>
-                    <b-form-group id="fieldset-2" :label="this.$t('admin.publisher_class')" label-for="input-2">
-                      <b-form-input id="input-2" v-model="publisherClass" disabled class="form-control disabled" readonly trim />
-                    </b-form-group>
                     <b-form-group id="fieldset-3" :label="this.$t('admin.notification_level')" label-for="input-3">
                       <b-form-select id="input-3" v-model="notificationLevel" :options="availableLevels" required></b-form-select>
                     </b-form-group>
-                    <b-input-group-form-input id="input-destination" :label="$t('admin.destination')" input-group-size="mb-3"
-                                              :required="(!(this.alert.hasOwnProperty('teams') && this.alert.teams != null && this.alert.teams.length > 0)).toString()"
-                                              type="text" v-model="destination" lazy="true" />
-                    <b-input-group-form-input v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.WebhookPublisher'" id="input-token-header" :label="$t('admin.api_token_header')" input-group-size="mb-3"
-                                              type="password" v-model="tokenHeader" lazy="true" />
-                    <b-input-group-form-input v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.WebhookPublisher'" id="input-token" :label="$t('admin.api_token')" input-group-size="mb-3"
-                                              type="password" v-model="token" lazy="true" />
-                    <b-input-group-form-input v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.JiraPublisher'" id="input-jira-ticket-type"
-                                              :label="$t('admin.jira_ticket_type')" :required="true" type="text" v-model="jiraTicketType" lazy="true" />
+                    <extension-config-form
+                      v-if="alert.publisher && alert.publisher.uuid"
+                      ref="extensionConfigForm"
+                      :extension-name="alert.publisher.name"
+                      :config-schema-url="getConfigSchemaUrl(alert.publisher.uuid)"
+                      :initial-config="getInitialConfig(alert.publisherConfig)"
+                      :hide-submit-button="true"
+                      @config-update="onPublisherConfigUpdate"
+                    />
                      <b-form-group v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.SendMailPublisher'"
                                    id="teamDestinationList" :label="this.$t('admin.select_team_as_recipient')">
                        <div class="list group">
@@ -242,6 +237,7 @@ export default {
               BInputGroupFormInput,
               VueTagsInput,
               cSwitch,
+              ExtensionConfigForm,
             },
             data() {
               return {
@@ -254,10 +250,6 @@ export default {
                 publisherName: row.publisher.name,
                 publisherClass: row.publisher.publisherClass,
                 notificationLevel: row.notificationLevel,
-                destination: this.parseDestination(row),
-                token: this.parseToken(row),
-                tokenHeader: this.parseTokenHeader(row),
-                jiraTicketType: this.parseJiraTicketType(row),
                 scope: row.scope,
                 notifyOn: row.notifyOn,
                 projects: row.projects,
@@ -285,10 +277,6 @@ export default {
             },
             created() {
               this.initializeTags();
-              this.parseDestination(this.alert);
-              this.parseToken(this.alert);
-              this.parseTokenHeader(this.alert);
-              this.parseJiraTicketType(this.alert);
             },
             watch: {
               alert() {
@@ -309,43 +297,41 @@ export default {
                   return projectName;
                 }
               },
-              parseDestination: function (alert) {
-                if (alert.publisherConfig) {
-                  let value = JSON.parse(alert.publisherConfig);
-                  if (value) {
-                    return value.destination;
-                  }
-                  return null;
+              getConfigSchemaUrl: function (publisherUuid) {
+                return `${this.$api.BASE_URL}/api/v1/notification/publisher/${publisherUuid}/configSchema`;
+              },
+              getInitialConfig: function (publisherConfig) {
+                if (!publisherConfig) {
+                  return {};
+                }
+                try {
+                  return typeof publisherConfig === 'string'
+                    ? JSON.parse(publisherConfig)
+                    : publisherConfig;
+                } catch (e) {
+                  console.error('Failed to parse publisherConfig:', e);
+                  return {};
                 }
               },
-              parseToken: function (alert) {
-                if (alert.publisherConfig) {
-                  let value = JSON.parse(alert.publisherConfig);
-                  if (value) {
-                    return value.token;
-                  }
-                  return null;
-                }
+              onPublisherConfigUpdate: function (newConfig) {
+                this.alert.publisherConfig = JSON.stringify(newConfig);
               },
-              parseTokenHeader: function (alert) {
-                if (alert.publisherConfig) {
-                  let value = JSON.parse(alert.publisherConfig);
-                  if (value) {
-                    return value.tokenHeader;
+              updateNotificationRule: async function () {
+                let publisherConfig = this.alert.publisherConfig;
+                if (this.$refs.extensionConfigForm) {
+                  try {
+                    const config =
+                      await this.$refs.extensionConfigForm.validateAndGetConfig();
+                    publisherConfig = JSON.stringify(config);
+                  } catch (error) {
+                    this.$toastr.e(
+                      error.message,
+                      this.$t('message.input_validation_failed'),
+                    );
+                    return;
                   }
-                  return null;
                 }
-              },
-              parseJiraTicketType: function (alert) {
-                if (alert.publisherConfig) {
-                  let value = JSON.parse(alert.publisherConfig);
-                  if (value) {
-                    return value.jiraTicketType;
-                  }
-                  return null;
-                }
-              },
-              updateNotificationRule: function () {
+
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}`;
                 this.axios
                   .post(url, {
@@ -355,12 +341,7 @@ export default {
                     logSuccessfulPublish: this.logSuccessfulPublish,
                     notifyChildren: this.notifyChildren,
                     notificationLevel: this.notificationLevel,
-                    publisherConfig: JSON.stringify({
-                      destination: this.destination,
-                      jiraTicketType: this.jiraTicketType,
-                      token: this.token,
-                      tokenHeader: this.tokenHeader,
-                    }),
+                    publisherConfig: publisherConfig,
                     notifyOn: this.notifyOn,
                     tags: this.tags.map((tag) => {
                       return { name: tag.text };
@@ -368,14 +349,10 @@ export default {
                   })
                   .then((response) => {
                     this.alert = response.data;
-                    this.destination = this.parseDestination(this.alert);
-                    this.token = this.parseToken(this.alert);
-                    this.tokenHeader = this.parseTokenHeader(this.alert);
-                    this.jiraTicketType = this.parseJiraTicketType(this.alert);
                     EventBus.$emit('admin:alerts:rowUpdate', index, this.alert);
                     this.$toastr.s(this.$t('message.updated'));
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
@@ -387,11 +364,11 @@ export default {
                       uuid: this.alert.uuid,
                     },
                   })
-                  .then((response) => {
+                  .then(() => {
                     EventBus.$emit('admin:alerts:rowDeleted', index);
                     this.$toastr.s(this.$t('admin.alert_deleted'));
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
@@ -399,7 +376,7 @@ export default {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}/${this.uuid}/project/${projectUuid}`;
                 this.axios
                   .delete(url)
-                  .then((response) => {
+                  .then(() => {
                     let p = [];
                     for (let i = 0; i < this.projects.length; i++) {
                       if (this.projects[i].uuid !== projectUuid) {
@@ -409,25 +386,19 @@ export default {
                     this.projects = p;
                     this.$toastr.s(this.$t('message.updated'));
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
               testNotification: function () {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_PUBLISHER}/test/${this.uuid}`;
-                let params = new URLSearchParams();
-                params.append('destination', this.destination);
                 this.axios
-                  .post(url, params, {
-                    headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                  })
+                  .post(url)
                   .then((response) => {
                     this.alert = response.data;
                     this.$toastr.s(this.$t('admin.test_notification_queued'));
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
@@ -438,7 +409,7 @@ export default {
                   let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}/${this.uuid}/project/${selection.uuid}`;
                   this.axios
                     .post(url)
-                    .then((response) => {
+                    .then(() => {
                       this.projects.push(selection);
                       this.$toastr.s(this.$t('message.updated'));
                     })
@@ -460,7 +431,7 @@ export default {
                   let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}/${this.uuid}/team/${selection.uuid}`;
                   this.axios
                     .post(url)
-                    .then((response) => {
+                    .then(() => {
                       if (this.teams) {
                         this.teams.push(selection);
                       } else {
@@ -487,7 +458,7 @@ export default {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}/${this.uuid}/team/${teamUuid}`;
                 this.axios
                   .delete(url)
-                  .then((response) => {
+                  .then(() => {
                     let newTeams = [];
                     for (let i = 0; i < this.teams.length; i++) {
                       if (this.teams[i].uuid !== teamUuid) {
@@ -496,7 +467,7 @@ export default {
                     }
                     this.teams = newTeams;
                   })
-                  .catch((error) => {
+                  .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
               },
