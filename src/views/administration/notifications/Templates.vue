@@ -116,11 +116,11 @@ export default {
                     </b-form-group>
                     <b-input-group-form-input v-if="!template.defaultPublisher" id="input-1" :label="$t('message.name')" input-group-size="mb-3"
                                               required="true" type="text" v-model="template.name" />
-                    <b-form-group v-if="template.defaultPublisher" id="fieldset-2" :label="this.$t('admin.publisher_class')" label-for="input-2">
-                      <b-form-input v-if="template.defaultPublisher" id="input-2" v-model="template.publisherClass" disabled class="form-control disabled" readonly trim />
+                    <b-form-group v-if="template.defaultPublisher" id="fieldset-2" :label="this.$t('admin.extension_name')" label-for="input-2">
+                      <b-form-input v-if="template.defaultPublisher" id="input-2" v-model="template.extensionName" disabled class="form-control disabled" readonly trim />
                     </b-form-group>
-                    <b-input-group-form-input v-if="!template.defaultPublisher" id="input-2" :label="this.$t('admin.publisher_class')" input-group-size="mb-3"
-                                              required="true" type="text" v-model="template.publisherClass" />
+                    <b-input-group-form-input v-if="!template.defaultPublisher" id="input-2" :label="this.$t('admin.extension_name')" input-group-size="mb-3"
+                                              required="true" type="text" v-model="template.extensionName" />
                     <b-form-group v-if="template.defaultPublisher" id="fieldset-3" :label="this.$t('message.description')" label-for="input-3">
                       <b-form-textarea v-if="template.defaultPublisher" id="input-3" v-model="template.description" rows="4" disabled class="form-control disabled" readonly trim />
                     </b-form-group>
@@ -141,7 +141,7 @@ export default {
                       <b-button variant="outline-primary" @click="cloneNotificationPublisher">{{ $t('admin.clone_template') }}</b-button>
                       <b-button v-if="!template.defaultPublisher" variant="outline-primary" @click="updateNotificationPublisher">{{ $t('message.update') }}</b-button>
                       <b-button v-if="!template.defaultPublisher" variant="outline-danger" @click="deleteNotificationPublisher">{{ $t('admin.delete_template') }}</b-button>
-                    </div>    
+                    </div>
                   </b-col>
                 </b-row>
               `,
@@ -162,7 +162,7 @@ export default {
                     uuid: this.template.uuid,
                     name: this.template.name,
                     description: this.template.description,
-                    publisherClass: this.template.publisherClass,
+                    extensionName: this.template.extensionName,
                     template: this.template.template,
                     templateMimeType: this.template.templateMimeType,
                   })

@@ -18,17 +18,24 @@
         @input="onInput"
         @change="onChange"
       />
-      <b-form-invalid-feedback v-if="!isComplexType" :state="isValid">
+      <b-form-invalid-feedback v-if="!isComplexType">
         {{ validationError }}
       </b-form-invalid-feedback>
     </b-form-group>
-    <component
-      v-else
-      :is="fieldComponent"
-      v-bind="fieldProps"
-      @input="onInput"
-      @change="onChange"
-    />
+    <div v-else>
+      <component
+        :is="fieldComponent"
+        v-bind="fieldProps"
+        @input="onInput"
+        @change="onChange"
+      />
+      <div
+        v-if="!isComplexType && validationError"
+        class="invalid-feedback d-block"
+      >
+        {{ validationError }}
+      </div>
+    </div>
   </div>
 </template>
 
