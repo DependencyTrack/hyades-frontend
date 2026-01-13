@@ -9,14 +9,6 @@
         >
           <span class="fa fa-plus"></span> {{ $t('admin.create_template') }}
         </b-button>
-        <b-button
-          size="md"
-          variant="outline-primary"
-          v-b-modal.generalTemplateConfigurationModal
-        >
-          <span class="fa fa-wrench"></span>
-          {{ $t('admin.general_template_configuration') }}
-        </b-button>
       </div>
       <bootstrap-table
         ref="table"
@@ -27,7 +19,6 @@
       </bootstrap-table>
     </b-card-body>
     <create-template-modal v-on:refreshTable="refreshTable" />
-    <general-template-configuration-modal v-on:refreshTable="refreshTable" />
   </b-card>
 </template>
 
@@ -40,7 +31,6 @@ import BootstrapToggle from 'vue-bootstrap-toggle';
 import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import CreateTemplateModal from './CreateTemplateModal';
-import GeneralTemplateConfigurationModal from './GeneralTemplateConfigurationModal';
 
 export default {
   props: {
@@ -49,7 +39,6 @@ export default {
   mixins: [bootstrapTableMixin],
   components: {
     CreateTemplateModal,
-    GeneralTemplateConfigurationModal,
   },
   mounted() {
     EventBus.$on('admin:templates:rowUpdate', (index, row) => {
