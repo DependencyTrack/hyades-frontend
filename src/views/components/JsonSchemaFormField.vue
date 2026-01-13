@@ -1,6 +1,10 @@
 <template>
   <div>
-    <b-form-group v-if="!isArrayItem" :label-for="fieldId">
+    <b-form-group
+      v-if="!isArrayItem"
+      :label-class="isRequired ? 'required' : ''"
+      :label-for="fieldId"
+    >
       <template v-slot:label>
         {{ label }}
         <i
@@ -165,7 +169,7 @@ export default {
         value: this.value,
         type: this.getInputType(),
         required: this.isRequired,
-        placeholder: this.schema.examples?.[0] || '',
+        placeholder: this.schema.examples?.[0]?.toString() || '',
         min: this.schema.minimum,
         max: this.schema.maximum,
         minlength: this.schema.minLength,

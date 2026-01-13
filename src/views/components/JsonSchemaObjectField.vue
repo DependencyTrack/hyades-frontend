@@ -3,7 +3,7 @@
     <b-card-body>
       <div v-for="(propSchema, propName) in schema.properties" :key="propName">
         <json-schema-form-field
-          :schema="propSchema"
+          :schema="enrichSchema(propSchema, propName)"
           :property-name="propName"
           :value="localValue[propName]"
           :validation-error="validationErrors[propName]"
@@ -55,6 +55,14 @@ export default {
       // which is supposed to handle cases like this a bit better.
       this.$set(this.localValue, propName, propValue);
       this.$emit('input', this.localValue);
+    },
+    // Make it easier to detect whether a field is required
+    // by attaching the required property directly to it.
+    enrichSchema(propSchema, propName) {
+      return {
+        ...propSchema,
+        isRequired: this.schema.required?.includes(propName) || false,
+      };
     },
   },
 };
