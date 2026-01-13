@@ -110,14 +110,14 @@
         }}</b-tooltip>
       </div>
     </div>
-    <bootstrap-table
+    <token-paginated-table
       ref="table"
+      :base-url="tableDataUrl"
       :columns="columns"
-      :data="data"
       :options="options"
       @on-load-success="tableLoaded"
-    >
-    </bootstrap-table>
+      :response-data-field="'components'"
+    />
     <project-upload-bom-modal :uuid="this.uuid" />
     <project-add-component-modal
       :uuid="this.uuid"
@@ -144,12 +144,14 @@ import SeverityProgressBar from '../../components/SeverityProgressBar';
 import { get } from 'lodash-es';
 import i18n from '@/i18n';
 import bootstrapTableMixin from '@/mixins/bootstrapTableMixin';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 
 export default {
   components: {
     cSwitch,
     ProjectUploadBomModal,
     ProjectAddComponentModal,
+    TokenPaginatedTable,
   },
   mixins: [bootstrapTableMixin, permissionsMixin],
   comments: {
@@ -232,7 +234,7 @@ export default {
         },
         {
           title: this.$t('message.published'),
-          field: 'componentMetaInformation.publishedDate',
+          field: 'published',
           sortable: true,
           formatter(value, row, index) {
             if (value != null) {
@@ -242,7 +244,7 @@ export default {
         },
         {
           title: this.$t('message.latest_version'),
-          field: 'latestVersion',
+          field: 'latest_version',
           sortable: false,
           visible: false,
           formatter(value, row, index) {
@@ -259,7 +261,7 @@ export default {
         },
         {
           title: this.$t('message.internal'),
-          field: 'isInternal',
+          field: 'internal',
           sortable: false,
           align: 'center',
           class: 'tight',
@@ -269,79 +271,53 @@ export default {
         },
         {
           title: this.$t('message.integrity'),
-          field: 'componentMetaInformation.integrityMatchStatus',
+          field: 'integrity_check_status',
           sortable: true,
           visible: false,
           formatter: (value, row, index) => {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                row,
-                'componentMetaInformation',
-              ) &&
-              Object.prototype.hasOwnProperty.call(
-                row.componentMetaInformation,
-                'integrityMatchStatus',
-              ) &&
-              row.componentMetaInformation.integrityMatchStatus != null
-            ) {
+            if (row.integrity_check_status != null) {
               var lastFetchMessage = 'Last fetch unknown.';
               if (
-                typeof row.componentMetaInformation.lastFetched !==
-                  'undefined' &&
-                row.componentMetaInformation.lastFetched != null
+                typeof row.last_fetched !== 'undefined' &&
+                row.last_fetched != null
               ) {
                 lastFetchMessage =
                   'Last fetched on ' +
-                  common.formatTimestamp(
-                    row.componentMetaInformation.lastFetched,
-                  ) +
+                  common.formatTimestamp(row.last_fetched) +
                   '.';
               }
 
-              if (
-                typeof row.componentMetaInformation.integrityRepoUrl != null
-              ) {
-                lastFetchMessage +=
-                  ' Source:  ' + row.componentMetaInformation.integrityRepoUrl;
+              if (typeof row.integrity_repo_url != null) {
+                lastFetchMessage += ' Source:  ' + row.integrity_repo_url;
               }
-              if (
-                row.componentMetaInformation.integrityMatchStatus ==
-                'HASH_MATCH_PASSED'
-              ) {
+              if (row.integrity_check_status == 'HASH_MATCH_PASSED') {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes match. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-check status-passed" aria-hidden="true"></i></span> '
                 );
-              } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
-                'HASH_MATCH_FAILED'
-              ) {
+              } else if (row.integrity_check_status === 'HASH_MATCH_FAILED') {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component & repository hashes do not match. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
-                'COMPONENT_MISSING_HASH'
+                row.integrity_check_status === 'COMPONENT_MISSING_HASH'
               ) {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Component hashes are missing. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
-              } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
-                'HASH_MATCH_UNKNOWN'
-              ) {
+              } else if (row.integrity_check_status === 'HASH_MATCH_UNKNOWN') {
                 return (
                   '<span style="float:center" data-toggle="tooltip" data-placement="bottom" title="Repository hashes are missing. ' +
                   xssFilters.inHTMLData(lastFetchMessage) +
                   '"><i class="fa fa-exclamation-triangle status-warning" aria-hidden="true"></i></span> '
                 );
               } else if (
-                row.componentMetaInformation.integrityMatchStatus ===
+                row.integrity_check_status ===
                 'COMPONENT_MISSING_HASH_AND_MATCH_UNKNOWN'
               ) {
                 return (
@@ -358,21 +334,21 @@ export default {
           field: 'license',
           sortable: false,
           formatter(value, row, index) {
-            if (Object.prototype.hasOwnProperty.call(row, 'resolvedLicense')) {
+            if (Object.prototype.hasOwnProperty.call(row, 'resolved_license')) {
               let licenseurl =
-                '../../../licenses/' + row.resolvedLicense.licenseId;
+                '../../../licenses/' + row.resolved_license.license_id;
               return (
                 '<a href="' +
                 licenseurl +
                 '">' +
-                xssFilters.inHTMLData(row.resolvedLicense.licenseId) +
+                xssFilters.inHTMLData(row.resolved_license.license_id) +
                 '</a>'
               );
             } else if (value) {
               return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
-            } else if (row.licenseExpression) {
+            } else if (row.license_expression) {
               return xssFilters.inHTMLData(
-                common.valueWithDefault(row.licenseExpression, ''),
+                common.valueWithDefault(row.license_expression, ''),
               );
             } else {
               return '';
@@ -381,7 +357,7 @@ export default {
         },
         {
           title: this.$t('message.occurrences'),
-          field: 'occurrenceCount',
+          field: 'occurrence_count',
           sortable: true,
           class: 'tight',
           visible: false,
@@ -413,29 +389,25 @@ export default {
         },
         {
           title: this.$t('message.risk_score'),
-          field: 'lastInheritedRiskScore',
+          field: 'last_inherited_risk_score',
           sortable: true,
           class: 'tight',
         },
         {
           title: this.$t('message.vulnerabilities'),
-          field: 'metrics',
+          field: 'vulnerabilities',
           sortable: false,
-          formatter: function (metrics, row, index) {
-            if (typeof metrics === 'undefined') {
-              return '-'; // No vulnerability info available
-            }
-
+          formatter: function (value, row, index) {
             // Programmatically instantiate SeverityProgressBar Vue component
             let ComponentClass = Vue.extend(SeverityProgressBar);
             let progressBar = new ComponentClass({
               propsData: {
-                vulnerabilities: metrics.vulnerabilities,
-                critical: metrics.critical,
-                high: metrics.high,
-                medium: metrics.medium,
-                low: metrics.low,
-                unassigned: metrics.unassigned,
+                vulnerabilities: row.vulnerabilities,
+                critical: row.critical,
+                high: row.high,
+                medium: row.medium,
+                low: row.low,
+                unassigned: row.unassigned,
                 $t: this.$t.bind(this),
               },
             });
@@ -444,23 +416,9 @@ export default {
           }.bind(this),
         },
       ],
-      data: [],
       options: {
         onPostBody: this.initializeTooltips,
-        search: true,
-        showColumns: true,
-        showRefresh: true,
-        pagination: true,
-        silentSort: false,
-        sidePagination: 'server',
         toolbar: '#componentsToolbar',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize:
-          localStorage &&
-          localStorage.getItem('ProjectComponentsPageSize') !== null
-            ? Number(localStorage.getItem('ProjectComponentsPageSize'))
-            : 10,
         sortName:
           localStorage &&
           localStorage.getItem('ProjectComponentsSortName') !== null
@@ -471,14 +429,6 @@ export default {
           localStorage.getItem('ProjectComponentsSortOrder') !== null
             ? localStorage.getItem('ProjectComponentsSortOrder')
             : undefined,
-        icons: {
-          refresh: 'fa-refresh',
-        },
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: this.apiUrl(),
         onPageChange: (number, size) => {
           if (localStorage) {
             localStorage.setItem('ProjectComponentsPageSize', size.toString());
@@ -500,6 +450,19 @@ export default {
         },
       },
     };
+  },
+  computed: {
+    tableDataUrl() {
+      const url = `${this.$api.BASE_URL}/api/v2/projects/${this.uuid}/components`;
+      const queryParams = {
+        onlyOutdated: this.onlyOutdated ?? false,
+        onlyDirect: this.onlyDirect ?? false,
+      };
+      const queryString = Object.entries(queryParams)
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join('&');
+      return `${url}?${queryString}`;
+    },
   },
   methods: {
     initializeTooltips: function () {
@@ -610,26 +573,8 @@ export default {
       this.$refs.table.hideLoading();
       this.vueFormatterInit();
     },
-    apiUrl: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/project/${this.uuid}`;
-      if (this.onlyOutdated === undefined) {
-        url += '?onlyOutdated=false';
-      } else {
-        url += '?onlyOutdated=' + this.onlyOutdated;
-      }
-      if (this.onlyDirect === undefined) {
-        url += '&onlyDirect=false';
-      } else {
-        url += '&onlyDirect=' + this.onlyDirect;
-      }
-      return url;
-    },
-    refreshTable: function () {
-      this.$refs.table.refresh({
-        url: this.apiUrl(),
-        pageNumber: 1,
-        silent: true,
-      });
+    refreshTable: async function () {
+      await this.$refs.table.refreshCurrentPage();
     },
   },
   watch: {

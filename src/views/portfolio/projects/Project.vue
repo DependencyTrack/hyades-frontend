@@ -500,6 +500,10 @@ export default {
             this.project.metrics.policyViolationsFail,
             0,
           );
+          this.totalComponents = common.valueWithDefault(
+            this.project.metrics.components,
+            0,
+          );
           EventBus.$emit('addCrumb', this.projectLabel);
           this.$title = this.projectLabel;
         });
