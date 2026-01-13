@@ -343,11 +343,6 @@ export default {
               route: 'integrations/fortifySSC',
             },
             {
-              component: 'Jira',
-              name: this.$t('admin.jira'),
-              route: 'integrations/jira',
-            },
-            {
               component: 'KennaSecurity',
               name: this.$t('admin.kenna_security'),
               route: 'integrations/kennaSecurity',
