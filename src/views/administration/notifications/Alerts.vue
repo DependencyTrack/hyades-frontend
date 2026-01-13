@@ -418,8 +418,7 @@ export default {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_PUBLISHER}/test/${this.uuid}`;
                 this.axios
                   .post(url)
-                  .then((response) => {
-                    this.alert = response.data;
+                  .then(() => {
                     this.$toastr.s(this.$t('admin.test_notification_queued'));
                   })
                   .catch(() => {
