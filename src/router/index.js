@@ -29,7 +29,6 @@ const BomFormats = () =>
   import('@/views/administration/configuration/BomFormats');
 const WelcomeMessage = () =>
   import('@/views/administration/configuration/WelcomeMessage');
-const Email = () => import('@/views/administration/configuration/Email');
 const InternalComponents = () =>
   import('@/views/administration/configuration/InternalComponents');
 const Maintenance = () =>
@@ -420,23 +419,6 @@ function configRoutes() {
                 sectionPath: '/admin',
                 sectionName: 'Admin',
                 permission: 'SYSTEM_CONFIGURATION',
-              },
-            },
-            {
-              path: 'configuration/email',
-              component: Email,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
               },
             },
             {

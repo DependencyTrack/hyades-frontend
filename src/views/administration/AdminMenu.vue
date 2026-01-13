@@ -110,11 +110,6 @@ export default {
               route: 'configuration/bomFormats',
             },
             {
-              component: 'Email',
-              name: this.$t('admin.email'),
-              route: 'configuration/email',
-            },
-            {
               component: 'WelcomeMessage',
               name: this.$t('admin.welcome_message'),
               route: 'configuration/welcomeMessage',
