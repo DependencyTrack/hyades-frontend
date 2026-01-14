@@ -14,13 +14,15 @@
           <span class="fa fa-plus"></span> {{ $t('message.create') }}
         </b-button>
       </div>
-      <bootstrap-table
+      <token-paginated-table
         ref="table"
+        :base-url="tableDataBaseUrl"
+        response-data-field="secrets"
         :columns="columns"
         :data="data"
         :options="options"
       >
-      </bootstrap-table>
+      </token-paginated-table>
     </b-card-body>
     <create-secret-modal v-on:refreshTable="refreshTable" />
     <update-secret-modal
@@ -38,6 +40,7 @@ import routerMixin from '@/mixins/routerMixin';
 import xssFilters from 'xss-filters';
 import CreateSecretModal from '@/views/administration/secrets/CreateSecretModal.vue';
 import UpdateSecretModal from '@/views/administration/secrets/UpdateSecretModal.vue';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 
 export default {
   mixins: [bootstrapTableMixin, permissionsMixin, routerMixin],
@@ -45,18 +48,18 @@ export default {
     header: String,
   },
   components: {
+    TokenPaginatedTable,
     CreateSecretModal,
     UpdateSecretModal,
   },
   data() {
     return {
       selectedRow: null,
+      searchText: null,
       columns: [
         {
           title: this.$t('message.name'),
           field: 'name',
-          sortable: true,
-          searchable: true,
           formatter(value) {
             return xssFilters.inHTMLData(value);
           },
@@ -73,8 +76,6 @@ export default {
         {
           title: this.$t('message.created'),
           field: 'created_at',
-          sortable: true,
-          searchable: false,
           formatter(value) {
             return common.formatTimestamp(value, true);
           },
@@ -82,8 +83,6 @@ export default {
         {
           title: this.$t('message.updated'),
           field: 'updated_at',
-          sortable: true,
-          searchable: false,
           formatter(value) {
             return value ? common.formatTimestamp(value, true) : '-';
           },
@@ -91,8 +90,6 @@ export default {
         {
           title: this.$t('message.actions'),
           align: 'center',
-          sortable: false,
-          searchable: false,
           formatter: () => {
             return `
               <button class="btn btn-sm btn-outline-primary action-btn" data-action="copy-to-clipboard" title=${JSON.stringify(this.$t('admin.copy_secret_expression_to_clipboard'))}>
@@ -130,13 +127,10 @@ export default {
         searchable: false,
         showColumns: true,
         showRefresh: true,
-        pagination: true,
         silentSort: false,
-        sortName: 'name',
-        sortOrder: 'asc',
-        sidePagination: 'client',
-        pageList: '[10, 25, 50, 100]',
-        pageSize: 10,
+        onSearch: (text) => {
+          this.searchText = text;
+        },
         queryParams: function () {
           // Don't send any query parameters for now,
           // since pagination happens on the client
@@ -147,11 +141,6 @@ export default {
           refresh: 'fa-refresh',
         },
         toolbar: '#customToolbar',
-        responseHandler: function (res) {
-          res.total = res.secrets.length;
-          return res.secrets;
-        },
-        url: `${this.$api.BASE_URL}/api/v2/secrets`,
       },
     };
   },
@@ -172,6 +161,13 @@ export default {
         (this.isPermitted(this.PERMISSIONS.SECRET_MANAGEMENT) ||
           this.isPermitted(this.PERMISSIONS.SECRET_MANAGEMENT_DELETE))
       );
+    },
+    tableDataBaseUrl() {
+      const baseUrl = `${this.$api.BASE_URL}/api/v2/secrets`;
+      if (!this.searchText) {
+        return baseUrl;
+      }
+      return common.setQueryParams(baseUrl, { search_text: this.searchText });
     },
   },
   methods: {
@@ -227,9 +223,7 @@ export default {
         });
     },
     refreshTable: function () {
-      this.$refs.table.refresh({
-        silent: true,
-      });
+      this.$refs.table.refreshCurrentPage();
     },
   },
 };
