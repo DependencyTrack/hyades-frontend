@@ -590,6 +590,20 @@ $common.trimToNull = function (value) {
   return value;
 };
 
+$common.setQueryParams = function (url, params) {
+  // During local development, the API base URL is empty,
+  // leading to URLs such as "/api/v2/secrets".
+  // URL parsing fails when the URL is not absolute,
+  // so we supply a dummy localhost base URL if needed.
+  const parsed = url.startsWith('/')
+    ? new URL(url, 'http://localhost')
+    : new URL(url);
+  for (const [key, value] of Object.entries(params)) {
+    parsed.searchParams.set(key, value);
+  }
+  return parsed.pathname + parsed.search;
+};
+
 $common.OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX = {
   LOW: {
     LOW: 'INFO',
@@ -640,6 +654,7 @@ export default {
   sleep: $common.sleep,
   toBoolean: $common.toBoolean,
   trimToNull: $common.trimToNull,
+  setQueryParams: $common.setQueryParams,
   OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX:
     $common.OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX,
 };

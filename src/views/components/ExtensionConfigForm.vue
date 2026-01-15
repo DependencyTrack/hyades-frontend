@@ -71,6 +71,11 @@ export default {
       ajv: null,
     };
   },
+  computed: {
+    normalizedFormData() {
+      return this.normalizeFormData(this.formData);
+    },
+  },
   async mounted() {
     this.ajv = new Ajv({
       allErrors: true,
@@ -123,10 +128,10 @@ export default {
 
       switch (schema.type) {
         case 'string':
-          return '';
+          return null;
         case 'number':
         case 'integer':
-          return 0;
+          return null;
         case 'boolean':
           return false;
         case 'array':
@@ -150,7 +155,7 @@ export default {
       }
 
       const validate = this.ajv.compile(this.schema);
-      const valid = validate(this.formData);
+      const valid = validate(this.normalizedFormData);
 
       if (!valid) {
         this.validationErrors = {};
@@ -172,6 +177,30 @@ export default {
 
       this.validationErrors = {};
       return true;
+    },
+    // Normalize form data by omitting fields that are null entirely.
+    // Required for schema validation to correctly determine missing required fields.
+    normalizeFormData(data) {
+      if (data === null || data === undefined) {
+        return data;
+      }
+
+      if (Array.isArray(data)) {
+        return data.map((item) => this.normalizeFormData(item));
+      }
+
+      if (typeof data === 'object') {
+        const normalized = {};
+        Object.keys(data).forEach((key) => {
+          const value = data[key];
+          if (value !== null) {
+            normalized[key] = this.normalizeFormData(value);
+          }
+        });
+        return normalized;
+      }
+
+      return data;
     },
     formatValidationError(error) {
       const { keyword, params, message } = error;
@@ -243,7 +272,7 @@ export default {
         const response = await this.axios.put(
           `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config`,
           {
-            config: this.formData,
+            config: this.normalizedFormData,
           },
           {
             validateStatus: function (status) {
