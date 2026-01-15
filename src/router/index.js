@@ -97,6 +97,8 @@ const Permissions = () =>
   import('@/views/administration/accessmanagement/Permissions');
 const PortfolioAccessControl = () =>
   import('@/views/administration/accessmanagement/PortfolioAccessControl');
+const WorkflowRunList = () =>
+  import('@/views/administration/workflows/WorkflowRunList');
 
 const Component = () => import('@/views/portfolio/projects/Component');
 const Service = () => import('@/views/portfolio/projects/Service');
@@ -1104,6 +1106,19 @@ function configRoutes() {
                   'ACCESS_MANAGEMENT_READ',
                   'ACCESS_MANAGEMENT_UPDATE',
                   'ACCESS_MANAGEMENT_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'workflows/runs',
+              component: WorkflowRunList,
+              meta: {
+                title: i18n.t('admin.workflow_runs'),
+                i18n: 'admin.workflow_runs',
+                sectionPath: '/workflowRuns',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_READ',
                 ],
               },
             },

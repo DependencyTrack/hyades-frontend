@@ -77,6 +77,8 @@ import Permissions from './accessmanagement/Permissions';
 import PortfolioAccessControl from './accessmanagement/PortfolioAccessControl';
 import Roles from './accessmanagement/Roles';
 import Teams from './accessmanagement/Teams';
+// Workflow plugins
+import WorkflowRunList from '@/views/administration/workflows/WorkflowRunList.vue';
 
 export default {
   components: {
@@ -124,6 +126,7 @@ export default {
     Teams,
     Permissions,
     PortfolioAccessControl,
+    WorkflowRunList,
   },
   created() {
     // Specifies the admin plugin metadata (Vue component, i18n name, and href) of the plugin to load

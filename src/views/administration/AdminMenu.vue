@@ -407,6 +407,18 @@ export default {
             },
           ],
         },
+        {
+          name: this.$t('admin.workflows'),
+          id: 'workflows',
+          permission: [SYSTEM_CONFIGURATION, SYSTEM_CONFIGURATION_READ],
+          children: [
+            {
+              component: 'WorkflowRunList',
+              name: this.$t('admin.workflow_runs'),
+              route: 'workflows/runs',
+            },
+          ],
+        },
       ],
     };
   },
