@@ -1,6 +1,14 @@
 <template>
   <div>
-    <b-form-group v-if="!isArrayItem" :label="label" :label-for="fieldId">
+    <b-form-group v-if="!isArrayItem" :label-for="fieldId">
+      <template v-slot:label>
+        {{ label }}
+        <i
+          v-if="isSecretRef"
+          class="fa fa-key text-warning ml-1"
+          :title="$t('admin.secret_reference_field')"
+        ></i>
+      </template>
       <template v-if="!isComplexType && schema.description" v-slot:description>
         <showdown :markdown="schema.description" />
       </template>
@@ -26,11 +34,13 @@
 
 <script>
 import Showdown from './Showdown.vue';
+import SecretRefSelect from './SecretRefSelect.vue';
 
 export default {
   name: 'JsonSchemaFormField',
   components: {
     Showdown,
+    SecretRefSelect,
   },
   props: {
     schema: {
@@ -71,6 +81,9 @@ export default {
     isComplexType() {
       return this.schema.type === 'array' || this.schema.type === 'object';
     },
+    isSecretRef() {
+      return this.schema['x-secret-ref'] === true;
+    },
     fieldComponent() {
       if (this.schema.type === 'object') {
         return () => import('./JsonSchemaObjectField.vue');
@@ -80,6 +93,9 @@ export default {
       }
       if (this.schema.type === 'boolean') {
         return 'b-form-checkbox';
+      }
+      if (this.isSecretRef) {
+        return 'secret-ref-select';
       }
       if (this.schema.enum) {
         return 'b-form-select';
@@ -118,6 +134,13 @@ export default {
           ...baseProps,
           checked: this.value,
           switch: true,
+        };
+      }
+
+      if (this.isSecretRef) {
+        return {
+          ...baseProps,
+          value: this.value,
         };
       }
 

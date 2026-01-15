@@ -1,0 +1,174 @@
+<template>
+  <div>
+    <multiselect
+      :id="id"
+      v-model="selectedSecret"
+      :placeholder="$t('admin.select_secret_placeholder')"
+      :options="availableSecrets"
+      :multiple="false"
+      :searchable="true"
+      :loading="isLoading"
+      :internal-search="false"
+      :close-on-select="true"
+      :clear-on-select="false"
+      :preserve-search="true"
+      :show-no-results="true"
+      :max-height="250"
+      track-by="name"
+      label="name"
+      open-direction="bottom"
+      select-label=""
+      deselect-label=""
+      @search-change="onSearchChange"
+      @input="onInput"
+    >
+      <template slot="singleLabel" slot-scope="{ option }">
+        <span>{{ option.name }}</span>
+        <i
+          v-if="secretNotFound"
+          class="fa fa-exclamation-triangle text-danger ml-1"
+          :title="$t('admin.secret_not_found')"
+        ></i>
+      </template>
+      <template slot="option" slot-scope="{ option }">
+        <div class="secret-option">
+          <strong>{{ option.name }}</strong>
+          <small v-if="option.description" class="text-muted d-block">
+            {{ option.description }}
+          </small>
+        </div>
+      </template>
+      <template slot="noResult">
+        {{ $t('admin.no_secrets_found') }}
+      </template>
+      <template slot="noOptions">
+        {{ $t('admin.type_to_search_secrets') }}
+      </template>
+    </multiselect>
+    <small v-if="secretNotFound" class="text-danger">
+      {{ $t('admin.secret_not_found_message') }}
+    </small>
+  </div>
+</template>
+
+<script>
+import Multiselect from 'vue-multiselect';
+import common from '@/shared/common';
+
+export default {
+  name: 'SecretRefSelect',
+  components: {
+    Multiselect,
+  },
+  props: {
+    id: {
+      type: String,
+      default: 'secret-ref-select',
+    },
+    value: {
+      type: String,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      availableSecrets: [],
+      isLoading: false,
+      debounceTimer: null,
+      selectedSecret: null,
+      secretNotFound: false,
+    };
+  },
+  watch: {
+    value: {
+      immediate: true,
+      async handler(newValue) {
+        if (
+          newValue &&
+          (!this.selectedSecret || this.selectedSecret.name !== newValue)
+        ) {
+          this.selectedSecret = { name: newValue };
+          if (!this.availableSecrets.some((s) => s.name === newValue)) {
+            this.availableSecrets.push({ name: newValue });
+          }
+          await this.verifySecretExists(newValue);
+        } else if (!newValue) {
+          this.selectedSecret = null;
+          this.secretNotFound = false;
+        }
+      },
+    },
+  },
+  mounted() {
+    this.fetchSecrets('');
+  },
+  beforeDestroy() {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+  },
+  methods: {
+    onSearchChange(query) {
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        this.fetchSecrets(query);
+      }, 300);
+    },
+    async fetchSecrets(searchText) {
+      this.isLoading = true;
+      try {
+        const baseUrl = `${this.$api.BASE_URL}/api/v2/secrets`;
+        const params = { limit: '6' };
+        if (searchText) {
+          params.q = searchText;
+        }
+        const url = common.setQueryParams(baseUrl, params);
+        const response = await this.axios.get(url);
+        const secrets = response.data.secrets || [];
+        this.availableSecrets = secrets;
+        if (
+          this.selectedSecret &&
+          !this.availableSecrets.some(
+            (s) => s.name === this.selectedSecret.name,
+          )
+        ) {
+          this.availableSecrets.unshift(this.selectedSecret);
+        }
+      } catch (err) {
+        console.error('Failed to fetch secrets:', err);
+        this.availableSecrets = [];
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async verifySecretExists(secretName) {
+      try {
+        const baseUrl = `${this.$api.BASE_URL}/api/v2/secrets`;
+        const params = { q: secretName, limit: '1' };
+        const url = common.setQueryParams(baseUrl, params);
+        const response = await this.axios.get(url);
+        const secrets = response.data.secrets || [];
+        this.secretNotFound = !secrets.some((s) => s.name === secretName);
+      } catch (err) {
+        console.error('Failed to verify secret:', err);
+        this.secretNotFound = false;
+      }
+    },
+    onInput(selected) {
+      const value = selected ? selected.name : '';
+      if (selected) {
+        this.secretNotFound = false;
+      }
+      this.$emit('input', value);
+    },
+  },
+};
+</script>
+
+<style scoped>
+.secret-option {
+  line-height: 1.4;
+}
+</style>

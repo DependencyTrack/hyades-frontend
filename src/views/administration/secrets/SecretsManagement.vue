@@ -92,9 +92,6 @@ export default {
           align: 'center',
           formatter: () => {
             return `
-              <button class="btn btn-sm btn-outline-primary action-btn" data-action="copy-to-clipboard" title=${JSON.stringify(this.$t('admin.copy_secret_expression_to_clipboard'))}>
-                <i class="fa fa-clipboard"></i>
-              </button>
               <button class="btn btn-sm btn-outline-primary action-btn" data-action="edit" title=${JSON.stringify(this.$t('admin.edit_secret'))} ${!this.canUpdate ? 'disabled' : ''}>
                 <i class="fa fa-pencil"></i>
               </button>
@@ -107,9 +104,6 @@ export default {
             'click .action-btn': (event, _, row) => {
               const action = event.currentTarget.dataset.action;
               switch (action) {
-                case 'copy-to-clipboard':
-                  this.onCopyToClipboardClicked(row);
-                  break;
                 case 'edit':
                   this.onEditClicked(row);
                   break;
@@ -167,23 +161,10 @@ export default {
       if (!this.searchText) {
         return baseUrl;
       }
-      return common.setQueryParams(baseUrl, { search_text: this.searchText });
+      return common.setQueryParams(baseUrl, { q: this.searchText });
     },
   },
   methods: {
-    onCopyToClipboardClicked(row) {
-      navigator.clipboard
-        .writeText(`{{ secret('${row.name}') }}`)
-        .then(() => {
-          this.$toastr.s(this.$t('message.copied_to_clipboard'));
-        })
-        .catch((err) => {
-          console.error(
-            `Failed to copy secret expression to clipboard: ${err}`,
-          );
-          this.$toastr.e(this.$t('condition.unsuccessful_action'));
-        });
-    },
     onEditClicked(row) {
       this.selectedRow = row;
       this.$nextTick(() => {
