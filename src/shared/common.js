@@ -591,7 +591,13 @@ $common.trimToNull = function (value) {
 };
 
 $common.setQueryParams = function (url, params) {
-  const parsed = new URL(url, 'http://localhost');
+  // During local development, the API base URL is empty,
+  // leading to URLs such as "/api/v2/secrets".
+  // URL parsing fails when the URL is not absolute,
+  // so we supply a dummy localhost base URL if needed.
+  const parsed = url.startsWith('/')
+    ? new URL(url, 'http://localhost')
+    : new URL(url);
   for (const [key, value] of Object.entries(params)) {
     parsed.searchParams.set(key, value);
   }
