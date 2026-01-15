@@ -361,7 +361,7 @@ export default {
               });
         throw new Error(errorSummary);
       }
-      return this.formData;
+      return this.normalizedFormData;
     },
   },
 };

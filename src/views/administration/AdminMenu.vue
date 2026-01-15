@@ -314,6 +314,11 @@ export default {
               name: this.$t('admin.templates'),
               route: 'notifications/templates',
             },
+            {
+              component: 'Publishers',
+              name: this.$t('admin.publishers'),
+              route: 'notifications/publishers',
+            },
           ],
         },
         {

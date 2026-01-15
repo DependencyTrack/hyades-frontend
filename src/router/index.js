@@ -73,6 +73,8 @@ const Python = () => import('@/views/administration/repositories/Python');
 const Alerts = () => import('@/views/administration/notifications/Alerts');
 const Templates = () =>
   import('@/views/administration/notifications/Templates');
+const Publishers = () =>
+  import('@/views/administration/notifications/Publishers');
 
 const FortifySsc = () =>
   import('@/views/administration/integrations/FortifySsc');
@@ -870,6 +872,23 @@ function configRoutes() {
             {
               path: 'notifications/templates',
               component: Templates,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                sectionName: 'Admin',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'notifications/publishers',
+              component: Publishers,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
