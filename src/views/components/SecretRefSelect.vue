@@ -67,7 +67,7 @@ export default {
     },
     value: {
       type: String,
-      default: '',
+      default: null,
     },
   },
   data() {
@@ -158,7 +158,7 @@ export default {
       }
     },
     onInput(selected) {
-      const value = selected ? selected.name : '';
+      const value = selected ? selected.name : null;
       if (selected) {
         this.secretNotFound = false;
       }

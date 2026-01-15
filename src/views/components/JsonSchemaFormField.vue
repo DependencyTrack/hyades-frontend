@@ -165,6 +165,7 @@ export default {
         maxlength: this.schema.maxLength,
         pattern: this.schema.pattern,
         readonly: this.schema.readOnly,
+        trim: this.schema.type === 'string',
       };
     },
     isRequired() {
@@ -209,6 +210,8 @@ export default {
       let processedValue = newValue;
       if (this.schema.type === 'number' || this.schema.type === 'integer') {
         processedValue = newValue === '' ? null : Number(newValue);
+      } else if (this.schema.type === 'string') {
+        processedValue = newValue === '' ? null : newValue;
       }
       this.$emit('input', processedValue);
     },
