@@ -260,7 +260,7 @@ export default {
       }
       this.debounceTimer = setTimeout(() => {
         this.reset();
-      });
+      }, this.debounceMs);
     },
     async currentPageSize() {
       await this.reset();
