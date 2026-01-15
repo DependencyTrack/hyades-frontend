@@ -145,12 +145,13 @@ export default {
     },
     async verifySecretExists(secretName) {
       try {
-        const baseUrl = `${this.$api.BASE_URL}/api/v2/secrets`;
-        const params = { q: secretName, limit: '1' };
-        const url = common.setQueryParams(baseUrl, params);
-        const response = await this.axios.get(url);
-        const secrets = response.data.secrets || [];
-        this.secretNotFound = !secrets.some((s) => s.name === secretName);
+        const url = `${this.$api.BASE_URL}/api/v2/secrets/${encodeURIComponent(secretName)}`;
+        const response = await this.axios.get(url, {
+          validateStatus: function (status) {
+            return status === 200 || status === 404;
+          },
+        });
+        this.secretNotFound = response.status === 404;
       } catch (err) {
         console.error('Failed to verify secret:', err);
         this.secretNotFound = false;
