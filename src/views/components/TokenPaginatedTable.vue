@@ -14,15 +14,15 @@
           class="pagination-button"
           :disabled="!hasPreviousPage"
           @click="goToPrevPage"
-          >‹ Previous
+          >‹ {{ $t('message.previous') }}
         </b-button>
       </div>
       <div class="d-flex align-items-center">
         <span v-if="totalCountDisplay" class="total-count-indicator mr-3">
-          {{ totalCountDisplay }} total rows
+          {{ totalCountDisplay }} {{ $t('message.total_rows') }}
         </span>
         <b-form-group
-          label="Rows per page:"
+          :label="$t('message.rows_per_page')"
           label-for="pagination-page-size-select"
           label-cols="auto"
           class="mb-0"
@@ -46,7 +46,7 @@
           class="pagination-button"
           :disabled="!hasNextPage"
           @click="goToNextPage"
-          >Next ›
+          >{{ $t('message.next') }} ›
         </b-button>
       </div>
     </div>
