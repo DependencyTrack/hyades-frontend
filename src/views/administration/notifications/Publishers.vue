@@ -39,6 +39,7 @@
       <extension-config-form
         v-else-if="isConfigurable === true && selectedExtension"
         :key="selectedExtension.name"
+        :header="null"
         :extension-name="selectedExtension.name"
         extension-point-name="notification.publisher"
       />
@@ -118,4 +119,3 @@ export default {
   },
 };
 </script>
-

@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body :header="extensionName">
+  <b-card no-body :header="cardHeader">
     <b-form @submit="onSubmit">
       <b-card-body>
         <b-alert v-if="loadError" variant="danger" show>
@@ -74,6 +74,11 @@ export default {
       required: false,
       default: false,
     },
+    header: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -86,6 +91,9 @@ export default {
     };
   },
   computed: {
+    cardHeader() {
+      return this.header !== undefined ? this.header : this.extensionName;
+    },
     normalizedFormData() {
       return this.normalizeFormData(this.formData);
     },
