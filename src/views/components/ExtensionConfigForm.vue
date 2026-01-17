@@ -27,15 +27,50 @@
           <b-spinner />
           <p class="mt-2">{{ this.$t('message.loading') }}</p>
         </div>
+        <b-alert
+          v-if="testResults"
+          :variant="testPassed ? 'success' : 'danger'"
+          dismissible
+          show
+          @dismissed="testResults = null"
+        >
+          <strong>{{
+            testPassed ? $t('admin.test_passed') : $t('admin.test_failed')
+          }}</strong>
+          <ul class="mb-0 mt-2">
+            <li v-for="check in testResults.checks" :key="check.name">
+              <strong>{{ check.name }}:</strong>
+              <span
+                :class="{
+                  'text-success': check.status === 'PASSED',
+                  'text-danger': check.status === 'FAILED',
+                  'text-muted': check.status === 'SKIPPED',
+                }"
+              >
+                {{ $t(`admin.test_check_${check.status.toLowerCase()}`) }}
+              </span>
+              <span v-if="check.message"> - {{ check.message }}</span>
+            </li>
+          </ul>
+        </b-alert>
       </b-card-body>
       <b-card-footer>
         <b-button
+          variant="outline-secondary"
+          :disabled="isTestingInProgress || isSavingInProgress || !schema"
+          @click="testConfig"
+        >
+          <b-spinner v-show="isTestingInProgress" small />
+          {{ $t('admin.test') }}
+        </b-button>
+        <b-button
           variant="outline-primary"
+          class="ml-2"
           type="submit"
-          :disabled="isSavingInProgress || !schema"
+          :disabled="isSavingInProgress || isTestingInProgress || !schema"
         >
           <b-spinner v-show="isSavingInProgress" small />
-          {{ this.$t('admin.submit') }}
+          {{ $t('admin.submit') }}
         </b-button>
       </b-card-footer>
     </b-form>
@@ -67,6 +102,8 @@ export default {
       formData: {},
       validationErrors: {},
       isSavingInProgress: false,
+      isTestingInProgress: false,
+      testResults: null,
       loadError: null,
       ajv: null,
     };
@@ -74,6 +111,14 @@ export default {
   computed: {
     normalizedFormData() {
       return this.normalizeFormData(this.formData);
+    },
+    testPassed() {
+      if (!this.testResults?.checks) {
+        return false;
+      }
+      return this.testResults.checks.every(
+        (check) => check.status === 'PASSED' || check.status === 'SKIPPED',
+      );
     },
   },
   async mounted() {
@@ -296,6 +341,58 @@ export default {
         }
       } finally {
         this.isSavingInProgress = false;
+      }
+    },
+    async testConfig() {
+      if (this.isTestingInProgress) {
+        return;
+      }
+
+      if (!this.validateForm()) {
+        const errorCount = Object.keys(this.validationErrors).length;
+        const errorSummary =
+          errorCount === 1
+            ? this.$t('validation.schema.validation_failed')
+            : this.$t('validation.schema.validation_failed_plural', {
+                count: errorCount,
+              });
+        await this.$toastr.e(
+          errorSummary,
+          this.$t('message.input_validation_failed'),
+        );
+        return;
+      }
+
+      try {
+        this.isTestingInProgress = true;
+        this.testResults = null;
+
+        const response = await this.axios.post(
+          `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/test`,
+          {
+            config: this.normalizedFormData,
+          },
+          {
+            validateStatus: (status) =>
+              status === 200 || status === 400 || status === 422,
+          },
+        );
+
+        if (response.status === 400) {
+          await this.$toastr.e(
+            response.data?.message ||
+              this.$t('message.input_validation_failed'),
+            this.$t('admin.test_failed'),
+          );
+          return;
+        }
+
+        this.testResults = response.data;
+      } catch (error) {
+        console.error('Failed to test configuration:', error);
+        await this.$toastr.e(error.message, this.$t('admin.test_failed'));
+      } finally {
+        this.isTestingInProgress = false;
       }
     },
     async onSubmit(event) {
