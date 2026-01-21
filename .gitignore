@@ -2,6 +2,7 @@
 node_modules
 /dist
 /coverage
+/bom.*
 
 /tests/e2e/reports/
 selenium-debug.log
