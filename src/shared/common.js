@@ -595,13 +595,14 @@ $common.setQueryParams = function (url, params) {
   // leading to URLs such as "/api/v2/secrets".
   // URL parsing fails when the URL is not absolute,
   // so we supply a dummy localhost base URL if needed.
-  const parsed = url.startsWith('/')
-    ? new URL(url, 'http://localhost')
-    : new URL(url);
+  const isRelative = url.startsWith('/');
+  const parsed = isRelative ? new URL(url, 'http://localhost') : new URL(url);
   for (const [key, value] of Object.entries(params)) {
     parsed.searchParams.set(key, value);
   }
-  return parsed.pathname + parsed.search;
+  return isRelative
+    ? parsed.pathname + parsed.search + parsed.hash
+    : parsed.href;
 };
 
 $common.OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX = {
