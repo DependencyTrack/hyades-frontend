@@ -1,7 +1,7 @@
 <template>
   <extension-config-form
     extension-name="osv"
-    extension-point-name="vuln.datasource"
+    extension-point-name="vuln-data-source"
   />
 </template>
 
