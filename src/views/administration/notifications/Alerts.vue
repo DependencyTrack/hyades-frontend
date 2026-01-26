@@ -149,8 +149,7 @@ export default {
                       :hide-submit-button="true"
                       @config-update="onPublisherConfigUpdate"
                     />
-                     <b-form-group v-if="this.publisherClass === 'org.dependencytrack.notification.publisher.SendMailPublisher'"
-                                   id="teamDestinationList" :label="this.$t('admin.select_team_as_recipient')">
+                     <b-form-group id="teamDestinationList" :label="this.$t('admin.select_team_as_recipient')">
                        <div class="list group">
                           <span v-for="team in teams">
                             <actionable-list-group-item :value="team.name" :delete-icon="true" v-on:actionClicked="removeSelectedTeam(team.uuid)"></actionable-list-group-item>
