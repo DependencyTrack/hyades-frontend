@@ -195,9 +195,14 @@ export default {
             .replace(/\//g, '.');
           const message = this.formatValidationError(error);
 
-          // For root-level errors (empty field path), show on the offending property.
-          if (!field && error.params?.missingProperty) {
-            this.validationErrors[error.params.missingProperty] = message;
+          // For required field errors, show on the missing property itself.
+          // For root-level errors, field is empty so use missingProperty directly.
+          // For nested errors, field is the parent path so append missingProperty.
+          if (error.params?.missingProperty) {
+            const errorKey = field
+              ? `${field}.${error.params.missingProperty}`
+              : error.params.missingProperty;
+            this.validationErrors[errorKey] = message;
           } else if (field) {
             this.validationErrors[field] = message;
           }

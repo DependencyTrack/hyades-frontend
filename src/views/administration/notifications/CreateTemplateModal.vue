@@ -129,7 +129,7 @@ export default {
   methods: {
     fetchAvailableExtensions: async function () {
       try {
-        const url = `${this.$api.BASE_URL}/api/v2/extension-points/notification.publisher/extensions`;
+        const url = `${this.$api.BASE_URL}/api/v2/extension-points/notification-publisher/extensions`;
         const response = await this.axios.get(url);
         this.availableExtensions = response.data.extensions.map(
           (extension) => ({

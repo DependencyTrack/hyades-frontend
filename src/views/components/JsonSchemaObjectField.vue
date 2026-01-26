@@ -4,7 +4,7 @@
       <div v-for="(propSchema, propName) in schema.properties" :key="propName">
         <json-schema-form-field
           :schema="enrichSchema(propSchema, propName)"
-          :property-name="propName"
+          :property-name="`${propertyName}.${propName}`"
           :value="localValue[propName]"
           :validation-error="validationErrors[propName]"
           @input="onPropertyChange(propName, $event)"

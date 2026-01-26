@@ -41,7 +41,7 @@
         :key="selectedExtension.name"
         :header="null"
         :extension-name="selectedExtension.name"
-        extension-point-name="notification.publisher"
+        extension-point-name="notification-publisher"
       />
     </div>
   </div>
@@ -77,7 +77,7 @@ export default {
       try {
         this.loading = true;
         const response = await this.axios.get(
-          `${this.$api.BASE_URL}/api/v2/extension-points/notification.publisher/extensions`,
+          `${this.$api.BASE_URL}/api/v2/extension-points/notification-publisher/extensions`,
         );
         this.extensions = response.data.extensions || [];
         if (this.extensions.length > 0) {
@@ -103,7 +103,7 @@ export default {
       try {
         this.checkingConfigurability = true;
         const response = await this.axios.get(
-          `${this.$api.BASE_URL}/api/v2/extension-points/notification.publisher/extensions/${this.selectedExtension.name}/config-schema`,
+          `${this.$api.BASE_URL}/api/v2/extension-points/notification-publisher/extensions/${this.selectedExtension.name}/config-schema`,
           {
             validateStatus: (status) => status === 200 || status === 204,
           },

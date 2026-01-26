@@ -4,6 +4,7 @@
       v-if="!isArrayItem"
       :label-class="isRequired ? 'required' : ''"
       :label-for="fieldId"
+      :state="isComplexType ? null : isValid ? null : false"
     >
       <template v-slot:label>
         {{ label }}
@@ -111,7 +112,13 @@ export default {
       if (this.schema.enum) {
         return 'b-form-select';
       }
-      return 'b-form-input';
+      const inputTypeHint = this.schema['x-ui-hint']?.inputType;
+      switch (inputTypeHint) {
+        case 'textarea':
+          return 'b-form-textarea';
+        default:
+          return 'b-form-input';
+      }
     },
     fieldProps() {
       const baseProps = {
