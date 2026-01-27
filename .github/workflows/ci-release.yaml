@@ -70,7 +70,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
         with:
           token: ${{ github.repository_owner == 'DependencyTrack' && secrets.BOT_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
