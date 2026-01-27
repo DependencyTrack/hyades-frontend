@@ -87,7 +87,7 @@ jobs:
 
       - name: Bump Version
         run: |-
-          NPM_VERSION_OPTS='--tag-version-prefix ""'
+          NPM_VERSION_OPTS='--tag-version-prefix='
 
           if [[ -n "${{ inputs.release-version }}" ]]; then
             npm version "${{ inputs.release-version }}" ${NPM_VERSION_OPTS} -m "prepare-release: set version to %s"
