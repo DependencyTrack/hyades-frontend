@@ -29,10 +29,8 @@ import AdminMenu from './AdminMenu';
 
 // Configuration plugins
 import BomFormats from './configuration/BomFormats';
-import Email from './configuration/Email';
 import General from './configuration/General';
 import InternalComponents from './configuration/InternalComponents';
-import Jira from './configuration/JiraConfig';
 import RiskScore from './configuration/RiskScore.vue';
 import WelcomeMessage from './configuration/WelcomeMessage.vue';
 // Secrets plugins
@@ -87,8 +85,6 @@ export default {
     General,
     WelcomeMessage,
     BomFormats,
-    Email,
-    Jira,
     InternalComponents,
     RiskScore,
     SecretsManagement,

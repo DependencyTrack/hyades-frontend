@@ -110,11 +110,6 @@ export default {
               route: 'configuration/bomFormats',
             },
             {
-              component: 'Email',
-              name: this.$t('admin.email'),
-              route: 'configuration/email',
-            },
-            {
               component: 'WelcomeMessage',
               name: this.$t('admin.welcome_message'),
               route: 'configuration/welcomeMessage',
@@ -319,6 +314,11 @@ export default {
               name: this.$t('admin.templates'),
               route: 'notifications/templates',
             },
+            {
+              component: 'Publishers',
+              name: this.$t('admin.publishers'),
+              route: 'notifications/publishers',
+            },
           ],
         },
         {
@@ -341,11 +341,6 @@ export default {
               component: 'FortifySsc',
               name: this.$t('admin.fortify_ssc'),
               route: 'integrations/fortifySSC',
-            },
-            {
-              component: 'Jira',
-              name: this.$t('admin.jira'),
-              route: 'integrations/jira',
             },
             {
               component: 'KennaSecurity',

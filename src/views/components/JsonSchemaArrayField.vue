@@ -17,6 +17,7 @@
           :property-name="`${propertyName}[${index}]`"
           :value="item"
           :validation-error="validationErrors[index]"
+          :validation-errors="getNestedValidationErrors(index)"
           :is-array-item="true"
           @input="onItemChange(index, $event)"
         />
@@ -156,6 +157,21 @@ export default {
         default:
           return null;
       }
+    },
+    // Extract nested validation errors for a given array index,
+    // e.g. for index 0, extract "0.url" -> "url".
+    getNestedValidationErrors(index) {
+      const prefix = `${index}.`;
+      const nestedErrors = {};
+
+      Object.keys(this.validationErrors).forEach((key) => {
+        if (key.startsWith(prefix)) {
+          const nestedKey = key.substring(prefix.length);
+          nestedErrors[nestedKey] = this.validationErrors[key];
+        }
+      });
+
+      return nestedErrors;
     },
   },
 };

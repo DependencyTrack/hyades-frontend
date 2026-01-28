@@ -1,6 +1,11 @@
 <template>
   <div>
-    <b-form-group v-if="!isArrayItem" :label-for="fieldId">
+    <b-form-group
+      v-if="!isArrayItem"
+      :label-class="isRequired ? 'required' : ''"
+      :label-for="fieldId"
+      :state="isComplexType ? null : isValid ? null : false"
+    >
       <template v-slot:label>
         {{ label }}
         <i
@@ -18,17 +23,24 @@
         @input="onInput"
         @change="onChange"
       />
-      <b-form-invalid-feedback v-if="!isComplexType" :state="isValid">
+      <b-form-invalid-feedback v-if="!isComplexType">
         {{ validationError }}
       </b-form-invalid-feedback>
     </b-form-group>
-    <component
-      v-else
-      :is="fieldComponent"
-      v-bind="fieldProps"
-      @input="onInput"
-      @change="onChange"
-    />
+    <div v-else>
+      <component
+        :is="fieldComponent"
+        v-bind="fieldProps"
+        @input="onInput"
+        @change="onChange"
+      />
+      <div
+        v-if="!isComplexType && validationError"
+        class="invalid-feedback d-block"
+      >
+        {{ validationError }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -100,7 +112,13 @@ export default {
       if (this.schema.enum) {
         return 'b-form-select';
       }
-      return 'b-form-input';
+      const inputTypeHint = this.schema['x-ui-hint']?.inputType;
+      switch (inputTypeHint) {
+        case 'textarea':
+          return 'b-form-textarea';
+        default:
+          return 'b-form-input';
+      }
     },
     fieldProps() {
       const baseProps = {
@@ -158,7 +176,7 @@ export default {
         value: this.value,
         type: this.getInputType(),
         required: this.isRequired,
-        placeholder: this.schema.examples?.[0] || '',
+        placeholder: this.schema.examples?.[0]?.toString() || '',
         min: this.schema.minimum,
         max: this.schema.maximum,
         minlength: this.schema.minLength,

@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body :header="extensionName">
+  <b-card no-body :header="cardHeader">
     <b-form @submit="onSubmit">
       <b-card-body>
         <b-alert v-if="loadError" variant="danger" show>
@@ -28,7 +28,7 @@
           <p class="mt-2">{{ this.$t('message.loading') }}</p>
         </div>
       </b-card-body>
-      <b-card-footer>
+      <b-card-footer v-if="!hideSubmitButton">
         <b-button
           variant="outline-primary"
           type="submit"
@@ -54,11 +54,30 @@ export default {
   props: {
     extensionPointName: {
       type: String,
-      required: true,
+      required: false,
     },
     extensionName: {
       type: String,
       required: true,
+    },
+    configSchemaUrl: {
+      type: String,
+      required: false,
+    },
+    initialConfig: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    hideSubmitButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    header: {
+      type: String,
+      required: false,
+      default: undefined,
     },
   },
   data() {
@@ -72,6 +91,9 @@ export default {
     };
   },
   computed: {
+    cardHeader() {
+      return this.header !== undefined ? this.header : this.extensionName;
+    },
     normalizedFormData() {
       return this.normalizeFormData(this.formData);
     },
@@ -88,17 +110,25 @@ export default {
   methods: {
     async fetchSchemaAndConfig() {
       try {
-        const [schemaResponse, configResponse] = await Promise.all([
-          this.axios.get(
-            `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config-schema`,
-          ),
-          this.axios.get(
-            `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config`,
-          ),
-        ]);
+        const schemaUrl =
+          this.configSchemaUrl ||
+          `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config-schema`;
+
+        let schemaResponse, configData;
+        if (this.initialConfig !== null) {
+          schemaResponse = await this.axios.get(schemaUrl);
+          configData = this.initialConfig;
+        } else {
+          const configUrl = `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/config`;
+          const [schemaResp, configResponse] = await Promise.all([
+            this.axios.get(schemaUrl),
+            this.axios.get(configUrl),
+          ]);
+          schemaResponse = schemaResp;
+          configData = configResponse.data.config || {};
+        }
 
         this.schema = schemaResponse.data;
-        const configData = configResponse.data.config || {};
         this.formData = this.initializeFormData(configData);
       } catch (err) {
         console.error(`Failed to load schema or config: ${err}`);
@@ -165,9 +195,14 @@ export default {
             .replace(/\//g, '.');
           const message = this.formatValidationError(error);
 
-          // For root-level errors (empty field path), show on the offending property.
-          if (!field && error.params?.missingProperty) {
-            this.validationErrors[error.params.missingProperty] = message;
+          // For required field errors, show on the missing property itself.
+          // For root-level errors, field is empty so use missingProperty directly.
+          // For nested errors, field is the parent path so append missingProperty.
+          if (error.params?.missingProperty) {
+            const errorKey = field
+              ? `${field}.${error.params.missingProperty}`
+              : error.params.missingProperty;
+            this.validationErrors[errorKey] = message;
           } else if (field) {
             this.validationErrors[field] = message;
           }
@@ -327,6 +362,19 @@ export default {
         ...propSchema,
         isRequired: this.schema.required?.includes(propName) || false,
       };
+    },
+    async validateAndGetConfig() {
+      if (!this.validateForm()) {
+        const errorCount = Object.keys(this.validationErrors).length;
+        const errorSummary =
+          errorCount === 1
+            ? this.$t('validation.schema.validation_failed')
+            : this.$t('validation.schema.validation_failed_plural', {
+                count: errorCount,
+              });
+        throw new Error(errorSummary);
+      }
+      return this.normalizedFormData;
     },
   },
 };

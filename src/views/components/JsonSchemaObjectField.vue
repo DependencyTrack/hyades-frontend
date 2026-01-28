@@ -3,10 +3,11 @@
     <b-card-body>
       <div v-for="(propSchema, propName) in schema.properties" :key="propName">
         <json-schema-form-field
-          :schema="propSchema"
-          :property-name="propName"
+          :schema="enrichSchema(propSchema, propName)"
+          :property-name="`${propertyName}.${propName}`"
           :value="localValue[propName]"
           :validation-error="validationErrors[propName]"
+          :validation-errors="getNestedValidationErrors(propName)"
           @input="onPropertyChange(propName, $event)"
         />
       </div>
@@ -55,6 +56,29 @@ export default {
       // which is supposed to handle cases like this a bit better.
       this.$set(this.localValue, propName, propValue);
       this.$emit('input', this.localValue);
+    },
+    // Make it easier to detect whether a field is required
+    // by attaching the required property directly to it.
+    enrichSchema(propSchema, propName) {
+      return {
+        ...propSchema,
+        isRequired: this.schema.required?.includes(propName) || false,
+      };
+    },
+    // Extract nested validation errors for a given property,
+    // e.g. for propName "foo", extract "foo.bar" -> "bar".
+    getNestedValidationErrors(propName) {
+      const prefix = `${propName}.`;
+      const nestedErrors = {};
+
+      Object.keys(this.validationErrors).forEach((key) => {
+        if (key.startsWith(prefix)) {
+          const nestedKey = key.substring(prefix.length);
+          nestedErrors[nestedKey] = this.validationErrors[key];
+        }
+      });
+
+      return nestedErrors;
     },
   },
 };
