@@ -147,7 +147,6 @@ export default {
                       :config-schema-url="getConfigSchemaUrl(alert.publisher.uuid)"
                       :initial-config="getInitialConfig(alert.publisherConfig)"
                       :hide-submit-button="true"
-                      @config-update="onPublisherConfigUpdate"
                     />
                      <b-form-group id="teamDestinationList" :label="this.$t('admin.select_team_as_recipient')">
                        <div class="list group">
@@ -243,8 +242,6 @@ export default {
                 enabled: row.enabled,
                 logSuccessfulPublish: row.logSuccessfulPublish,
                 notifyChildren: row.notifyChildren,
-                publisherName: row.publisher.name,
-                publisherClass: row.publisher.publisherClass,
                 notificationLevel: row.notificationLevel,
                 scope: row.scope,
                 notifyOn: row.notifyOn,
@@ -310,9 +307,6 @@ export default {
                   console.error('Failed to parse publisherConfig:', e);
                   return {};
                 }
-              },
-              onPublisherConfigUpdate: function (newConfig) {
-                this.alert.publisherConfig = JSON.stringify(newConfig);
               },
               // Some publishers such as the console publisher do not support
               // rule-level configuration. In that case, the /configSchema

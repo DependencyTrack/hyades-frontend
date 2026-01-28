@@ -7,6 +7,7 @@
           :property-name="`${propertyName}.${propName}`"
           :value="localValue[propName]"
           :validation-error="validationErrors[propName]"
+          :validation-errors="getNestedValidationErrors(propName)"
           @input="onPropertyChange(propName, $event)"
         />
       </div>
@@ -63,6 +64,21 @@ export default {
         ...propSchema,
         isRequired: this.schema.required?.includes(propName) || false,
       };
+    },
+    // Extract nested validation errors for a given property,
+    // e.g. for propName "foo", extract "foo.bar" -> "bar".
+    getNestedValidationErrors(propName) {
+      const prefix = `${propName}.`;
+      const nestedErrors = {};
+
+      Object.keys(this.validationErrors).forEach((key) => {
+        if (key.startsWith(prefix)) {
+          const nestedKey = key.substring(prefix.length);
+          nestedErrors[nestedKey] = this.validationErrors[key];
+        }
+      });
+
+      return nestedErrors;
     },
   },
 };

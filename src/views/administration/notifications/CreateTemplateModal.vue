@@ -131,12 +131,13 @@ export default {
       try {
         const url = `${this.$api.BASE_URL}/api/v2/extension-points/notification-publisher/extensions`;
         const response = await this.axios.get(url);
-        this.availableExtensions = response.data.extensions.map(
-          (extension) => ({
-            value: extension.name,
-            text: extension.name,
-          }),
-        );
+        const extensions = Array.isArray(response?.data?.extensions)
+          ? response.data.extensions
+          : [];
+        this.availableExtensions = extensions.map((extension) => ({
+          value: extension.name,
+          text: extension.name,
+        }));
       } catch (error) {
         console.error('Failed to fetch available extensions:', error);
         this.$toastr.w(this.$t('condition.unsuccessful_action'));
