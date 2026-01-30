@@ -241,6 +241,17 @@ export default {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
         });
     },
+    updateHistoricalRiskScore: function () {
+      let url = `${this.$api.BASE_URL}/riskscore/refresh`;
+      this.axios
+        .get(url)
+        .then((response) => {
+          this.$toastr.s(this.$t('admin.configuration_saved'));
+        })
+        .catch((error) => {
+          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+        });
+    },
   },
   watch: {
     isAclEnabled() {
