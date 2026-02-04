@@ -19,6 +19,7 @@ module.exports = {
     'validation.min_value',
     'validation.required',
   ],
+  missingTranslationString: null,
   languageFiles: 'src/i18n/locales/*.json',
   vueFiles: 'src/**/!(vendors)/*.{vue,js}',
 };
