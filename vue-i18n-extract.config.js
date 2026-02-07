@@ -1,5 +1,7 @@
 module.exports = {
   exclude: [
+    'condition.http_request_error',
+    'condition.server_error',
     'language.de',
     'language.en',
     'language.es',
@@ -18,5 +20,5 @@ module.exports = {
     'validation.required',
   ],
   languageFiles: 'src/i18n/locales/*.json',
-  vueFiles: 'src/**/*.?(vue|js)',
+  vueFiles: 'src/**/!(vendors)/*.{vue,js}',
 };

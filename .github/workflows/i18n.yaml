@@ -30,7 +30,5 @@ jobs:
         run: npm install
 
       - name: Check for Translations
-        run: |
-          mv src/assets/scss/vendors/chart.js src/assets/scss/vendors/chart.js.skip
-          npm run vue-i18n-extract
+        run: npm run vue-i18n-extract
         continue-on-error: false
