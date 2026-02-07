@@ -20,7 +20,8 @@
     "eslint-fix": "eslint --ext .js,.vue,.json,.md,.yaml --fix . --report-unused-disable-directives",
     "prettier": "prettier --check --cache '**/*.{js,vue,json,md,yaml}'",
     "prettier-fix": "prettier --write --cache '**/*.{js,vue,json,md,yaml}'",
-    "vue-i18n-extract": "vue-i18n-extract report --ci"
+    "vue-i18n-extract": "vue-i18n-extract report --ci",
+    "add-missing-i18n": "vue-i18n-extract --add"
   },
   "dependencies": {
     "@coreui/coreui": "2.1.16",
@@ -92,7 +93,7 @@
     "sass": "1.72.0",
     "sass-loader": "8.0.2",
     "uuid": "9.0.1",
-    "vue-i18n-extract": "^2.0.7",
+    "vue-i18n-extract": "git+https://git@github.com/Spittal/vue-i18n-extract.git#f856484d2f62abbd931d84676519f529062d94da",
     "vue-template-compiler": "2.7.16"
   },
   "overrides": {

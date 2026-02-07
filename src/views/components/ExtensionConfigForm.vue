@@ -32,13 +32,57 @@
         <b-button
           variant="outline-primary"
           type="submit"
-          :disabled="isSavingInProgress || !schema"
+          :disabled="isOperationInProgress || !schema"
+          class="ml-2"
         >
           <b-spinner v-show="isSavingInProgress" small />
           {{ this.$t('admin.submit') }}
         </b-button>
+        <b-button
+          variant="outline-secondary"
+          :disabled="isOperationInProgress || !schema"
+          class="ml-2"
+          @click="testConfig"
+        >
+          <b-spinner v-show="isTestInProgress" small />
+          {{ this.$t('admin.perform_test') }}
+        </b-button>
       </b-card-footer>
     </b-form>
+
+    <b-modal
+      id="testResultsModal"
+      ref="testResultsModal"
+      :title="$t('admin.test_results')"
+      ok-only
+      :ok-title="$t('message.close')"
+    >
+      <div v-if="testResults">
+        <b-alert
+          v-for="(check, index) in testResults.checks"
+          :key="index"
+          :variant="getCheckVariant(check.status)"
+          show
+          class="mb-2"
+        >
+          <i :class="getCheckIcon(check.status)" class="mr-2"></i>
+          <span v-if="check.status === 'PASSED'">
+            {{ $t('admin.test_check_passed', { name: check.name }) }}
+          </span>
+          <span v-else-if="check.status === 'FAILED'">
+            {{
+              $t('admin.test_check_failed', {
+                name: check.name,
+                message: check.message,
+              })
+            }}
+          </span>
+          <span v-else-if="check.status === 'SKIPPED'">
+            {{ $t('admin.test_check_skipped', { name: check.name }) }}
+          </span>
+        </b-alert>
+      </div>
+    </b-modal>
   </b-card>
 </template>
 
@@ -86,6 +130,8 @@ export default {
       formData: {},
       validationErrors: {},
       isSavingInProgress: false,
+      isTestInProgress: false,
+      testResults: null,
       loadError: null,
       ajv: null,
     };
@@ -96,6 +142,9 @@ export default {
     },
     normalizedFormData() {
       return this.normalizeFormData(this.formData);
+    },
+    isOperationInProgress() {
+      return this.isSavingInProgress || this.isTestInProgress;
     },
   },
   async mounted() {
@@ -375,6 +424,69 @@ export default {
         throw new Error(errorSummary);
       }
       return this.normalizedFormData;
+    },
+    async testConfig() {
+      if (this.isOperationInProgress) {
+        return;
+      }
+
+      if (!this.validateForm()) {
+        const errorCount = Object.keys(this.validationErrors).length;
+        const errorSummary =
+          errorCount === 1
+            ? this.$t('validation.schema.validation_failed')
+            : this.$t('validation.schema.validation_failed_plural', {
+                count: errorCount,
+              });
+        await this.$toastr.e(
+          errorSummary,
+          this.$t('message.input_validation_failed'),
+        );
+        return;
+      }
+
+      try {
+        this.isTestInProgress = true;
+        this.testResults = null;
+
+        const config = this.normalizeFormData(this.formData);
+
+        const response = await this.axios.post(
+          `${this.$api.BASE_URL}/api/v2/extension-points/${this.extensionPointName}/extensions/${this.extensionName}/test`,
+          { config },
+        );
+
+        this.testResults = response.data;
+        this.$refs.testResultsModal.show();
+      } catch (err) {
+        console.error('Failed to test configuration:', err);
+      } finally {
+        this.isTestInProgress = false;
+      }
+    },
+    getCheckVariant(status) {
+      switch (status) {
+        case 'PASSED':
+          return 'success';
+        case 'FAILED':
+          return 'danger';
+        case 'SKIPPED':
+          return 'warning';
+        default:
+          return 'secondary';
+      }
+    },
+    getCheckIcon(status) {
+      switch (status) {
+        case 'PASSED':
+          return 'fa fa-check-circle';
+        case 'FAILED':
+          return 'fa fa-times-circle';
+        case 'SKIPPED':
+          return 'fa fa-minus-circle';
+        default:
+          return 'fa fa-question-circle';
+      }
     },
   },
 };
