@@ -7,6 +7,22 @@
         </b-alert>
 
         <div v-if="!loadError && schema">
+          <!-- Additional fields (not in schema) -->
+          <div
+            v-for="(fieldConfig, fieldName) in additionalFields"
+            :key="`additional-${fieldName}`"
+            class="form-group"
+          >
+            <json-schema-form-field
+              :schema="fieldConfig.schema"
+              :property-name="fieldName"
+              :value="formData[fieldName]"
+              :validation-error="getValidationError(fieldName)"
+              :validation-errors="getNestedValidationErrors(fieldName)"
+              @input="onFieldChange(fieldName, $event)"
+            />
+          </div>
+          <!-- Schema fields -->
           <div
             v-for="(propSchema, propName) in schema.properties"
             :key="propName"
@@ -123,6 +139,11 @@ export default {
       required: false,
       default: undefined,
     },
+    additionalFields: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -178,7 +199,12 @@ export default {
         }
 
         this.schema = schemaResponse.data;
-        this.formData = this.initializeFormData(configData);
+        // Use $set to ensure reactivity for formData
+        const initializedData = this.initializeFormData(configData);
+        // Set formData reactively
+        Object.keys(initializedData).forEach((key) => {
+          this.$set(this.formData, key, initializedData[key]);
+        });
       } catch (err) {
         console.error(`Failed to load schema or config: ${err}`);
         this.loadError = `Failed to load extension configuration: ${err.message}`;
@@ -187,6 +213,18 @@ export default {
     initializeFormData(configData) {
       const data = { ...configData };
 
+      // Initialize additional fields
+      if (this.additionalFields) {
+        Object.entries(this.additionalFields).forEach(
+          ([fieldName, fieldConfig]) => {
+            if (data[fieldName] === undefined || data[fieldName] === null) {
+              data[fieldName] = this.getDefaultValue(fieldConfig.schema);
+            }
+          },
+        );
+      }
+
+      // Initialize schema fields
       if (this.schema?.properties) {
         Object.entries(this.schema.properties).forEach(
           ([propName, propSchema]) => {
