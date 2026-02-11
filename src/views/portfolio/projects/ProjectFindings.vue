@@ -355,7 +355,7 @@ export default {
         showRefresh: true,
         pagination: true,
         silentSort: false,
-        sidePagination: 'client',
+        sidePagination: 'server',
         toolbar: '#findingsToolbar',
         queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',
