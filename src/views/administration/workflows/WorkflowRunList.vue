@@ -89,6 +89,13 @@ export default {
           title: this.$t('message.id'),
           field: 'id',
           sortable: true,
+          formatter: (value) => {
+            const href = this.$router.resolve({
+              name: 'WorkflowRunDetail',
+              params: { id: value },
+            }).href;
+            return `<a href="${href}">${value}</a>`;
+          },
         },
         {
           title: this.$t('admin.workflow_name'),

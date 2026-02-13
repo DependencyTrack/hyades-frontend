@@ -99,6 +99,8 @@ const PortfolioAccessControl = () =>
   import('@/views/administration/accessmanagement/PortfolioAccessControl');
 const WorkflowRunList = () =>
   import('@/views/administration/workflows/WorkflowRunList');
+const WorkflowRunDetail = () =>
+  import('@/views/administration/workflows/WorkflowRunDetail');
 
 const Component = () => import('@/views/portfolio/projects/Component');
 const Service = () => import('@/views/portfolio/projects/Service');
@@ -1097,6 +1099,20 @@ function configRoutes() {
               component: WorkflowRunList,
               meta: {
                 title: i18n.t('admin.workflow_runs'),
+                i18n: 'admin.workflow_runs',
+                sectionPath: '/workflowRuns',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_READ',
+                ],
+              },
+            },
+            {
+              path: 'workflows/runs/:id',
+              name: 'WorkflowRunDetail',
+              props: (route) => ({ id: route.params.id }),
+              component: WorkflowRunDetail,
+              meta: {
                 i18n: 'admin.workflow_runs',
                 sectionPath: '/workflowRuns',
                 permissions: [
