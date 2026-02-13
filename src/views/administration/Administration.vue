@@ -76,6 +76,7 @@ import PortfolioAccessControl from './accessmanagement/PortfolioAccessControl';
 import Roles from './accessmanagement/Roles';
 import Teams from './accessmanagement/Teams';
 // Workflow plugins
+import WorkflowRunDetail from '@/views/administration/workflows/WorkflowRunDetail.vue';
 import WorkflowRunList from '@/views/administration/workflows/WorkflowRunList.vue';
 
 export default {
@@ -122,6 +123,7 @@ export default {
     Teams,
     Permissions,
     PortfolioAccessControl,
+    WorkflowRunDetail,
     WorkflowRunList,
   },
   created() {
