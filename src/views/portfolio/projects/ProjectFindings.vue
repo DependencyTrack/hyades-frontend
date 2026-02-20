@@ -295,7 +295,7 @@ export default {
         {
           title: this.$t('message.severity'),
           field: 'vulnerability.severity',
-          sortName: 'vulnerability.severityRank',
+          sortName: 'vulnerability.severity',
           sortable: true,
           formatter(value, row, index) {
             if (typeof value !== 'undefined') {
