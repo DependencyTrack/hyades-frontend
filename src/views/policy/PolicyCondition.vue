@@ -149,14 +149,14 @@
       </b-col>
 
       <b-col v-if="subject === 'EXPRESSION'" lg="6">
-        <MonacoEditor
+        <CodeMirrorEditor
           id="input-value"
           v-if="subject === 'EXPRESSION'"
           v-model="value"
           :markers="this.editorMarkers"
           v-debounce:1s="saveCondition"
           :debounce-events="'keyup'"
-        ></MonacoEditor>
+        ></CodeMirrorEditor>
       </b-col>
       <b-col v-if="subject === 'EXPRESSION'" lg="2">
         <b-form-select
@@ -178,7 +178,7 @@ import BInputGroupFormInput from '../../forms/BInputGroupFormInput';
 import BInputGroupFormSelect from '../../forms/BInputGroupFormSelect';
 import common from '../../shared/common';
 import ActionableListGroupItem from '../components/ActionableListGroupItem';
-import MonacoEditor from '@/views/components/MonacoEditor.vue';
+import CodeMirrorEditor from '@/views/components/CodeMirrorEditor.vue';
 
 export default {
   props: {
@@ -189,7 +189,7 @@ export default {
     ActionableListGroupItem,
     BInputGroupFormSelect,
     BInputGroupFormInput,
-    MonacoEditor,
+    CodeMirrorEditor,
   },
   created() {
     if (this.condition) {
@@ -485,6 +485,7 @@ export default {
             this.operator = response.data.operator;
             this.value = response.data.value;
             this.violationType = response.data.violationType;
+            this.editorMarkers = [];
             this.$toastr.s(this.$t('message.updated'));
           })
           .catch((error) => {
