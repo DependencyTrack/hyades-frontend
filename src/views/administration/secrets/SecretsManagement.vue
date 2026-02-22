@@ -17,7 +17,6 @@
       <token-paginated-table
         ref="table"
         :base-url="tableDataBaseUrl"
-        response-data-field="secrets"
         :columns="columns"
         :data="data"
         :options="options"
