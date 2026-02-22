@@ -180,11 +180,19 @@ export default {
           return;
         }
 
-        this.tableData = response.data[this.responseDataField] || [];
+        this.tableData = response.data['items'] || [];
         this.currentPageUrl = pageUrl;
-        this.nextPageUrl = response.data._pagination.links.next;
 
-        const total = response.data._pagination.total;
+        const nextPageToken = response.data.next_page_token;
+        if (nextPageToken) {
+          this.nextPageUrl = common.setQueryParams(pageUrl, {
+            page_token: nextPageToken,
+          });
+        } else {
+          this.nextPageUrl = null;
+        }
+
+        const total = response.data.total;
         if (total) {
           this.totalCount = total.count;
           this.totalCountType = total.type;

@@ -37,7 +37,6 @@
       <token-paginated-table
         ref="table"
         :base-url="tableDataBaseUrl"
-        response-data-field="workflow_runs"
         :columns="tableColumns"
         :options="tableOptions"
       />
