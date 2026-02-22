@@ -408,18 +408,6 @@ export default {
     this.stopPolling();
   },
   methods: {
-    extractNextPageToken(response) {
-      const pagination = response.data._pagination;
-      if (pagination && pagination.links && pagination.links.next) {
-        try {
-          const parsed = new URL(pagination.links.next, 'http://localhost');
-          return parsed.searchParams.get('page_token');
-        } catch {
-          return null;
-        }
-      }
-      return null;
-    },
     async fetchRun() {
       try {
         const response = await this.axios.get(this.runUrl);
@@ -441,9 +429,9 @@ export default {
         const response = await this.axios.get(`${this.runUrl}/events`, {
           params: { sort_direction: 'DESC', limit: EVENT_LIMIT },
         });
-        this.events = response.data.events || [];
+        this.events = response.data.items || [];
         this.updateMaxSeqNum(this.events);
-        this.nextPageToken = this.extractNextPageToken(response);
+        this.nextPageToken = response.data.next_page_token;
       } catch (e) {
         console.error('Failed to fetch workflow run events', e);
       } finally {
@@ -463,10 +451,10 @@ export default {
             page_token: this.nextPageToken,
           },
         });
-        const newEvents = response.data.events || [];
+        const newEvents = response.data.items || [];
         this.events = this.events.concat(newEvents);
         this.updateMaxSeqNum(newEvents);
-        this.nextPageToken = this.extractNextPageToken(response);
+        this.nextPageToken = response.data.next_page_token;
       } catch (e) {
         console.error('Failed to load more workflow run events', e);
       } finally {
@@ -498,7 +486,7 @@ export default {
             limit: POLL_LIMIT,
           },
         });
-        const newEvents = (response.data.events || []).filter(
+        const newEvents = (response.data.items || []).filter(
           (e) => e.sequence_number > this.maxSeqNum,
         );
         if (newEvents.length > 0) {

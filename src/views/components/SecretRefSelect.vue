@@ -126,7 +126,7 @@ export default {
         }
         const url = common.setQueryParams(baseUrl, params);
         const response = await this.axios.get(url);
-        const secrets = response.data.secrets || [];
+        const secrets = response.data.items || [];
         this.availableSecrets = secrets;
         if (
           this.selectedSecret &&
