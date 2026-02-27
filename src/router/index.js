@@ -38,23 +38,10 @@ const RiskScore = () =>
 const SecretsManagement = () =>
   import('@/views/administration/secrets/SecretsManagement.vue');
 
-const InternalAnalyzer = () =>
-  import('@/views/administration/analyzers/InternalAnalyzer');
-const OssIndexAnalyzer = () =>
-  import('@/views/administration/analyzers/OssIndexAnalyzer');
-const VulnDbAnalyzer = () =>
-  import('@/views/administration/analyzers/VulnDbAnalyzer');
-const SnykAnalyzer = () =>
-  import('@/views/administration/analyzers/SnykAnalyzer');
-const TrivyAnalyzer = () =>
-  import('@/views/administration/analyzers/TrivyAnalyzer');
+const AnalyzerView = () => import('@/views/administration/analyzers/Index');
 
-const VulnSourceNvd = () =>
-  import('@/views/administration/vuln-sources/VulnSourceNvd');
-const VulnSourceGitHubAdvisories = () =>
-  import('@/views/administration/vuln-sources/VulnSourceGitHubAdvisories');
-const VulnSourceOSVAdvisories = () =>
-  import('@/views/administration/vuln-sources/VulnSourceOSVAdvisories');
+const VulnSourceView = () =>
+  import('@/views/administration/vuln-sources/Index');
 
 const Cargo = () => import('@/views/administration/repositories/Cargo');
 const Composer = () => import('@/views/administration/repositories/Composer');
@@ -494,9 +481,12 @@ function configRoutes() {
               },
             },
             {
-              path: 'analyzers/internal',
-              alias: ['analyzers'],
-              component: InternalAnalyzer,
+              path: 'analyzers',
+              redirect: 'analyzers/internal',
+            },
+            {
+              path: 'analyzers/:extensionName',
+              component: AnalyzerView,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
@@ -512,111 +502,12 @@ function configRoutes() {
               },
             },
             {
-              path: 'analyzers/oss',
-              component: OssIndexAnalyzer,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
+              path: 'vulnerabilitySources',
+              redirect: 'vulnerabilitySources/nvd',
             },
             {
-              path: 'analyzers/vulnDB',
-              component: VulnDbAnalyzer,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'analyzers/snyk',
-              component: SnykAnalyzer,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'analyzers/trivy',
-              component: TrivyAnalyzer,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'vulnerabilitySources/nvd',
-              alias: ['vulnerabilitySources'],
-              component: VulnSourceNvd,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'vulnerabilitySources/github',
-              component: VulnSourceGitHubAdvisories,
-              meta: {
-                title: i18n.t('message.administration'),
-                i18n: 'message.administration',
-                sectionPath: '/admin',
-                sectionName: 'Admin',
-                permissions: [
-                  'SYSTEM_CONFIGURATION',
-                  'SYSTEM_CONFIGURATION_CREATE',
-                  'SYSTEM_CONFIGURATION_READ',
-                  'SYSTEM_CONFIGURATION_UPDATE',
-                  'SYSTEM_CONFIGURATION_DELETE',
-                ],
-              },
-            },
-            {
-              path: 'vulnerabilitySources/osv',
-              component: VulnSourceOSVAdvisories,
+              path: 'vulnerabilitySources/:extensionName',
+              component: VulnSourceView,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',

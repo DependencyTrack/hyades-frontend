@@ -35,16 +35,6 @@ import RiskScore from './configuration/RiskScore.vue';
 import WelcomeMessage from './configuration/WelcomeMessage.vue';
 // Secrets plugins
 import SecretsManagement from './secrets/SecretsManagement.vue';
-// Analyzer plugins
-import InternalAnalyzer from './analyzers/InternalAnalyzer';
-import OssIndexAnalyzer from './analyzers/OssIndexAnalyzer';
-import SnykAnalyzer from './analyzers/SnykAnalyzer';
-import TrivyAnalyzer from './analyzers/TrivyAnalyzer';
-import VulnDbAnalyzer from './analyzers/VulnDbAnalyzer';
-// Vulnerability sources
-import VulnSourceGitHubAdvisories from './vuln-sources/VulnSourceGitHubAdvisories';
-import VulnSourceNvd from './vuln-sources/VulnSourceNvd';
-import VulnSourceOSVAdvisories from './vuln-sources/VulnSourceOSVAdvisories';
 // Repositories
 import Cargo from './repositories/Cargo';
 import Composer from './repositories/Composer';
@@ -89,14 +79,6 @@ export default {
     InternalComponents,
     RiskScore,
     SecretsManagement,
-    InternalAnalyzer,
-    OssIndexAnalyzer,
-    VulnDbAnalyzer,
-    SnykAnalyzer,
-    TrivyAnalyzer,
-    VulnSourceNvd,
-    VulnSourceGitHubAdvisories,
-    VulnSourceOSVAdvisories,
     Cargo,
     Composer,
     Gem,

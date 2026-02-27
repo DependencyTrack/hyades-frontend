@@ -1,6 +1,7 @@
 <template>
   <extension-config-form
-    extension-name="oss-index"
+    :key="$route.params.extensionName"
+    :extension-name="$route.params.extensionName"
     extension-point-name="vuln-analyzer"
   />
 </template>

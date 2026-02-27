@@ -88,6 +88,22 @@ $common.capitalize = function capitalize(string) {
 };
 
 /**
+ * Converts a slug-case string to title case.
+ * e.g. "oss-index" → "Oss Index", "internal" → "Internal"
+ *
+ * @param {string} slug the slug-case string to convert
+ */
+$common.titleCase = function titleCase(slug) {
+  if (!slug) {
+    return slug;
+  }
+  return slug
+    .split('-')
+    .map((w) => $common.capitalize(w))
+    .join(' ');
+};
+
+/**
  * Formats and returns a specialized label for the severity of a vulnerability.
  */
 $common.formatSeverityLabel = function formatSeverityLabel(severity) {
@@ -610,6 +626,7 @@ export default {
   formatProjectTeamLabel: $common.formatProjectTeamLabel,
   formatVulnerabilityTagLabel: $common.formatVulnerabilityTagLabel,
   capitalize: $common.capitalize,
+  titleCase: $common.titleCase,
   formatSeverityLabel: $common.formatSeverityLabel,
   formatViolationStateLabel: $common.formatViolationStateLabel,
   formatCweLabel: $common.formatCweLabel,

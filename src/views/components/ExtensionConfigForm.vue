@@ -89,6 +89,7 @@
 <script>
 import Ajv from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
+import common from '../../shared/common';
 import JsonSchemaFormField from './JsonSchemaFormField.vue';
 
 export default {
@@ -138,7 +139,9 @@ export default {
   },
   computed: {
     cardHeader() {
-      return this.header !== undefined ? this.header : this.extensionName;
+      return this.header !== undefined
+        ? this.header
+        : common.titleCase(this.extensionName);
     },
     normalizedFormData() {
       return this.normalizeFormData(this.formData);

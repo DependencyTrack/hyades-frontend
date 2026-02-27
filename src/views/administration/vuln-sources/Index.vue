@@ -1,7 +1,8 @@
 <template>
   <extension-config-form
-    extension-name="vuln-db"
-    extension-point-name="vuln-analyzer"
+    :key="$route.params.extensionName"
+    :extension-name="$route.params.extensionName"
+    extension-point-name="vuln-data-source"
   />
 </template>
 
