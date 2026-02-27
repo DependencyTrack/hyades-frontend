@@ -192,9 +192,9 @@ $common.formatAnalyzerLabel = function formatAnalyzerLabel(
 
   let analyzerLabel = '';
   if (analyzerUrl) {
-    analyzerLabel = `<a href="${analyzerUrl}" target="_blank">${analyzer} <i class="fa fa-external-link"></i></a>`;
+    analyzerLabel = `<a href="${analyzerUrl}" target="_blank">${$common.titleCase(analyzer)} <i class="fa fa-external-link"></i></a>`;
   } else {
-    analyzerLabel = `<span class="label-analyzer-internal"> ${analyzer} </span>`;
+    analyzerLabel = `<span class="label-analyzer-internal"> ${$common.titleCase(analyzer)} </span>`;
   }
 
   return `<span class="label label-source label-analyzer" style="white-space:nowrap;">${analyzerLabel}</span>`;
