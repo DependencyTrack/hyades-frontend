@@ -190,11 +190,13 @@ $common.formatAnalyzerLabel = function formatAnalyzerLabel(
     }
   }
 
+  const escapedLabel = xssFilters.inHTMLData($common.titleCase(analyzer));
   let analyzerLabel = '';
   if (analyzerUrl) {
-    analyzerLabel = `<a href="${analyzerUrl}" target="_blank">${$common.titleCase(analyzer)} <i class="fa fa-external-link"></i></a>`;
+    const sanitizedUrl = xssFilters.uriInDoubleQuotedAttr(analyzerUrl);
+    analyzerLabel = `<a href="${sanitizedUrl}" target="_blank">${escapedLabel} <i class="fa fa-external-link"></i></a>`;
   } else {
-    analyzerLabel = `<span class="label-analyzer-internal"> ${$common.titleCase(analyzer)} </span>`;
+    analyzerLabel = `<span class="label-analyzer-internal"> ${escapedLabel} </span>`;
   }
 
   return `<span class="label label-source label-analyzer" style="white-space:nowrap;">${analyzerLabel}</span>`;
