@@ -408,6 +408,11 @@ export default {
               name: this.$t('admin.workflow_runs'),
               route: 'workflows/runs',
             },
+            {
+              component: 'TaskQueueList',
+              name: this.$t('admin.task_queues'),
+              route: 'workflows/taskQueues',
+            },
           ],
         },
       ],
