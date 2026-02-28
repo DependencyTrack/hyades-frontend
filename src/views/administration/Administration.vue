@@ -111,9 +111,13 @@ export default {
   created() {
     // Specifies the admin plugin metadata (Vue component, i18n name, and href) of the plugin to load
     EventBus.$on('admin:plugin', (plugin) => {
-      this.selectedComponent = plugin.component;
+      if (plugin.component) {
+        this.selectedComponent = plugin.component;
+      }
       this.header = plugin.name;
-      this.href = plugin.href;
+      if (plugin.href) {
+        this.href = plugin.href;
+      }
     });
   },
   data() {
