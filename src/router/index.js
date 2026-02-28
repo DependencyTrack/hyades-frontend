@@ -84,6 +84,8 @@ const Permissions = () =>
   import('@/views/administration/accessmanagement/Permissions');
 const PortfolioAccessControl = () =>
   import('@/views/administration/accessmanagement/PortfolioAccessControl');
+const TaskQueueList = () =>
+  import('@/views/administration/workflows/TaskQueueList');
 const WorkflowRunList = () =>
   import('@/views/administration/workflows/WorkflowRunList');
 const WorkflowRunDetail = () =>
@@ -982,6 +984,19 @@ function configRoutes() {
                   'ACCESS_MANAGEMENT_READ',
                   'ACCESS_MANAGEMENT_UPDATE',
                   'ACCESS_MANAGEMENT_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'workflows/taskQueues',
+              component: TaskQueueList,
+              meta: {
+                title: i18n.t('admin.task_queues'),
+                i18n: 'admin.task_queues',
+                sectionPath: '/taskQueues',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_READ',
                 ],
               },
             },
