@@ -87,12 +87,23 @@ export default {
           const extensions = Array.isArray(response.data)
             ? response.data
             : response.data.extensions || [];
-          section.children = extensions.map((ext) => ({
-            name: common.titleCase(ext.name),
-            route: routePrefix + '/' + ext.name,
-          }));
+          section.children = extensions.map((ext) => {
+            const encodedName = encodeURIComponent(ext.name);
+            const route = routePrefix + '/' + encodedName;
+            return {
+              id: route,
+              name: common.titleCase(ext.name),
+              route: route,
+            };
+          });
         })
-        .catch(() => {});
+        .catch((error) => {
+          console.error(
+            'Failed to load extensions for extension point:',
+            extensionPoint,
+            error,
+          );
+        });
     },
   },
   created() {
