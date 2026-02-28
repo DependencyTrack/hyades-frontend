@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import common from '../../shared/common';
 import permissionsMixin from '../../mixins/permissionsMixin';
 import EventBus from '../../shared/eventbus';
 import {
@@ -75,6 +76,43 @@ export default {
       let tab = pattern.exec(this.$route.fullPath.toLowerCase());
       return tab && tab[1] ? tab[1].toLowerCase() : 'configuration';
     },
+    fetchExtensions: function (menuId, extensionPoint, routePrefix) {
+      const section = this.menu.find((s) => s.id === menuId);
+      if (!section) return;
+      this.axios
+        .get(
+          `${this.$api.BASE_URL}/api/v2/extension-points/${extensionPoint}/extensions`,
+        )
+        .then((response) => {
+          const extensions = Array.isArray(response.data)
+            ? response.data
+            : response.data.extensions || [];
+          section.children = extensions.map((ext) => {
+            const encodedName = encodeURIComponent(ext.name);
+            const route = routePrefix + '/' + encodedName;
+            return {
+              id: route,
+              name: common.titleCase(ext.name),
+              route: route,
+            };
+          });
+        })
+        .catch((error) => {
+          console.error(
+            'Failed to load extensions for extension point:',
+            extensionPoint,
+            error,
+          );
+        });
+    },
+  },
+  created() {
+    this.fetchExtensions('analyzers', 'vuln-analyzer', 'analyzers');
+    this.fetchExtensions(
+      'vulnerabilitysources',
+      'vuln-data-source',
+      'vulnerabilitySources',
+    );
   },
   mounted() {
     this.$root.$emit('bv::toggle::collapse', this.getMenuFromRoute());
@@ -159,33 +197,7 @@ export default {
             SYSTEM_CONFIGURATION_UPDATE,
             SYSTEM_CONFIGURATION_DELETE,
           ],
-          children: [
-            {
-              component: 'InternalAnalyzer',
-              name: this.$t('admin.internal_analyzer'),
-              route: 'analyzers/internal',
-            },
-            {
-              component: 'OssIndexAnalyzer',
-              name: this.$t('admin.oss_index'),
-              route: 'analyzers/oss',
-            },
-            {
-              component: 'VulnDbAnalyzer',
-              name: this.$t('admin.vulndb'),
-              route: 'analyzers/vulnDB',
-            },
-            {
-              component: 'SnykAnalyzer',
-              name: this.$t('admin.snyk'),
-              route: 'analyzers/snyk',
-            },
-            {
-              component: 'TrivyAnalyzer',
-              name: this.$t('admin.trivy'),
-              route: 'analyzers/trivy',
-            },
-          ],
+          children: [],
         },
         {
           name: this.$t('admin.vuln_sources'),
@@ -197,23 +209,7 @@ export default {
             SYSTEM_CONFIGURATION_UPDATE,
             SYSTEM_CONFIGURATION_DELETE,
           ],
-          children: [
-            {
-              component: 'VulnSourceNvd',
-              name: this.$t('admin.national_vulnerability_database'),
-              route: 'vulnerabilitySources/nvd',
-            },
-            {
-              component: 'VulnSourceGitHubAdvisories',
-              name: this.$t('admin.github_advisories'),
-              route: 'vulnerabilitySources/github',
-            },
-            {
-              component: 'VulnSourceOSVAdvisories',
-              name: this.$t('admin.osv_advisories'),
-              route: 'vulnerabilitySources/osv',
-            },
-          ],
+          children: [],
         },
         {
           name: this.$t('admin.repositories'),

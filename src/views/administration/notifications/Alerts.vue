@@ -187,6 +187,8 @@ export default {
                         <b-form-checkbox-group id="checkbox-group-notify-on" v-model="notifyOn">
                           <div class="list-group-item"><b-form-checkbox value="NEW_VULNERABILITY">NEW_VULNERABILITY</b-form-checkbox></div>
                           <div class="list-group-item"><b-form-checkbox value="NEW_VULNERABLE_DEPENDENCY">NEW_VULNERABLE_DEPENDENCY</b-form-checkbox></div>
+                          <div class="list-group-item"><b-form-checkbox value="VULNERABILITY_RETRACTED">VULNERABILITY_RETRACTED</b-form-checkbox></div>
+                          <div class="list-group-item"><b-form-checkbox value="PROJECT_VULN_ANALYSIS_COMPLETE">PROJECT_VULN_ANALYSIS_COMPLETE</b-form-checkbox></div>
                           <div class="list-group-item"><b-form-checkbox value="PROJECT_AUDIT_CHANGE">PROJECT_AUDIT_CHANGE</b-form-checkbox></div>
                           <div class="list-group-item"><b-form-checkbox value="BOM_CONSUMED">BOM_CONSUMED</b-form-checkbox></div>
                           <div class="list-group-item"><b-form-checkbox value="BOM_PROCESSED">BOM_PROCESSED</b-form-checkbox></div>

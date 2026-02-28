@@ -88,6 +88,22 @@ $common.capitalize = function capitalize(string) {
 };
 
 /**
+ * Converts a slug-case string to title case.
+ * e.g. "oss-index" → "Oss Index", "internal" → "Internal"
+ *
+ * @param {string} slug the slug-case string to convert
+ */
+$common.titleCase = function titleCase(slug) {
+  if (!slug) {
+    return slug;
+  }
+  return slug
+    .split('-')
+    .map((w) => $common.capitalize(w))
+    .join(' ');
+};
+
+/**
  * Formats and returns a specialized label for the severity of a vulnerability.
  */
 $common.formatSeverityLabel = function formatSeverityLabel(severity) {
@@ -150,7 +166,7 @@ $common.formatCweShortLabel = function formatCweShortLabel(cweId, cweName) {
 };
 
 /**
- * Formats and returns a specialized label for a vulnerability analyzer (OSSINDEX_ANALYZER, INTERNAL_ANALYZER, etc).
+ * Formats and returns a specialized label for a vulnerability analyzer.
  */
 $common.formatAnalyzerLabel = function formatAnalyzerLabel(
   analyzer,
@@ -162,50 +178,27 @@ $common.formatAnalyzerLabel = function formatAnalyzerLabel(
   if (!analyzer) {
     return null;
   }
-  let analyzerLabel = '';
-  let analyzerUrl = null;
-  switch (analyzer) {
-    case 'INTERNAL_ANALYZER':
-      analyzerLabel = vulnSource;
-      if (vulnSource === 'GITHUB') {
+  let analyzerUrl = referenceUrl;
+  if (!analyzerUrl) {
+    switch (vulnSource) {
+      case 'GITHUB':
         analyzerUrl = 'https://github.com/advisories/' + vulnId;
-      } else if (vulnSource === 'OSV') {
-        analyzerUrl = 'https://osv.dev/vulnerability/' + vulnId;
-      } else if (vulnSource === 'SNYK') {
-        analyzerUrl = 'https://security.snyk.io/vuln/' + vulnId;
-      }
-      break;
-    case 'OSSINDEX_ANALYZER':
-      analyzerLabel = 'OSS Index';
-      analyzerUrl = referenceUrl
-        ? referenceUrl
-        : 'https://ossindex.sonatype.org/vuln/' + vulnId;
-      break;
-    case 'VULNDB_ANALYZER':
-      analyzerLabel = 'VulnDB';
-      analyzerUrl =
-        'https://vulndb.cyberriskanalytics.com/vulnerabilities/' + vulnId;
-      break;
-    case 'SNYK_ANALYZER':
-      analyzerLabel = 'Snyk';
-      analyzerUrl = 'https://security.snyk.io/vuln/' + vulnId;
-      break;
-    case 'TRIVY_ANALYZER':
-      analyzerLabel = 'Trivy';
-      if (vulnSource === 'NVD') {
+        break;
+      case 'NVD':
         analyzerUrl = 'https://nvd.nist.gov/vuln/detail/' + vulnId;
-      } else if (vulnSource === 'GITHUB') {
-        analyzerUrl = 'https://github.com/advisories/' + vulnId;
-      }
-      // NB: Trivy can report vulnerabilities from sources that DT does
-      // not explicitly support.
-      break;
+        break;
+    }
   }
+
+  const escapedLabel = xssFilters.inHTMLData($common.titleCase(analyzer));
+  let analyzerLabel = '';
   if (analyzerUrl) {
-    analyzerLabel = `<a href="${analyzerUrl}" target="_blank">${analyzerLabel} <i class="fa fa-external-link"></i></a>`;
+    const sanitizedUrl = xssFilters.uriInDoubleQuotedAttr(analyzerUrl);
+    analyzerLabel = `<a href="${sanitizedUrl}" target="_blank">${escapedLabel} <i class="fa fa-external-link"></i></a>`;
   } else {
-    analyzerLabel = `<span class="label-analyzer-internal"> ${analyzerLabel} </span>`;
+    analyzerLabel = `<span class="label-analyzer-internal"> ${escapedLabel} </span>`;
   }
+
   return `<span class="label label-source label-analyzer" style="white-space:nowrap;">${analyzerLabel}</span>`;
 };
 
@@ -635,6 +628,7 @@ export default {
   formatProjectTeamLabel: $common.formatProjectTeamLabel,
   formatVulnerabilityTagLabel: $common.formatVulnerabilityTagLabel,
   capitalize: $common.capitalize,
+  titleCase: $common.titleCase,
   formatSeverityLabel: $common.formatSeverityLabel,
   formatViolationStateLabel: $common.formatViolationStateLabel,
   formatCweLabel: $common.formatCweLabel,

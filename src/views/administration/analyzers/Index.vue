@@ -1,7 +1,8 @@
 <template>
   <extension-config-form
-    extension-name="nvd"
-    extension-point-name="vuln-data-source"
+    :key="$route.params.extensionName"
+    :extension-name="$route.params.extensionName"
+    extension-point-name="vuln-analyzer"
   />
 </template>
 

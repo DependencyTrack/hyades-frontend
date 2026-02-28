@@ -1,6 +1,7 @@
 <template>
   <extension-config-form
-    extension-name="github"
+    :key="$route.params.extensionName"
+    :extension-name="$route.params.extensionName"
     extension-point-name="vuln-data-source"
   />
 </template>
