@@ -56,19 +56,13 @@ export default {
       },
     };
   },
-  computed: {
-    decodedToken() {
-      return permissions.decodeToken(permissions.getToken());
-    },
-  },
   methods: {
     isPermitted(permission) {
-      // return permissions.hasPermission(permission, this.decodedToken);
       if (typeof permission == 'string') {
-        return permissions.hasPermission(permission, this.decodedToken);
+        return permissions.hasPermission(permission);
       } else if (Array.isArray(permission)) {
         for (let perm of permission) {
-          if (permissions.hasPermission(perm, this.decodedToken)) {
+          if (permissions.hasPermission(perm)) {
             return true;
           }
         }
@@ -79,10 +73,10 @@ export default {
     },
     isNotPermitted(permission) {
       if (typeof permission == 'string') {
-        return !permissions.hasPermission(permission, this.decodedToken);
+        return !permissions.hasPermission(permission);
       } else if (Array.isArray(permission)) {
         for (let perm of permission) {
-          if (permissions.hasPermission(perm, this.decodedToken)) {
+          if (permissions.hasPermission(perm)) {
             return false;
           }
         }

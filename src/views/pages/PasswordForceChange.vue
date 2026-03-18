@@ -134,7 +134,7 @@ export default {
         .then((result) => {
           if (result.status === 200) {
             this.$toastr.s(this.$t('message.password_change_success'));
-            // We don't get the JWT token on a successful password change,
+            // No session token is returned on password change;
             // reroute users back to login
             const redirectTo = getRedirectUrl(this.$router);
             this.$router.replace({
