@@ -52,15 +52,10 @@
       v-show="repository_authentication"
     />
 
-    <b-validated-input-group-form-input
-      id="password"
-      :label="$t('admin.password')"
-      input-group-size="mb-3"
-      type="password"
-      rules="required"
-      v-model="password"
-      v-show="repository_authentication"
-    />
+    <div v-show="repository_authentication">
+      <label for="password">{{ $t('admin.password') }}</label>
+      <secret-ref-select id="password" v-model="password" />
+    </div>
 
     <div>
       <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" />{{
@@ -82,6 +77,7 @@
 import { Switch as cSwitch } from '@coreui/vue';
 import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
+import SecretRefSelect from '../../components/SecretRefSelect.vue';
 
 export default {
   name: 'RepositoryCreateRepositoryModal',
@@ -92,6 +88,7 @@ export default {
     cSwitch,
     BInputGroupFormSelect,
     BValidatedInputGroupFormInput,
+    SecretRefSelect,
   },
   created() {
     this.initialRepositoryType = this.type;

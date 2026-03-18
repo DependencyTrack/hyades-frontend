@@ -226,8 +226,6 @@
     "subject_identifier": "Идентификатор субъекта",
     "submit": "Отправить",
     "suspended": "Приостановлен",
-    "synchronization_cadence_minutes": "Частота синхронизации (в минутах)",
-    "synchronization_cadence_restart_required": "Для применения изменений частоты требуется перезапуск Dependency-Track",
     "tags": "Теги",
     "tags_delete_unused": "Удалить неиспользуемые",
     "task_queue_name": null,

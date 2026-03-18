@@ -1,25 +1,15 @@
 <template>
   <b-card no-body :header="header">
     <b-card-body>
-      <c-switch
-        id="enabled"
-        color="primary"
-        v-model="enabled"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.integration_fortify_ssc_enable') }}
-      <b-validated-input-group-form-input
-        id="fortify-ssc-cadence"
-        :label="$t('admin.synchronization_cadence_minutes')"
-        input-group-size="mb-3"
-        rules="required"
-        type="number"
-        v-model="cadence"
-        lazy="true"
-      />
-      <p class="text-muted">
-        {{ $t('admin.synchronization_cadence_restart_required') }}
-      </p>
+      <b-form-group :label="$t('admin.integration_fortify_ssc_enable')">
+        <c-switch
+          id="enabled"
+          color="primary"
+          v-model="enabled"
+          label
+          v-bind="labelIcon"
+        />
+      </b-form-group>
       <b-validated-input-group-form-input
         id="fortify-ssc-url"
         :label="$t('admin.url')"
@@ -29,15 +19,14 @@
         v-model="url"
         lazy="true"
       />
-      <b-validated-input-group-form-input
-        id="fortify-ssc-token"
-        :label="$t('admin.token')"
-        input-group-size="mb-3"
-        rules="required"
-        type="password"
-        v-model="token"
-        lazy="true"
-      />
+      <label for="fortify-ssc-token"
+        >{{ $t('admin.token') }}
+        <i
+          class="fa fa-key text-warning ml-1"
+          :title="$t('admin.secret_reference_field')"
+        ></i
+      ></label>
+      <secret-ref-select id="fortify-ssc-token" v-model="token" />
     </b-card-body>
     <b-card-footer>
       <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
@@ -51,6 +40,7 @@
 import { Switch as cSwitch } from '@coreui/vue';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
 import common from '../../../shared/common';
+import SecretRefSelect from '../../components/SecretRefSelect.vue';
 import configPropertyMixin from '../mixins/configPropertyMixin';
 
 export default {
@@ -61,11 +51,11 @@ export default {
   components: {
     cSwitch,
     BValidatedInputGroupFormInput,
+    SecretRefSelect,
   },
   data() {
     return {
       enabled: false,
-      cadence: '60',
       url: '',
       token: '',
       labelIcon: {
@@ -81,11 +71,6 @@ export default {
           groupName: 'integrations',
           propertyName: 'fortify.ssc.enabled',
           propertyValue: this.enabled,
-        },
-        {
-          groupName: 'integrations',
-          propertyName: 'fortify.ssc.sync.cadence',
-          propertyValue: this.cadence,
         },
         {
           groupName: 'integrations',
@@ -110,9 +95,6 @@ export default {
         switch (item.propertyName) {
           case 'fortify.ssc.enabled':
             this.enabled = common.toBoolean(item.propertyValue);
-            break;
-          case 'fortify.ssc.sync.cadence':
-            this.cadence = item.propertyValue;
             break;
           case 'fortify.ssc.url':
             this.url = item.propertyValue;

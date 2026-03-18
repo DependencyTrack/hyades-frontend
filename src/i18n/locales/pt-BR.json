@@ -226,8 +226,6 @@
     "subject_identifier": "Identificador do Assunto",
     "submit": "Enviar",
     "suspended": "Suspenso",
-    "synchronization_cadence_minutes": "Cadência de sincronização (em minutos)",
-    "synchronization_cadence_restart_required": "É necessário reiniciar o Dependency-Track para que as alterações de cadência tenham efeito",
     "tags": "Etiquetas",
     "tags_delete_unused": "Excluir não utilizado",
     "task_queue_name": null,

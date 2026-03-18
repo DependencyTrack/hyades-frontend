@@ -226,8 +226,6 @@
     "subject_identifier": "विषय पहचानकर्ता",
     "submit": "जमा करना",
     "suspended": "निलंबित",
-    "synchronization_cadence_minutes": "तुल्यकालन ताल (मिनटों में)",
-    "synchronization_cadence_restart_required": "कैडेंस परिवर्तनों को प्रभावी बनाने के लिए डिपेंडेंसी-ट्रैक को पुनः आरंभ करना आवश्यक है",
     "tags": "टैग",
     "tags_delete_unused": "अप्रयुक्त हटाएँ",
     "task_queue_name": null,

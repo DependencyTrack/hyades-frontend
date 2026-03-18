@@ -30,6 +30,7 @@ import { Switch as cSwitch } from '@coreui/vue';
 import xssFilters from 'xss-filters';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
 import i18n from '../../../i18n';
+import SecretRefSelect from '../../components/SecretRefSelect.vue';
 import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
 import common from '../../../shared/common';
 import EventBus from '../../../shared/eventbus';
@@ -165,15 +166,12 @@ export default {
                         v-debounce:750ms="updateRepository" :debounce-events="'keyup'"/>
                     </div>
 
-                    <div>
-                      <b-validated-input-group-form-input
-                        id="password" :label="$t('admin.password')"
-                        input-group-size="mb-3"
-                        type="password"
-                        v-model="password"
-                        rules="required"
-                        v-show="authenticationRequired"
-                        v-debounce:750ms="updateRepository" :debounce-events="'keyup'"/>
+                    <div v-show="authenticationRequired">
+                      <label for="password">{{$t('admin.password')}} <i
+                        class="fa fa-key text-warning ml-1"
+                        :title="$t('admin.secret_reference_field')"
+                      ></i></label>
+                      <secret-ref-select id="password" v-model="password" />
                     </div>
 
                     <div>
@@ -189,6 +187,7 @@ export default {
             components: {
               cSwitch,
               BValidatedInputGroupFormInput,
+              SecretRefSelect,
             },
             data() {
               return {
@@ -198,7 +197,7 @@ export default {
                 internal: row.internal,
                 authenticationRequired: row.authenticationRequired,
                 username: row.username,
-                password: row.password || 'HiddenDecryptedPropertyPlaceholder',
+                password: row.password,
                 enabled: row.enabled,
                 uuid: row.uuid,
                 labelIcon: {
@@ -215,6 +214,9 @@ export default {
                 this.updateRepository();
               },
               authenticationRequired() {
+                this.updateRepository();
+              },
+              password() {
                 this.updateRepository();
               },
             },
@@ -240,8 +242,7 @@ export default {
                     internal: this.internal,
                     authenticationRequired: this.authenticationRequired,
                     username: this.username,
-                    password:
-                      this.password || 'HiddenDecryptedPropertyPlaceholder',
+                    password: this.password,
                     enabled: this.enabled,
                     uuid: this.uuid,
                   })

@@ -226,8 +226,6 @@
     "subject_identifier": "Identifiant du sujet",
     "submit": "Soumettre",
     "suspended": "Suspendu",
-    "synchronization_cadence_minutes": "Fréquence de synchronisation (en minutes)",
-    "synchronization_cadence_restart_required": "Le redémarrage de Dependency-Track est nécessaire pour que les changements de fréquence prennent effet",
     "tags": "Balises",
     "tags_delete_unused": "Supprimer les inutilisés",
     "task_queue_name": null,

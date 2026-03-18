@@ -226,8 +226,6 @@
     "subject_identifier": "Subject Identifier",
     "submit": "Submit",
     "suspended": "Suspended",
-    "synchronization_cadence_minutes": "Synchronization cadence (in minutes)",
-    "synchronization_cadence_restart_required": "Restarting Dependency-Track is required for cadence changes to take effect",
     "tags": "Tags",
     "tags_delete_unused": "Delete Unused",
     "task_queue_name": "Task Queue",

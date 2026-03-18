@@ -226,8 +226,6 @@
     "subject_identifier": "主题标识符",
     "submit": "提交",
     "suspended": "暂停",
-    "synchronization_cadence_minutes": "同步节奏（分钟）",
-    "synchronization_cadence_restart_required": "需要重新启动 Dependency-Track 才能使节奏更改生效",
     "tags": "标签",
     "tags_delete_unused": "删除未使用的",
     "task_queue_name": null,

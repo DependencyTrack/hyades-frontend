@@ -226,8 +226,6 @@
     "subject_identifier": "Betreffkennung",
     "submit": "Einreichen",
     "suspended": "Ausgesetzt",
-    "synchronization_cadence_minutes": "Synchronisierungsrhythmus (in Minuten)",
-    "synchronization_cadence_restart_required": "Damit die Kadenzänderungen wirksam werden, ist ein Neustart von Dependency-Track erforderlich.",
     "tags": "Tags",
     "tags_delete_unused": "Nicht verwendete löschen",
     "task_queue_name": null,

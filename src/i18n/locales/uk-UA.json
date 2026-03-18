@@ -226,8 +226,6 @@
     "subject_identifier": "Ідентифікатор предмета",
     "submit": "Надіслати",
     "suspended": "Підвішено",
-    "synchronization_cadence_minutes": "Частота синхронізації (у хвилинах)",
-    "synchronization_cadence_restart_required": "Перезапуск Dependency-Track потрібен для того, щоб зміни каденції вступили в силу",
     "tags": "Теги",
     "tags_delete_unused": "Видалити невикористані",
     "task_queue_name": null,

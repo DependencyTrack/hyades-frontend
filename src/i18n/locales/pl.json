@@ -226,8 +226,6 @@
     "subject_identifier": "Identyfikator podmiotu",
     "submit": "Składać",
     "suspended": "Zawieszony",
-    "synchronization_cadence_minutes": "Kadencja synchronizacji (w minutach)",
-    "synchronization_cadence_restart_required": "Aby zmiany rytmu zaczęły obowiązywać, wymagane jest ponowne uruchomienie modułu Depency-Track",
     "tags": "Tagi",
     "tags_delete_unused": "Usuń nieużywane",
     "task_queue_name": null,
