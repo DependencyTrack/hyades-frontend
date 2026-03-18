@@ -266,7 +266,6 @@ export default {
       }
     },
     permissibleNav() {
-      let decodedToken = permissions.decodeToken(permissions.getToken());
       let array = [];
       for (const item of this.nav) {
         if (
@@ -279,10 +278,10 @@ export default {
 
         if (
           (item.permission !== null &&
-            permissions.hasPermission(item.permission, decodedToken)) ||
+            permissions.hasPermission(item.permission)) ||
           (Object.prototype.hasOwnProperty.call(item, 'permissions') &&
             item.permissions.some((permission) =>
-              permissions.hasPermission(permission, decodedToken),
+              permissions.hasPermission(permission),
             ))
         ) {
           array.push(item);

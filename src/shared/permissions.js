@@ -48,12 +48,9 @@ export const TAG_MANAGEMENT_DELETE = 'TAG_MANAGEMENT_DELETE';
 
 /**
  * Determines if the current logged in user has a specific permission.
- * If the decodedToken is not passed, the function will automatically
- * retrieve and decode it.
  */
-export const hasPermission = function hasPermission(permission, decodedToken) {
-  const token = decodedToken || decodeToken(getToken());
-  const permissions = token?.permissions?.split(',') || [];
+export const hasPermission = function hasPermission(permission) {
+  const permissions = getPermissions();
   if (typeof permission == 'string') {
     return permissions.includes(permission);
   } else if (Array.isArray(permission)) {
@@ -67,12 +64,33 @@ export const hasPermission = function hasPermission(permission, decodedToken) {
 };
 
 /**
- * Returns the decoded token as a JSON object.
+ * Stores the effective permissions array in session storage.
  */
-export const decodeToken = function decodeToken(token) {
-  let base64Url = token.split('.')[1];
-  let base64 = base64Url.replace('-', '+').replace('_', '/');
-  return JSON.parse(window.atob(base64));
+export const storePermissions = function storePermissions(permissions) {
+  if (!Array.isArray(permissions)) {
+    return;
+  }
+  sessionStorage.setItem('permissions', JSON.stringify(permissions));
+};
+
+/**
+ * Retrieves the cached permissions from session storage.
+ */
+export const getPermissions = function getPermissions() {
+  try {
+    const stored = sessionStorage.getItem('permissions');
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+/**
+ * Clears the cached permissions from session storage.
+ */
+export const clearPermissions = function clearPermissions() {
+  sessionStorage.removeItem('permissions');
 };
 
 /**

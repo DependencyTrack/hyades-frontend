@@ -175,8 +175,8 @@ export default {
     initializePolicies: function () {
       let policyUrl = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}`;
       if (
-        hasPermission(permissions.POLICY_MANAGEMENT, this.decodedToken) ||
-        hasPermission(permissions.ACCESS_MANAGEMENT, this.decodedToken)
+        hasPermission(permissions.POLICY_MANAGEMENT) ||
+        hasPermission(permissions.ACCESS_MANAGEMENT)
       ) {
         this.axios
           .get(policyUrl)

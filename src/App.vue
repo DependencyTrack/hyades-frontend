@@ -6,30 +6,32 @@
 // bootstrap-table still relies on jQuery for ajax calls, even though there's a supported Vue wrapper for it.
 import $ from 'jquery';
 import { getUrlVar } from './shared/utils';
-import { getToken } from './shared/permissions';
+import { getToken, clearPermissions } from './shared/permissions';
 import EventBus from './shared/eventbus';
 import VueRouter from 'vue-router';
 
 export default {
   name: 'app',
   created() {
-    const setJwtForAjax = (jwt) => {
-      if (jwt) {
+    const setAuthHeader = (token) => {
+      if (token) {
         $.ajaxSettings.headers['Authorization'] =
-          this.axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+          this.axios.defaults.headers.common['Authorization'] =
+            `Bearer ${token}`;
       } else {
         delete this.axios.defaults.headers.common['Authorization'];
         delete $.ajaxSettings.headers['Authorization'];
       }
     };
 
-    EventBus.$on('authenticated', (jwt) => {
-      if (jwt) {
-        sessionStorage.setItem('token', jwt);
+    EventBus.$on('authenticated', (token) => {
+      if (token) {
+        sessionStorage.setItem('token', token);
       } else {
         sessionStorage.removeItem('token');
+        clearPermissions();
       }
-      setJwtForAjax(jwt);
+      setAuthHeader(token);
     });
 
     // ensure $.ajaxSettings.headers exists
@@ -37,7 +39,7 @@ export default {
       headers: {},
     });
 
-    setJwtForAjax(getToken());
+    setAuthHeader(getToken());
 
     // Send XHR cross-site cookie credentials
     if (this.$api.WITH_CREDENTIALS) {

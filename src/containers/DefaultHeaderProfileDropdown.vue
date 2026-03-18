@@ -32,7 +32,6 @@
 <script>
 import { HeaderDropdown as AppHeaderDropdown } from '@coreui/vue';
 import EventBus from '../shared/eventbus';
-import { decodeToken, getToken } from '../shared/permissions';
 import globalVarsMixin from '../mixins/globalVarsMixin';
 import LocalePicker from '@/views/components/LocalePicker.vue';
 
@@ -46,28 +45,36 @@ export default {
   data: () => {
     return {
       itemsCount: 42,
-      identityProvider: decodeToken(getToken()).idp,
     };
   },
   computed: {
     user() {
       return this.currentUser.fullname || this.currentUser.username;
     },
+    isManagedUser() {
+      return (
+        this.currentUser &&
+        Object.prototype.hasOwnProperty.call(this.currentUser, 'suspended')
+      );
+    },
   },
   methods: {
     logout: function () {
-      // Instructs all tabs (via localStorage event) that the session is being invalidated
-      localStorage.setItem('sessionInvalidate', Date.now().toLocaleString());
-      localStorage.removeItem('sessionInvalidate');
-      // Removes the token from session storage and reload
-      EventBus.$emit('authenticated', null);
-      this.$router.replace({ name: 'Login' });
+      const url = this.$api.BASE_URL + '/' + this.$api.URL_USER_LOGOUT;
+      this.axios.post(url).finally(() => {
+        // Instructs all tabs (via localStorage event) that the session is being invalidated
+        localStorage.setItem('sessionInvalidate', Date.now().toLocaleString());
+        localStorage.removeItem('sessionInvalidate');
+        // Clear token and permissions.
+        EventBus.$emit('authenticated', null);
+        this.$router.replace({ name: 'Login' });
+      });
     },
     canChangePassword: function () {
-      return this.identityProvider == 'LOCAL';
+      return this.isManagedUser;
     },
     canUpdateProfile: function () {
-      return this.identityProvider == 'LOCAL';
+      return this.isManagedUser;
     },
   },
 };

@@ -2,7 +2,12 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import i18n from '../i18n';
 import EventBus from '../shared/eventbus';
-import { getToken, hasPermission } from '../shared/permissions';
+import {
+  getToken,
+  getPermissions,
+  hasPermission,
+  storePermissions,
+} from '../shared/permissions';
 import { getContextPath } from '../shared/utils';
 
 // Containers
@@ -1147,32 +1152,63 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.permissions) {
     // non-public route, check permissions
-    const jwt = getToken();
-    if (jwt) {
-      const isAllowed = to.meta.permissions.some((permission) =>
-        hasPermission(permission),
-      );
-      if (isAllowed) {
-        // let backend verify the token
+    const token = getToken();
+    if (token) {
+      const checkAndProceed = () => {
+        const isAllowed = to.meta.permissions.some((permission) =>
+          hasPermission(permission),
+        );
+        if (isAllowed) {
+          // let backend verify the token
+          router.app.axios
+            .get(
+              `${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
+            )
+            .then((result) => {
+              Vue.prototype.$currentUser = result.data;
+              // allowed to proceed
+              next();
+            })
+            .catch(() => {
+              // token is stale
+              // notify app about this
+              EventBus.$emit('authenticated', null);
+              // redirect to login page
+              redirectToLogin();
+            });
+        } else {
+          Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
+          next({ name: 'Dashboard', replace: true });
+        }
+      };
+
+      if (getPermissions().length === 0) {
+        // permissions missing (e.g. after storage cleared), re-fetch before deciding
         router.app.axios
-          .get(`${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF}`, {
-            headers: { Authorization: `Bearer ${jwt}` },
-          })
+          .get(
+            `${router.app.$api.BASE_URL}/${router.app.$api.URL_USER_SELF_PERMISSIONS}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          )
           .then((result) => {
-            Vue.prototype.$currentUser = result.data;
-            // allowed to proceed
-            next();
+            if (!Array.isArray(result.data)) {
+              throw new Error(
+                `Unexpected permissions response: ${JSON.stringify(result.data)}`,
+              );
+            }
+            storePermissions(result.data);
+            checkAndProceed();
           })
           .catch(() => {
-            // token is stale
-            // notify app about this
             EventBus.$emit('authenticated', null);
-            // redirect to login page
             redirectToLogin();
           });
       } else {
-        Vue.prototype.$toastr.e(i18n.t('condition.forbidden'));
-        next({ name: 'Dashboard', replace: true });
+        checkAndProceed();
       }
     } else {
       // no token at all, redirect to login page

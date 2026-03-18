@@ -2,24 +2,23 @@
  * Permissions Vue Directive
  */
 import Vue from 'vue';
-import { hasPermission, decodeToken, getToken } from '../shared/permissions';
+import { hasPermission } from '../shared/permissions';
 
 Vue.directive('permission', function (el, binding) {
-  let decodedToken = decodeToken(getToken());
   if (Array.isArray(binding.value)) {
     let permitted = false;
     if (binding.arg === 'and') {
       // This is the AND case. If a user has ALL of the specified permissions, permitted will be true
       permitted = true;
       binding.value.forEach(function (b) {
-        if (!hasPermission(b, decodedToken)) {
+        if (!hasPermission(b)) {
           permitted = false;
         }
       });
     } else if (binding.arg === 'or') {
       // This is the OR case. If a user has one or more of the specified permissions, permitted will be true
       binding.value.forEach(function (b) {
-        if (hasPermission(b, decodedToken)) {
+        if (hasPermission(b)) {
           permitted = true;
         }
       });
@@ -28,7 +27,7 @@ Vue.directive('permission', function (el, binding) {
       el.style.display = 'none';
     }
   } else {
-    if (!hasPermission(binding.value, decodedToken)) {
+    if (!hasPermission(binding.value)) {
       el.style.display = 'none';
     }
   }
