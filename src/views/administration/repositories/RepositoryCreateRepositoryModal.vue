@@ -7,68 +7,77 @@
     no-stacking
     :title="$t('admin.create_repository')"
   >
-    <b-validated-input-group-form-input
-      id="identifier"
-      :label="$t('admin.identifier')"
-      input-group-size="mb-3"
-      rules="required"
-      v-model="identifier"
-    />
-    <b-validated-input-group-form-input
-      id="url"
-      :label="$t('admin.url')"
-      input-group-size="mb-3"
-      rules="required"
-      type="url"
-      v-model="url"
-    />
-    <b-input-group-form-select
-      id="input-repository-type"
-      required="true"
-      v-model="repositoryType"
-      :options="repositoryTypes"
-      :label="$t('admin.repository_type')"
-    />
-
-    <div>
-      <c-switch color="primary" v-model="internal" label v-bind="labelIcon" />{{
-        $t('admin.internal')
-      }}
-    </div>
-    <div>
-      <c-switch
-        color="primary"
-        v-model="repository_authentication"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.repository_authentication') }}
-    </div>
-    <b-validated-input-group-form-input
-      id="username"
-      :label="$t('admin.username')"
-      input-group-size="mb-3"
-      v-model="username"
-      rules="required"
-      v-show="repository_authentication"
-    />
-
-    <div v-show="repository_authentication">
-      <label for="password">{{ $t('admin.password') }}</label>
-      <secret-ref-select id="password" v-model="password" />
-    </div>
-
-    <div>
-      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" />{{
-        $t('admin.enabled')
-      }}
-    </div>
+    <b-form id="createRepositoryForm" @submit.prevent="createRepository">
+      <b-validated-input-group-form-input
+        id="identifier"
+        :label="$t('admin.identifier')"
+        input-group-size="mb-3"
+        rules="required"
+        v-model="identifier"
+      />
+      <b-validated-input-group-form-input
+        id="url"
+        :label="$t('admin.url')"
+        input-group-size="mb-3"
+        rules="required"
+        type="url"
+        v-model="url"
+      />
+      <b-input-group-form-select
+        id="input-repository-type"
+        required="true"
+        v-model="repositoryType"
+        :options="repositoryTypes"
+        :label="$t('admin.repository_type')"
+      />
+      <div class="mb-3">
+        <c-switch
+          color="primary"
+          v-model="enabled"
+          label
+          v-bind="labelIcon"
+        />{{ $t('admin.enabled') }}
+      </div>
+      <div class="mb-3">
+        <c-switch
+          color="primary"
+          v-model="internal"
+          label
+          v-bind="labelIcon"
+        />{{ $t('admin.internal') }}
+      </div>
+      <div class="mb-3">
+        <c-switch
+          color="primary"
+          v-model="repository_authentication"
+          label
+          v-bind="labelIcon"
+        />{{ $t('admin.repository_authentication') }}
+      </div>
+      <div v-if="repository_authentication" class="ml-4">
+        <b-validated-input-group-form-input
+          id="username"
+          :label="$t('admin.username')"
+          input-group-size="mb-3"
+          v-model="username"
+        />
+        <div class="mb-3">
+          <label for="password">{{ $t('admin.password') }}</label>
+          <secret-ref-select id="password" v-model="password" />
+        </div>
+      </div>
+    </b-form>
     <template v-slot:modal-footer="{ cancel }">
       <b-button size="md" variant="secondary" @click="cancel()">{{
         $t('message.close')
       }}</b-button>
-      <b-button size="md" variant="primary" @click="createRepository()">{{
-        $t('message.create')
-      }}</b-button>
+      <b-button
+        size="md"
+        variant="primary"
+        type="submit"
+        form="createRepositoryForm"
+        >{{ $t('message.create') }}</b-button
+      >
     </template>
   </b-modal>
 </template>

@@ -65,7 +65,6 @@
     "defectdojo": "DefectDojo",
     "delete_alert": "アラートを削除",
     "delete_oidc_group": "グループを削除",
-    "delete_repository": "リポジトリの削除",
     "delete_role": "ロールを削除",
     "delete_secret": "シークレットを削除",
     "delete_team": "チームを削除",

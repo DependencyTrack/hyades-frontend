@@ -65,7 +65,6 @@
     "defectdojo": "DefectDojo",
     "delete_alert": "Видалити сповіщення",
     "delete_oidc_group": "Видалити групу",
-    "delete_repository": "Видалити репозиторій",
     "delete_role": "Видалити роль",
     "delete_secret": "Видалити секрет",
     "delete_team": "Видалити команду",

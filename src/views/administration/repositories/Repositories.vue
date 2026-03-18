@@ -139,48 +139,41 @@ export default {
             i18n,
             template: `
                 <b-row class="expanded-row">
-                  <b-col sm="6">
-                    <b-validated-input-group-form-input
-                      id="url" :label="$t('admin.url')"
-                      input-group-size="mb-3" rules="required"
-                      type="url" v-model="url"
-                      autofocus="true"
-                      v-debounce:750ms="updateRepository" :debounce-events="'keyup'"/>
-                  </b-col>
-                  <b-col sm="6">
-
-                    <div>
-                      <c-switch color="primary" v-model="internal" label v-bind="labelIcon" />{{$t('admin.internal')}}
-                    </div>
-                    <div>
-                     <c-switch color="primary" v-model="authenticationRequired" label v-bind="labelIcon" />{{$t('admin.repository_authentication')}}
-                    </div>
-
-                    <div>
+                  <b-col sm="12">
+                    <b-form @submit.prevent="updateRepository" style="max-width: 40rem">
                       <b-validated-input-group-form-input
-                        id="username" :label="$t('admin.username')"
-                        input-group-size="mb-3"
-                        v-model="username"
-                        rules="required"
-                        v-show="authenticationRequired"
-                        v-debounce:750ms="updateRepository" :debounce-events="'keyup'"/>
-                    </div>
-
-                    <div v-show="authenticationRequired">
-                      <label for="password">{{$t('admin.password')}} <i
-                        class="fa fa-key text-warning ml-1"
-                        :title="$t('admin.secret_reference_field')"
-                      ></i></label>
-                      <secret-ref-select id="password" v-model="password" />
-                    </div>
-
-                    <div>
-                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" />{{$t('admin.enabled')}}
-                    </div>
-
-                    <div style="text-align:right">
-                       <b-button variant="outline-danger" @click="deleteRepository">{{ $t('admin.delete_repository') }}</b-button>
-                    </div>
+                        id="url" :label="$t('admin.url')"
+                        input-group-size="mb-3" rules="required"
+                        type="url" v-model="url"
+                        autofocus="true"/>
+                      <div class="mb-3">
+                        <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" />{{$t('admin.enabled')}}
+                      </div>
+                      <div class="mb-3">
+                        <c-switch color="primary" v-model="internal" label v-bind="labelIcon" />{{$t('admin.internal')}}
+                      </div>
+                      <div class="mb-3">
+                        <c-switch color="primary" v-model="authenticationRequired" label v-bind="labelIcon" />{{$t('admin.repository_authentication')}}
+                      </div>
+                      <div v-if="authenticationRequired" class="ml-4">
+                        <b-validated-input-group-form-input
+                          id="username" :label="$t('admin.username')"
+                          input-group-size="mb-3"
+                          v-model="username"
+                          />
+                        <div class="mb-3">
+                          <label for="password">{{$t('admin.password')}} <i
+                            class="fa fa-key text-warning ml-1"
+                            :title="$t('admin.secret_reference_field')"
+                          ></i></label>
+                          <secret-ref-select id="password" v-model="password" />
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-end mt-3">
+                        <b-button type="submit" variant="primary" class="mr-2">{{ $t('message.update') }}</b-button>
+                        <b-button variant="outline-danger" @click="deleteRepository">{{ $t('message.delete') }}</b-button>
+                      </div>
+                    </b-form>
                   </b-col>
                 </b-row>
               `,
@@ -205,20 +198,6 @@ export default {
                   dataOff: '\u2715',
                 },
               };
-            },
-            watch: {
-              internal() {
-                this.updateRepository();
-              },
-              enabled() {
-                this.updateRepository();
-              },
-              authenticationRequired() {
-                this.updateRepository();
-              },
-              password() {
-                this.updateRepository();
-              },
             },
             methods: {
               deleteRepository: function () {

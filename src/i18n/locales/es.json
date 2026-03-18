@@ -65,7 +65,6 @@
     "defectdojo": "defectodojo",
     "delete_alert": "Eliminar alerta",
     "delete_oidc_group": "Eliminar grupo",
-    "delete_repository": "Eliminar repositorio",
     "delete_role": "Delete Role",
     "delete_secret": "Eliminar secreto",
     "delete_team": "Eliminar equipo",

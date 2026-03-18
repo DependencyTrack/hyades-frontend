@@ -65,7 +65,6 @@
     "defectdojo": "DefectDojo (一个开源的应用程序安全漏洞协调和管理平台)",
     "delete_alert": "删除告警",
     "delete_oidc_group": "删除 OIDC 组",
-    "delete_repository": "删除存储库",
     "delete_role": "删除角色",
     "delete_secret": "删除密钥",
     "delete_team": "删除团队",
