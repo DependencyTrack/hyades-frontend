@@ -20,6 +20,7 @@
           :state="errorHandlingMethod(errors, valid)"
           :autocomplete="autocomplete"
           :autofocus="isFocused"
+          :required="isRequired"
           v-on="inputListeners"
         />
         <b-input-group-append v-if="tooltip"
@@ -84,6 +85,9 @@ export default {
           vm.$emit('input', event);
         },
       });
+    },
+    isRequired: function () {
+      return !!(this.rules && this.rules.includes('required'));
     },
     inputClasses: function () {
       let classes = 'form-control';

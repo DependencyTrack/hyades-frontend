@@ -1,32 +1,24 @@
 <template>
   <b-card no-body :header="header">
     <b-card-body>
-      <c-switch
-        id="enabled"
-        color="primary"
-        v-model="enabled"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.integration_defectdojo_enable') }}
-      <c-switch
-        id="reimport-enabled"
-        color="primary"
-        v-model="reimportEnabled"
-        label
-        v-bind="labelIcon"
-      />{{ $t('admin.integration_defectdojo_reimport_enable') }}
-      <b-validated-input-group-form-input
-        id="defectdojo-cadence"
-        :label="$t('admin.synchronization_cadence_minutes')"
-        input-group-size="mb-3"
-        rules="required"
-        type="number"
-        v-model="cadence"
-        lazy="true"
-      />
-      <p class="text-muted">
-        {{ $t('admin.synchronization_cadence_restart_required') }}
-      </p>
+      <b-form-group :label="$t('admin.integration_defectdojo_enable')">
+        <c-switch
+          id="enabled"
+          color="primary"
+          v-model="enabled"
+          label
+          v-bind="labelIcon"
+        />
+      </b-form-group>
+      <b-form-group :label="$t('admin.integration_defectdojo_reimport_enable')">
+        <c-switch
+          id="reimport-enabled"
+          color="primary"
+          v-model="reimportEnabled"
+          label
+          v-bind="labelIcon"
+        />
+      </b-form-group>
       <b-validated-input-group-form-input
         id="defectdojo-url"
         :label="$t('admin.url')"
@@ -36,15 +28,14 @@
         v-model="url"
         lazy="true"
       />
-      <b-validated-input-group-form-input
-        id="defectdojo-apiKey"
-        :label="$t('admin.api_token')"
-        input-group-size="mb-3"
-        rules="required"
-        type="password"
-        v-model="apiKey"
-        lazy="true"
-      />
+      <label for="defectdojo-apiKey"
+        >{{ $t('admin.api_token') }}
+        <i
+          class="fa fa-key text-warning ml-1"
+          :title="$t('admin.secret_reference_field')"
+        ></i
+      ></label>
+      <secret-ref-select id="defectdojo-apiKey" v-model="apiKey" />
     </b-card-body>
     <b-card-footer>
       <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
@@ -58,6 +49,7 @@
 import { Switch as cSwitch } from '@coreui/vue';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
 import common from '../../../shared/common';
+import SecretRefSelect from '../../components/SecretRefSelect.vue';
 import configPropertyMixin from '../mixins/configPropertyMixin';
 
 export default {
@@ -68,12 +60,12 @@ export default {
   components: {
     cSwitch,
     BValidatedInputGroupFormInput,
+    SecretRefSelect,
   },
   data() {
     return {
       enabled: false,
       reimportEnabled: false,
-      cadence: '60',
       url: '',
       apiKey: '',
       labelIcon: {
@@ -94,11 +86,6 @@ export default {
           groupName: 'integrations',
           propertyName: 'defectdojo.reimport.enabled',
           propertyValue: this.reimportEnabled,
-        },
-        {
-          groupName: 'integrations',
-          propertyName: 'defectdojo.sync.cadence',
-          propertyValue: this.cadence,
         },
         {
           groupName: 'integrations',
@@ -126,9 +113,6 @@ export default {
             break;
           case 'defectdojo.reimport.enabled':
             this.reimportEnabled = common.toBoolean(item.propertyValue);
-            break;
-          case 'defectdojo.sync.cadence':
-            this.cadence = item.propertyValue;
             break;
           case 'defectdojo.url':
             this.url = item.propertyValue;
