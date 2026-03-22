@@ -427,7 +427,13 @@ $common.componentClassifierLabelFormatter = (i18n) => {
  */
 $common.componentClassifierLabelProjectUrlFormatter = (i18n) => {
   return function (value) {
-    let url = '../projects/?classifier=' + value;
+    let url = !this.routerFunc
+      ? '../projects/?classifier=' + value
+      : this.routerFunc().resolve({
+          name: 'Projects',
+          query: { classifier: value },
+        }).href;
+
     switch (value) {
       case 'APPLICATION':
       case 'FRAMEWORK':
@@ -598,6 +604,29 @@ $common.setQueryParams = function (url, params) {
     : parsed.href;
 };
 
+$common.getCollectionLogicText = function (i18n, project) {
+  const tag = project.collectionTag
+    ? xssFilters.inDoubleQuotedAttr(project.collectionTag.name)
+    : '';
+  switch (project.collectionLogic) {
+    case 'AGGREGATE_DIRECT_CHILDREN':
+      return i18n.$t(
+        'message.collection_logic_metrics_by_aggregate_direct_children',
+      );
+    case 'AGGREGATE_DIRECT_CHILDREN_WITH_TAG':
+      return i18n.$t(
+        'message.collection_logic_metrics_by_aggregate_direct_children_with_tags',
+        { tag },
+      );
+    case 'AGGREGATE_LATEST_VERSION_CHILDREN':
+      return i18n.$t(
+        'message.collection_logic_metrics_by_aggregate_latest_version',
+      );
+    default:
+      return '';
+  }
+};
+
 $common.OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX = {
   LOW: {
     LOW: 'INFO',
@@ -652,4 +681,5 @@ export default {
   setQueryParams: $common.setQueryParams,
   OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX:
     $common.OWASP_RR_LIKELIHOOD_TO_IMPACT_SEVERITY_MATRIX,
+  getCollectionLogicText: $common.getCollectionLogicText,
 };
