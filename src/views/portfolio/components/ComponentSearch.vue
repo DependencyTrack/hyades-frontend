@@ -52,14 +52,12 @@
         </b-col>
       </b-row>
     </div>
-    <bootstrap-table
+    <token-paginated-table
       ref="table"
+      :base-url="tableBaseUrl"
       :columns="columns"
-      :data="data"
-      :options="options"
-      @on-pre-body="onPreBody"
-    >
-    </bootstrap-table>
+      :options="tableOptions"
+    />
   </div>
 </template>
 
@@ -73,6 +71,7 @@ import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import xssFilters from 'xss-filters';
 import SeverityProgressBar from '@/views/components/SeverityProgressBar';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 import { loadUserPreferencesForBootstrapTable } from '@/shared/utils';
 
 export default {
@@ -82,6 +81,7 @@ export default {
     PortfolioWidgetRow,
     BInputGroupFormSelect,
     BInputGroupFormInput,
+    TokenPaginatedTable,
   },
   beforeCreate() {
     this.subject =
@@ -122,6 +122,9 @@ export default {
       }
     },
   },
+  mounted() {
+    this.changeSearchUrl = true;
+  },
   methods: {
     createQueryParams: function () {
       if (this.subject === 'COORDINATES') {
@@ -147,15 +150,19 @@ export default {
       }
     },
     performSearch: function () {
+      let url;
       if (this.subject === 'HASH') {
         let hash = encodeURIComponent(common.trimToNull(this.value));
-        this.options.url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/hash/${hash}`;
-        this.$refs.table.refresh({ silent: true });
+        url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/hash/${hash}`;
       } else {
         let queryParams = this.createQueryParams();
-        this.options.url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/identity?${queryParams}`;
-        this.$refs.table.refresh({ silent: true });
+        url = `${this.$api.BASE_URL}/api/v2/components?${queryParams}`;
       }
+      this.tableBaseUrl = url;
+      this.$nextTick(() => {
+        this.$refs.table.refresh({ silent: true });
+      });
+
       if (this.changeSearchUrl) {
         if (this.subject === 'COORDINATES') {
           let urlCoordinatesGroup = this.coordinatesGroup
@@ -194,10 +201,6 @@ export default {
         'ComponentSearch',
         this.$refs.table.columns,
       );
-      if (!this.changeSearchUrl) {
-        this.performSearch();
-        this.changeSearchUrl = true;
-      }
     },
   },
   data() {
@@ -228,7 +231,7 @@ export default {
                 '/dependencyGraph/' +
                 row.uuid,
             );
-            return row.project.directDependencies
+            return row.project.direct_dependencies
               ? `<a href="${dependencyGraphUrl}"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
                   `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`
               : `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
@@ -261,7 +264,7 @@ export default {
         },
         {
           title: this.$t('message.internal'),
-          field: 'isInternal',
+          field: 'internal',
           sortable: false,
           align: 'center',
           class: 'tight',
@@ -279,7 +282,7 @@ export default {
         },
         {
           title: this.$t('message.swid_tagid'),
-          field: 'swid',
+          field: 'swid_tag_id',
           sortable: true,
           formatter(value, row, index) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
@@ -303,24 +306,24 @@ export default {
         },
         {
           title: this.$t('message.license_name'),
-          field: 'resolvedLicense.licenseId',
+          field: 'resolved_license.license_id',
           sortable: true,
           visible: false,
-          formatter(resolvedLicense, row, index) {
-            if (typeof resolvedLicense === 'undefined') {
+          formatter(resolved_license, row, index) {
+            if (typeof resolved_license === 'undefined') {
               return '-'; // No resolvedLicense info available
             }
 
             let url = xssFilters.uriInUnQuotedAttr(
               '../licenses/' +
-                encodeURIComponent(row.resolvedLicense.licenseId),
+                encodeURIComponent(row.resolved_license.license_id),
             );
-            return `<a href="${url}">${xssFilters.inHTMLData(row.resolvedLicense.name)}</a>`;
+            return `<a href="${url}">${xssFilters.inHTMLData(row.resolved_license.name)}</a>`;
           },
         },
         {
           title: this.$t('message.risk_score'),
-          field: 'lastInheritedRiskScore',
+          field: 'last_inherited_risk_score',
           sortable: true,
           visible: false,
           class: 'tight',
@@ -353,62 +356,14 @@ export default {
           }.bind(this),
         },
       ],
-      data: [],
-      options: {
-        onPostBody: this.initializeTooltips,
-        search: false,
+      tableOptions: {
         showColumns: true,
         showRefresh: true,
-        pagination: true,
-        silentSort: false,
-        toolbar: '#componentSearchToolbar',
-        sidePagination: 'server',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize:
-          localStorage &&
-          localStorage.getItem('ComponentSearchPageSize') !== null
-            ? Number(localStorage.getItem('ComponentSearchPageSize'))
-            : 10,
-        sortName:
-          localStorage &&
-          localStorage.getItem('ComponentSearchSortName') !== null
-            ? localStorage.getItem('ComponentSearchSortName')
-            : undefined,
-        sortOrder:
-          localStorage &&
-          localStorage.getItem('ComponentSearchSortOrder') !== null
-            ? localStorage.getItem('ComponentSearchSortOrder')
-            : undefined,
         icons: {
           refresh: 'fa-refresh',
         },
-        //toolbar: '#componentSearchToolbar',
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/identity`,
-        onPageChange: (number, size) => {
-          if (localStorage) {
-            localStorage.setItem('ComponentSearchPageSize', size.toString());
-          }
-        },
-        onColumnSwitch: (field, checked) => {
-          if (localStorage) {
-            localStorage.setItem(
-              'ComponentSearchShow' + common.capitalize(field),
-              checked.toString(),
-            );
-          }
-        },
-        onSort: (name, order) => {
-          if (localStorage) {
-            localStorage.setItem('ComponentSearchSortName', name);
-            localStorage.setItem('ComponentSearchSortOrder', order);
-          }
-        },
       },
+      tableBaseUrl: null,
     };
   },
 };
