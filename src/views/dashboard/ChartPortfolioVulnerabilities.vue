@@ -116,9 +116,9 @@ export default {
                   drawOnChartArea: false,
                 },
                 ticks: {
-                  callback: function (value, index) {
+                  callback: function (value) {
                     return common.formatTimestamp(
-                      this.chart.data.labels[index],
+                      value,
                     );
                   },
                 },
