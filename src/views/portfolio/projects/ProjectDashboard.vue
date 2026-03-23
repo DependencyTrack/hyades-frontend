@@ -6,7 +6,11 @@
           <h4 id="chart-portfolio-vulns" class="card-title mb-0">
             {{ $t('message.project_vulnerabilities') }}
           </h4>
-          <table class="small text-muted" style="border: 0">
+          <table
+            v-if="!isCollectionProject"
+            class="small text-muted"
+            style="border: 0"
+          >
             <tr>
               <td>{{ $t('message.last_bom_import') }}:</td>
               <td>{{ lastBomImport }}</td>
@@ -18,7 +22,7 @@
                 <b-link
                   v-permission:or="[
                     'PORTFOLIO_MANAGEMENT',
-                    'PORTFOLIO_MANAGEMENT_READ',
+                    'PORTFOLIO_MANAGEMENT_UPDATE',
                   ]"
                   class="font-weight-bold"
                   style="margin-left: 6px"
@@ -319,6 +323,11 @@ export default {
   },
   mounted() {
     this.fetchMetrics();
+  },
+  computed: {
+    isCollectionProject() {
+      return !!this.project.collectionLogic;
+    },
   },
   watch: {
     project(newProject) {

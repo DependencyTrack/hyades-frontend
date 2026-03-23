@@ -11,7 +11,7 @@
             }}<b-link
               v-permission:or="[
                 'PORTFOLIO_MANAGEMENT',
-                'PORTFOLIO_MANAGEMENT_READ',
+                'PORTFOLIO_MANAGEMENT_UPDATE',
               ]"
               class="font-weight-bold"
               style="margin-left: 6px"
