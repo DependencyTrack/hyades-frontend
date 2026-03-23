@@ -99,9 +99,7 @@ export default {
                 },
                 ticks: {
                   callback: function (value, index) {
-                    return common.formatTimestamp(
-                      this.chart.data.labels[index],
-                    );
+                    return common.formatTimestamp(value);
                   },
                 },
               },
