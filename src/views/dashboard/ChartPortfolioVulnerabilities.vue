@@ -117,9 +117,7 @@ export default {
                 },
                 ticks: {
                   callback: function (value) {
-                    return common.formatTimestamp(
-                      value,
-                    );
+                    return common.formatTimestamp(value);
                   },
                 },
               },

@@ -97,14 +97,12 @@ export default {
                 gridLines: {
                   drawOnChartArea: false,
                 },
-               ticks: {
-                 callback: function (value) {
-                   return common.formatTimestamp(
-                     value,
-                   );
-                 },
-               },
-             },
+                ticks: {
+                  callback: function (value) {
+                    return common.formatTimestamp(value);
+                  },
+                },
+              },
             ],
             yAxes: [
               {
