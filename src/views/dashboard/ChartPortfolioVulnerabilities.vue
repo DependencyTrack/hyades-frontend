@@ -25,7 +25,7 @@ export default {
       let unassignedData = [];
 
       for (let i = 0; i < metrics.length; i++) {
-        labels.push(common.formatTimestamp(metrics[i].firstOccurrence));
+        labels.push(metrics[i].firstOccurrence);
         criticalData.push(metrics[i].critical);
         highData.push(metrics[i].high);
         mediumData.push(metrics[i].medium);
@@ -33,7 +33,7 @@ export default {
         unassignedData.push(metrics[i].unassigned);
 
         if (i === metrics.length - 1) {
-          labels.push(common.formatTimestamp(metrics[i].lastOccurrence));
+          labels.push(metrics[i].lastOccurrence);
           criticalData.push(metrics[i].critical);
           highData.push(metrics[i].high);
           mediumData.push(metrics[i].medium);
@@ -97,6 +97,12 @@ export default {
                     chart.data.datasets[tooltipItem.datasetIndex].borderColor,
                 };
               },
+              title: function (tooltipItems, data) {
+                return common.formatTimestamp(
+                  data.labels[tooltipItems[0].index],
+                  true,
+                );
+              },
             },
           },
           maintainAspectRatio: false,
@@ -108,6 +114,13 @@ export default {
               {
                 gridLines: {
                   drawOnChartArea: false,
+                },
+                ticks: {
+                  callback: function (value, index) {
+                    return common.formatTimestamp(
+                      this.chart.data.labels[index],
+                    );
+                  },
                 },
               },
             ],
