@@ -41,7 +41,8 @@ const Maintenance = () =>
   import('@/views/administration/configuration/Maintenance');
 const RiskScore = () =>
   import('@/views/administration/configuration/RiskScore');
-import Telemetry from '@/views/administration/configuration/Telemetry.vue';
+const Telemetry = () =>
+  import('@/views/administration/configuration/Telemetry.vue');
 const SecretsManagement = () =>
   import('@/views/administration/secrets/SecretsManagement.vue');
 
