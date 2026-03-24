@@ -32,6 +32,7 @@ import BomFormats from './configuration/BomFormats';
 import General from './configuration/General';
 import InternalComponents from './configuration/InternalComponents';
 import RiskScore from './configuration/RiskScore.vue';
+import Telemetry from './configuration/Telemetry.vue';
 import WelcomeMessage from './configuration/WelcomeMessage.vue';
 // Secrets plugins
 import SecretsManagement from './secrets/SecretsManagement.vue';
@@ -78,6 +79,7 @@ export default {
     WelcomeMessage,
     BomFormats,
     InternalComponents,
+    Telemetry,
     RiskScore,
     SecretsManagement,
     Cargo,

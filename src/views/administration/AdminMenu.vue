@@ -167,6 +167,11 @@ export default {
               name: this.$t('message.risk_score'),
               route: 'configuration/RiskScore',
             },
+            {
+              component: 'Telemetry',
+              name: this.$t('admin.telemetry'),
+              route: 'configuration/telemetry',
+            },
           ],
         },
         {

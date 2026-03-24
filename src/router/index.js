@@ -41,6 +41,7 @@ const Maintenance = () =>
   import('@/views/administration/configuration/Maintenance');
 const RiskScore = () =>
   import('@/views/administration/configuration/RiskScore');
+import Telemetry from '@/views/administration/configuration/Telemetry.vue';
 const SecretsManagement = () =>
   import('@/views/administration/secrets/SecretsManagement.vue');
 
@@ -458,6 +459,23 @@ function configRoutes() {
             {
               path: 'configuration/riskscore',
               component: RiskScore,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                sectionName: 'Admin',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'configuration/telemetry',
+              component: Telemetry,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',
