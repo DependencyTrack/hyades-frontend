@@ -5,6 +5,7 @@
       border: '1px solid #52525e',
       borderRadius: '0.25rem',
       maxWidth: maxWidth,
+      height: initialHeight,
       resize: 'vertical',
       overflow: 'auto',
     }"
@@ -33,6 +34,18 @@ export default {
       type: String,
       default: '100%',
     },
+    language: {
+      type: Object,
+      default: null,
+    },
+    lineWrapping: {
+      type: Boolean,
+      default: true,
+    },
+    initialHeight: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
@@ -46,10 +59,10 @@ export default {
       doc: this.value || '',
       extensions: [
         basicSetup,
-        javascript(),
+        this.language || javascript(),
         autocompletion({ override: [] }),
         oneDark,
-        EditorView.lineWrapping,
+        ...(this.lineWrapping ? [EditorView.lineWrapping] : []),
         this.readOnlyCompartment.of(EditorState.readOnly.of(this.readOnly)),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
