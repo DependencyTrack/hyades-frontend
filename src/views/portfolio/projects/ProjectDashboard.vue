@@ -16,6 +16,10 @@
               <td>{{ lastBomImport }}</td>
             </tr>
             <tr>
+              <td>{{ $t('message.last_vulnerability_analysis') }}:</td>
+              <td>{{ lastVulnAnalysis }}</td>
+            </tr>
+            <tr>
               <td>{{ $t('message.last_measurement') }}:</td>
               <td>
                 {{ lastMeasurement }}
@@ -251,6 +255,7 @@ export default {
       suppressed: 0,
       lastMeasurement: 'n/a',
       lastBomImport: 'n/a',
+      lastVulnAnalysis: 'n/a',
       options: [
         { value: 5, text: '5' },
         { value: 10, text: '10' },
@@ -340,6 +345,15 @@ export default {
         );
       } else {
         this.lastBomImport = 'n/a';
+      }
+
+      if (newProject && newProject.lastVulnerabilityAnalysis) {
+        this.lastVulnAnalysis = common.formatTimestamp(
+          newProject.lastVulnerabilityAnalysis,
+          true,
+        );
+      } else {
+        this.lastVulnAnalysis = 'n/a';
       }
     },
     metricDays() {
