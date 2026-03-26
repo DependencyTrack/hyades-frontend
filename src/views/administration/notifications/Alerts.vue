@@ -392,6 +392,7 @@ export default {
                   logSuccessfulPublish: this.logSuccessfulPublish,
                   notifyChildren: this.notifyChildren,
                   notificationLevel: this.notificationLevel,
+                  scope: this.scope,
                   triggerType: this.triggerType,
                   publisherConfig: publisherConfig,
                   notifyOn: this.notifyOn,
