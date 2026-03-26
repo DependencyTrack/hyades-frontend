@@ -499,7 +499,7 @@ export default {
     },
     initialize: function () {
       let projectUrl = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/${this.uuid}`;
-      this.axios
+      return this.axios
         .get(projectUrl)
         .catch((error) => {
           if (error.response.status === 403) {
@@ -587,14 +587,22 @@ export default {
   },
   beforeMount() {
     this.uuid = this.$route.params.uuid;
-    this.initialize();
-  },
-  mounted() {
-    if (this.$route.params.componentUuids && this.$refs.dependencygraph) {
-      this.$refs.dependencygraph.active = true;
-    } else {
-      this.getTabFromRoute().active = true;
-    }
+    this.initialize()
+      .then(() => {
+        this.$nextTick(() => {
+          if (this.$route.params.componentUuids) {
+            this.$refs.dependencygraph.active = true;
+          } else {
+            this.getTabFromRoute().active = true;
+          }
+        });
+      })
+      .catch((e) => {
+        console.error(e);
+        this.$toastr.e(this.$t('condition.forbidden'));
+        this.$router.replace({ path: '/projects/' + this.uuid });
+        this.$refs.overview.active = true;
+      });
   },
   watch: {
     $route(to, from) {
