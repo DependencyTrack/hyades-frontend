@@ -96,6 +96,16 @@ export default {
           },
         },
         {
+          title: this.$t('admin.alert_trigger_type'),
+          field: 'triggerType',
+          sortable: false,
+          formatter: (value) => {
+            return value === 'SCHEDULE'
+              ? this.$t('admin.alert_trigger_type_schedule')
+              : this.$t('admin.alert_trigger_type_event');
+          },
+        },
+        {
           title: this.$t('admin.enabled'),
           field: 'enabled',
           sortable: false,
@@ -185,19 +195,19 @@ export default {
                     <b-form-group id="fieldset-6" :label="this.$t('admin.group')" label-for="input-6">
                       <div class="list-group" v-if="this.scope === 'PORTFOLIO'">
                         <b-form-checkbox-group id="checkbox-group-notify-on" v-model="notifyOn">
-                          <div class="list-group-item"><b-form-checkbox value="NEW_VULNERABILITY">NEW_VULNERABILITY</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="NEW_VULNERABLE_DEPENDENCY">NEW_VULNERABLE_DEPENDENCY</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="VULNERABILITY_RETRACTED">VULNERABILITY_RETRACTED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="PROJECT_VULN_ANALYSIS_COMPLETE">PROJECT_VULN_ANALYSIS_COMPLETE</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="PROJECT_AUDIT_CHANGE">PROJECT_AUDIT_CHANGE</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="BOM_CONSUMED">BOM_CONSUMED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="BOM_PROCESSED">BOM_PROCESSED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="BOM_PROCESSING_FAILED">BOM_PROCESSING_FAILED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="BOM_VALIDATION_FAILED">BOM_VALIDATION_FAILED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="VEX_CONSUMED">VEX_CONSUMED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="VEX_PROCESSED">VEX_PROCESSED</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="POLICY_VIOLATION">POLICY_VIOLATION</b-form-checkbox></div>
-                          <div class="list-group-item"><b-form-checkbox value="PROJECT_CREATED">PROJECT_CREATED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="NEW_VULNERABILITY">NEW_VULNERABILITY</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="NEW_VULNERABLE_DEPENDENCY">NEW_VULNERABLE_DEPENDENCY</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="PROJECT_AUDIT_CHANGE">PROJECT_AUDIT_CHANGE</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="BOM_CONSUMED">BOM_CONSUMED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="BOM_PROCESSED">BOM_PROCESSED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="BOM_PROCESSING_FAILED">BOM_PROCESSING_FAILED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="BOM_VALIDATION_FAILED">BOM_VALIDATION_FAILED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="VEX_CONSUMED">VEX_CONSUMED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="VEX_PROCESSED">VEX_PROCESSED</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="POLICY_VIOLATION">POLICY_VIOLATION</b-form-checkbox></div>
+                          <div v-if="!isScheduled" class="list-group-item"><b-form-checkbox value="PROJECT_CREATED">PROJECT_CREATED</b-form-checkbox></div>
+                          <div v-if="isScheduled" class="list-group-item"><b-form-checkbox value="NEW_POLICY_VIOLATIONS_SUMMARY">NEW_POLICY_VIOLATIONS_SUMMARY</b-form-checkbox></div>
+                          <div v-if="isScheduled" class="list-group-item"><b-form-checkbox value="NEW_VULNERABILITIES_SUMMARY">NEW_VULNERABILITIES_SUMMARY</b-form-checkbox></div>
                         </b-form-checkbox-group>
                       </div>
                       <div class="list-group" v-if="this.scope === 'SYSTEM'">
@@ -212,6 +222,13 @@ export default {
                         </b-form-checkbox-group>
                       </div>
                     </b-form-group>
+                    <p v-show="isScheduled && (notifyOn.includes('NEW_POLICY_VIOLATIONS_SUMMARY') || notifyOn.includes('NEW_VULNERABILITIES_SUMMARY'))" class="font-sm text-warning">
+                      <span class="fa fa-warning"></span> {{ $t('admin.alert_schedule_summary_warning') }}
+                    </p>
+                    <b-input-group-form-input v-if="isScheduled" :label="$t('admin.alert_schedule_cron_expression')" :required="true" type="text" v-model="scheduleCron"/>
+                    <b-input-group-form-input v-if="isScheduled" :label="$t('admin.alert_schedule_last_triggered_at')" :readonly="true" type="text" :value="this.scheduleLastTriggeredAt" :state="null"/>
+                    <b-input-group-form-input v-if="isScheduled" :label="$t('admin.alert_schedule_next_trigger_at')" :readonly="true" type="text" :value="this.scheduleNextTriggerAt" :state="null"/>
+                    <b-form-group v-if="isScheduled" :title="$t('admin.alert_schedule_skip_publish_if_unchanged_tooltip')"><c-switch v-model="scheduleSkipUnchanged" color="primary" label v-bind="labelIcon"/> {{ $t('admin.alert_schedule_skip_publish_if_unchanged') }}</b-form-group>
                     <div style="text-align:right">
                       <b-button variant="outline-primary" @click="testNotification">{{ $t('admin.perform_test') }}</b-button>
                       <b-toggleable-display-button variant="outline-primary" :label="$t('admin.limit_to')"
@@ -242,6 +259,7 @@ export default {
                 uuid: row.uuid,
                 name: row.name,
                 enabled: row.enabled,
+                triggerType: row.triggerType,
                 logSuccessfulPublish: row.logSuccessfulPublish,
                 notifyChildren: row.notifyChildren,
                 notificationLevel: row.notificationLevel,
@@ -249,6 +267,16 @@ export default {
                 notifyOn: row.notifyOn,
                 projects: row.projects,
                 teams: row.teams,
+                scheduleLastTriggeredAt: common.formatTimestamp(
+                  row.scheduleLastTriggeredAt,
+                  true,
+                ),
+                scheduleNextTriggerAt: common.formatTimestamp(
+                  row.scheduleNextTriggerAt,
+                  true,
+                ),
+                scheduleCron: row.scheduleCron,
+                scheduleSkipUnchanged: row.scheduleSkipUnchanged,
                 limitToVisible: false,
                 tag: '', // The contents of a tag as its being typed into the vue-tag-input
                 tags: [], // An array of tags bound to the vue-tag-input
@@ -274,6 +302,11 @@ export default {
             created() {
               this.initializeTags();
               this.checkPublisherConfigurability();
+            },
+            computed: {
+              isScheduled() {
+                return this.triggerType === 'SCHEDULE';
+              },
             },
             watch: {
               alert() {
@@ -352,28 +385,29 @@ export default {
                 }
 
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}`;
-                this.axios
-                  .post(url, {
-                    uuid: this.uuid,
-                    name: this.name,
-                    enabled: this.enabled,
-                    logSuccessfulPublish: this.logSuccessfulPublish,
-                    notifyChildren: this.notifyChildren,
-                    notificationLevel: this.notificationLevel,
-                    publisherConfig: publisherConfig,
-                    notifyOn: this.notifyOn,
-                    tags: this.tags.map((tag) => {
-                      return { name: tag.text };
-                    }),
-                  })
-                  .then((response) => {
-                    this.alert = response.data;
-                    EventBus.$emit('admin:alerts:rowUpdate', index, this.alert);
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch(() => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
+                let payload = {
+                  uuid: this.uuid,
+                  name: this.name,
+                  enabled: this.enabled,
+                  logSuccessfulPublish: this.logSuccessfulPublish,
+                  notifyChildren: this.notifyChildren,
+                  notificationLevel: this.notificationLevel,
+                  triggerType: this.triggerType,
+                  publisherConfig: publisherConfig,
+                  notifyOn: this.notifyOn,
+                  tags: this.tags.map((tag) => {
+                    return { name: tag.text };
+                  }),
+                };
+                if (this.triggerType === 'SCHEDULE') {
+                  payload.scheduleCron = this.scheduleCron;
+                  payload.scheduleSkipUnchanged = this.scheduleSkipUnchanged;
+                }
+                this.axios.post(url, payload).then((response) => {
+                  this.alert = response.data;
+                  EventBus.$emit('admin:alerts:rowUpdate', index, this.alert);
+                  this.$toastr.s(this.$t('message.updated'));
+                });
               },
               deleteNotificationRule: function () {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}`;
