@@ -147,17 +147,14 @@ export default {
       } else if (this.subject === 'SWID_TAGID') {
         let v = common.trimToNull(this.value);
         return v != null ? 'swidTagId=' + encodeURIComponent(v) : '';
+      } else if (this.subject === 'HASH') {
+        let v = common.trimToNull(this.value);
+        return v != null ? 'hash=' + encodeURIComponent(v) : '';
       }
     },
     performSearch: function () {
-      let url;
-      if (this.subject === 'HASH') {
-        let hash = encodeURIComponent(common.trimToNull(this.value));
-        url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/hash/${hash}`;
-      } else {
-        let queryParams = this.createQueryParams();
-        url = `${this.$api.BASE_URL}/api/v2/components?${queryParams}`;
-      }
+      let queryParams = this.createQueryParams();
+      let url = `${this.$api.BASE_URL}/api/v2/components?${queryParams}`;
       this.tableBaseUrl = url;
       this.$nextTick(() => {
         this.$refs.table.refresh({ silent: true });
