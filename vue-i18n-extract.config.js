@@ -1,6 +1,7 @@
 module.exports = {
   exclude: [
     'condition.http_request_error',
+    'condition.request_validation_failed',
     'condition.server_error',
     'language.de',
     'language.en',
