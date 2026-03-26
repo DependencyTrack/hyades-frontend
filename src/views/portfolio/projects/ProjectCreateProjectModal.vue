@@ -50,7 +50,45 @@
               />
             </b-col>
           </b-row>
+          <b-input-group-form-switch
+            id="project-create-is-collection"
+            :label="$t('message.collection_project')"
+            v-model="isCollection"
+            @change="onCollectionToggle"
+          />
           <b-input-group-form-select
+            v-if="isCollection"
+            id="v-collection-logic-input"
+            required="true"
+            v-model="project.collectionLogic"
+            :options="availableCollectionLogics"
+            :label="$t('message.collectionLogic')"
+            :tooltip="$t('message.project_collection_logic_desc')"
+            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+          />
+          <b-form-group
+            v-if="isCollection && showCollectionTags"
+            id="project-collection-tag-form-group"
+            :label="$t('message.project_add_collection_tag')"
+            :autocomplete-items="tagsAutoCompleteItems"
+            label-for="input-collectionTags"
+          >
+            <vue-tags-input
+              id="input-collectionTags"
+              v-model="collectionTagTyping"
+              :tags="collectionTags"
+              :add-on-key="addOnKeys"
+              :placeholder="$t('message.project_add_collection_tag')"
+              @tags-changed="
+                (newCollectionTags) => (this.collectionTags = newCollectionTags)
+              "
+              class="mw-100 bg-transparent text-lowercase"
+              :max-tags="1"
+              :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+            />
+          </b-form-group>
+          <b-input-group-form-select
+            v-if="!isCollection"
             id="v-classifier-input"
             required="true"
             v-model="project.classifier"
@@ -68,7 +106,7 @@
             :disabled="isDisabled"
           />
           <div style="margin-bottom: 1rem">
-            <label>Parent</label>
+            <label>{{ $t('message.parent') }}</label>
             <multiselect
               v-model="selectedParent"
               id="multiselect"
@@ -224,10 +262,16 @@ import permissionsMixin from '../../../mixins/permissionsMixin';
 import Multiselect from 'vue-multiselect';
 import BInputGroupFormSwitch from '@/forms/BInputGroupFormSwitch.vue';
 import common from '../../../shared/common';
+import availableClassifiersMixin from '@/mixins/availableClassifiersMixin';
+import availableCollectionLogicsMixin from '@/mixins/availableCollectionLogicsMixin';
 
 export default {
   name: 'ProjectCreateProjectModal',
-  mixins: [permissionsMixin],
+  mixins: [
+    permissionsMixin,
+    availableClassifiersMixin,
+    availableCollectionLogicsMixin,
+  ],
   components: {
     BInputGroupFormSwitch,
     BInputGroupFormInput,
@@ -242,28 +286,6 @@ export default {
       isDisabled: false,
       readOnlyProjectName: '',
       readOnlyProjectVersion: '',
-      availableClassifiers: [
-        {
-          value: 'APPLICATION',
-          text: this.$i18n.t('message.component_application'),
-        },
-        {
-          value: 'FRAMEWORK',
-          text: this.$i18n.t('message.component_framework'),
-        },
-        { value: 'LIBRARY', text: this.$i18n.t('message.component_library') },
-        {
-          value: 'CONTAINER',
-          text: this.$i18n.t('message.component_container'),
-        },
-        {
-          value: 'OPERATING_SYSTEM',
-          text: this.$i18n.t('message.component_operating_system'),
-        },
-        { value: 'DEVICE', text: this.$i18n.t('message.component_device') },
-        { value: 'FIRMWARE', text: this.$i18n.t('message.component_firmware') },
-        { value: 'FILE', text: this.$i18n.t('message.component_file') },
-      ],
       availableTeams: [],
       selectableLicenses: [],
       selectedLicense: '',
@@ -275,6 +297,9 @@ export default {
       tags: [], // An array of tags bound to the vue-tag-input
       tagsAutoCompleteItems: [],
       tagsAutoCompleteDebounce: null,
+      collectionTagTyping: '', // The contents of a collection tag as its being typed into the vue-tag-input
+      collectionTags: [], // An array of tags bound to the vue-tag-input for collection tag
+      isCollection: false,
       addOnKeys: [9, 13, 32, ':', ';', ','], // Separators used when typing tags into the vue-tag-input
       isLoading: false,
     };
@@ -298,16 +323,13 @@ export default {
       this.$root.$emit('bv::show::modal', 'projectCreateProjectModal');
     });
   },
-  computed: {
-    sortAvailableClassifiers: function () {
-      this.availableClassifiers.sort(function (a, b) {
-        return a.text.localeCompare(b.text);
-      });
-      return this.availableClassifiers;
-    },
-  },
   watch: {
-    tag: 'searchTags',
+    tag(input) {
+      this.searchTags(input);
+    },
+    collectionTagTyping(input) {
+      this.searchTags(input);
+    },
   },
   methods: {
     async getACLEnabled() {
@@ -333,17 +355,20 @@ export default {
         return a.text.localeCompare(b.text);
       });
     },
-    syncReadOnlyNameField: function (value) {
-      this.readOnlyProjectName = value;
-    },
-    syncReadOnlyVersionField: function (value) {
-      this.readOnlyProjectVersion = value;
+    onCollectionToggle: function (value) {
+      if (value) {
+        this.project.classifier = undefined;
+      } else {
+        this.project.collectionLogic = null;
+        this.collectionTagTyping = '';
+        this.collectionTags = [];
+      }
     },
     createProject: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}`;
       let tagsNode = [];
       let choosenTeams = this.teams.filter((team) => {
-        return this.project.team.includes(team.uuid);
+        return (this.project.team || []).includes(team.uuid);
       });
       let choosenTeamswithoutAPIKeys = choosenTeams.map((team) => {
         team.apiKeys = [];
@@ -364,6 +389,14 @@ export default {
           parent: parent,
           classifier: this.project.classifier,
           accessTeams: choosenTeamswithoutAPIKeys,
+          collectionLogic: this.project.collectionLogic,
+          collectionTag:
+            this.project.collectionLogic ===
+              'AGGREGATE_DIRECT_CHILDREN_WITH_TAG' &&
+            this.collectionTags &&
+            this.collectionTags.length > 0
+              ? { name: this.collectionTags[0].text }
+              : null,
           purl: this.project.purl,
           cpe: this.project.cpe,
           swidTagId: this.project.swidTagId,
@@ -415,12 +448,16 @@ export default {
     },
     resetValues: function () {
       this.project = {
+        collectionLogic: null,
         team: [],
       };
       this.tag = '';
       this.tags = [];
       this.selectedParent = null;
       this.availableParents = [];
+      this.isCollection = false;
+      this.collectionTagTyping = '';
+      this.collectionTags = [];
     },
     createProjectLabel: function (project) {
       if (project.version) {
@@ -443,19 +480,27 @@ export default {
         });
       }
     },
-    searchTags: function () {
-      if (!this.tag) {
+    searchTags: function (input) {
+      clearTimeout(this.tagsAutoCompleteDebounce);
+      if (!input) {
+        this.tagsAutoCompleteItems = [];
         return;
       }
-      clearTimeout(this.tagsAutoCompleteDebounce);
       this.tagsAutoCompleteDebounce = setTimeout(() => {
-        const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(this.tag)}&pageNumber=1&pageSize=6`;
+        const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(input)}&pageNumber=1&pageSize=6`;
         this.axios.get(url).then((response) => {
           this.tagsAutoCompleteItems = response.data.map((tag) => {
             return { text: tag.name };
           });
         });
       }, 250);
+    },
+  },
+  computed: {
+    showCollectionTags() {
+      return (
+        this.project.collectionLogic === 'AGGREGATE_DIRECT_CHILDREN_WITH_TAG'
+      );
     },
   },
 };

@@ -1,6 +1,5 @@
 <template>
-  <div class="animated fadeIn" v-permission="'VIEW_PORTFOLIO'">
-    <portfolio-widget-row :fetch="true" />
+  <div>
     <div id="projectsToolbar" class="bs-table-custom-toolbar">
       <b-button
         size="md"
@@ -61,7 +60,6 @@ import routerMixin from '../../../mixins/routerMixin';
 import common from '../../../shared/common';
 import PolicyViolationProgressBar from '../../components/PolicyViolationProgressBar';
 import SeverityProgressBar from '../../components/SeverityProgressBar';
-import PortfolioWidgetRow from '../../dashboard/PortfolioWidgetRow';
 import ProjectCreateProjectModal from './ProjectCreateProjectModal';
 
 export default {
@@ -69,7 +67,11 @@ export default {
   components: {
     cSwitch,
     ProjectCreateProjectModal,
-    PortfolioWidgetRow,
+  },
+  props: {
+    // If only children from a specific project shall be shown,
+    // this must be set to the corresponding project.
+    uuid: String,
   },
   beforeCreate() {
     this.showInactiveProjects =
@@ -87,6 +89,10 @@ export default {
       this.$root.$emit('initializeProjectCreateProjectModal');
     },
     apiUrl: function (parentUuid) {
+      if (this.uuid && !parentUuid) {
+        parentUuid = this.uuid;
+      }
+
       let url = `${this.$api.BASE_URL}/${this.$api.URL_PROJECT}/concise`;
       if (parentUuid) {
         url += `/${parentUuid}/children`;
@@ -263,9 +269,21 @@ export default {
           title: this.$t('message.project_name'),
           field: 'name',
           sortable: true,
+          routerFunc: () => this.$router,
+          $t: (key, values) => this.$t(key, values),
           formatter(value, row, index) {
-            let url = xssFilters.uriInUnQuotedAttr('../projects/' + row.uuid);
-            return `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
+            let url = xssFilters.uriInUnQuotedAttr(
+              this.routerFunc().resolve({
+                name: 'Project',
+                params: { uuid: row.uuid },
+              }).href,
+            );
+            let collectionIcon = '';
+            if (row.collectionLogic) {
+              const title = common.getCollectionLogicText(this, row);
+              collectionIcon = ` <i class="fa fa-calculator fa-fw icon-cellend" title="${title}"></i>`;
+            }
+            return `<a href="${url}">${xssFilters.inHTMLData(value)}</a>${collectionIcon}`;
           },
         },
         {
@@ -345,6 +363,7 @@ export default {
           title: this.$t('message.classifier'),
           field: 'classifier',
           sortable: true,
+          routerFunc: () => this.$router,
           formatter: common.componentClassifierLabelProjectUrlFormatter(this),
         },
         {

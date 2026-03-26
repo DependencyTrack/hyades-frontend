@@ -67,15 +67,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write
+      contents: write # Required to create commits.
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # tag=v6.0.2
         with:
           token: ${{ github.repository_owner == 'DependencyTrack' && secrets.BOT_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Set up NodeJs
-        uses: actions/setup-node@v6.2.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # tag=v6.3.0
         with:
           node-version: '20'
           cache: 'npm'
@@ -86,15 +86,20 @@ jobs:
           git config user.email "106437498+dependencytrack-bot@users.noreply.github.com"
 
       - name: Bump Version
+        env:
+          RELEASE_VERSION: ${{ inputs.release-version }}
+          VERSION_BUMP_TYPE: ${{ inputs.version-bump-type }}
+          PREID: ${{ inputs.preid }}
+          DRY_RUN: ${{ inputs.dry-run }}
         run: |-
           NPM_VERSION_OPTS='--tag-version-prefix='
 
-          if [[ -n "${{ inputs.release-version }}" ]]; then
-            npm version "${{ inputs.release-version }}" ${NPM_VERSION_OPTS} -m "prepare-release: set version to %s"
-          elif [[ -n "${{ inputs.version-bump-type }}" ]]; then
-            NPM_VERSION_ARGS="${{ inputs.version-bump-type }}"
-            if [[ -n "${{ inputs.preid }}" ]]; then
-              NPM_VERSION_ARGS="${NPM_VERSION_ARGS} --preid=${{ inputs.preid }}"
+          if [[ -n "${RELEASE_VERSION}" ]]; then
+            npm version "${RELEASE_VERSION}" ${NPM_VERSION_OPTS} -m "prepare-release: set version to %s"
+          elif [[ -n "${VERSION_BUMP_TYPE}" ]]; then
+            NPM_VERSION_ARGS="${VERSION_BUMP_TYPE}"
+            if [[ -n "${PREID}" ]]; then
+              NPM_VERSION_ARGS="${NPM_VERSION_ARGS} --preid=${PREID}"
             fi
             npm version ${NPM_VERSION_ARGS} ${NPM_VERSION_OPTS} -m "prepare-release: set version to %s"
           else
@@ -102,7 +107,7 @@ jobs:
             exit 1
           fi
 
-          if [[ "${{ inputs.dry-run }}" != "true" ]]; then
+          if [[ "${DRY_RUN}" != "true" ]]; then
             git push
             git push --tags
           fi
@@ -123,4 +128,5 @@ jobs:
           gh release create "${VERSION}" \
             --title "${VERSION}" \
             --generate-notes \
+            --draft \
             ${PRERELEASE_FLAG}

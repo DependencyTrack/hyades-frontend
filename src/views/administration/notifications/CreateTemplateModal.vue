@@ -75,13 +75,11 @@
       label-for="input-5"
       label-class="required"
     >
-      <b-form-textarea
+      <code-mirror-editor
         id="input-5"
         v-model="template"
-        class="required"
-        rows="10"
-        required
-        trim
+        :language="jinjaLanguage"
+        :line-wrapping="false"
       />
     </b-form-group>
     <template v-slot:modal-footer="{ cancel }">
@@ -98,9 +96,14 @@
 <script>
 import permissionsMixin from '../../../mixins/permissionsMixin';
 import EventBus from '../../../shared/eventbus';
+import CodeMirrorEditor from '../../components/CodeMirrorEditor';
+import { jinja } from '@codemirror/lang-jinja';
 
 export default {
   mixins: [permissionsMixin],
+  components: {
+    CodeMirrorEditor,
+  },
   mounted() {
     this.fetchAvailableExtensions();
     EventBus.$on('admin:templates:cloneTemplate', (template) => {
@@ -123,6 +126,7 @@ export default {
       description: null,
       mimeType: null,
       template: null,
+      jinjaLanguage: jinja(),
       availableExtensions: [],
     };
   },

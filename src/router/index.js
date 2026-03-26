@@ -15,7 +15,8 @@ const DefaultContainer = () => import('@/containers/DefaultContainer');
 
 // Views
 const Dashboard = () => import('@/views/Dashboard');
-const ProjectList = () => import('@/views/portfolio/projects/ProjectList');
+const ProjectListView = () =>
+  import('@/views/portfolio/projects/ProjectListView');
 const TagList = () => import('@/views/portfolio/tags/TagList.vue');
 const ComponentSearch = () =>
   import('@/views/portfolio/components/ComponentSearch');
@@ -40,6 +41,8 @@ const Maintenance = () =>
   import('@/views/administration/configuration/Maintenance');
 const RiskScore = () =>
   import('@/views/administration/configuration/RiskScore');
+const Telemetry = () =>
+  import('@/views/administration/configuration/Telemetry.vue');
 const SecretsManagement = () =>
   import('@/views/administration/secrets/SecretsManagement.vue');
 
@@ -132,7 +135,7 @@ function configRoutes() {
         {
           path: 'projects',
           name: 'Projects',
-          component: ProjectList,
+          component: ProjectListView,
           meta: {
             title: i18n.t('message.projects'),
             i18n: 'message.projects',
@@ -147,6 +150,7 @@ function configRoutes() {
           alias: [
             'projects/:uuid/overview',
             'projects/:uuid/components',
+            'projects/:uuid/collectionprojects',
             'projects/:uuid/services',
             'projects/:uuid/dependencyGraph',
             'projects/:uuid/findings',
@@ -456,6 +460,23 @@ function configRoutes() {
             {
               path: 'configuration/riskscore',
               component: RiskScore,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                sectionName: 'Admin',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
+              path: 'configuration/telemetry',
+              component: Telemetry,
               meta: {
                 title: i18n.t('message.administration'),
                 i18n: 'message.administration',

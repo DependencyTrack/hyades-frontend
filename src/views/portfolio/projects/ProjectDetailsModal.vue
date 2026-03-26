@@ -75,7 +75,7 @@
             id="v-classifier-input"
             required="true"
             v-model="project.classifier"
-            :options="availableClassifiers"
+            :options="sortAvailableClassifiers"
             :label="$t('message.classifier')"
             :tooltip="$t('message.component_classifier_desc')"
             :readonly="
@@ -85,8 +85,31 @@
               ])
             "
           />
+          <b-input-group-form-select
+            id="v-collection-logic-input"
+            v-model="project.collectionLogic"
+            :options="availableCollectionLogics"
+            :label="$t('message.collectionLogic')"
+            :tooltip="$t('message.project_collection_logic_desc')"
+            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+          />
+          <vue-tags-input
+            id="input-collectionTags"
+            v-model="collectionTagTyping"
+            :tags="collectionTags"
+            :add-on-key="addOnKeys"
+            :placeholder="$t('message.project_add_collection_tag')"
+            :autocomplete-items="tagsAutoCompleteItems"
+            @tags-changed="
+              (newCollectionTags) => (this.collectionTags = newCollectionTags)
+            "
+            class="mw-100 bg-transparent text-lowercase"
+            :max-tags="1"
+            v-show="showCollectionTags"
+            :readonly="this.isNotPermitted(PERMISSIONS.PORTFOLIO_MANAGEMENT)"
+          />
           <div style="margin-bottom: 1rem">
-            <label>Parent</label>
+            <label>{{ $t('message.parent') }}</label>
             <multiselect
               v-model="selectedParent"
               id="multiselect"
@@ -526,10 +549,16 @@ import common from '../../../shared/common';
 import Multiselect from 'vue-multiselect';
 import xssFilters from 'xss-filters';
 import BInputGroupFormSwitch from '@/forms/BInputGroupFormSwitch.vue';
+import availableClassifiersMixin from '@/mixins/availableClassifiersMixin';
+import availableCollectionLogicsMixin from '@/mixins/availableCollectionLogicsMixin';
 
 export default {
   name: 'ProjectDetailsModal',
-  mixins: [permissionsMixin],
+  mixins: [
+    permissionsMixin,
+    availableClassifiersMixin,
+    availableCollectionLogicsMixin,
+  ],
   components: {
     BInputGroupFormSwitch,
     BInputGroupFormInput,
@@ -546,28 +575,6 @@ export default {
     return {
       readOnlyProjectName: '',
       readOnlyProjectVersion: '',
-      availableClassifiers: [
-        {
-          value: 'APPLICATION',
-          text: this.$i18n.t('message.component_application'),
-        },
-        {
-          value: 'FRAMEWORK',
-          text: this.$i18n.t('message.component_framework'),
-        },
-        { value: 'LIBRARY', text: this.$i18n.t('message.component_library') },
-        {
-          value: 'CONTAINER',
-          text: this.$i18n.t('message.component_container'),
-        },
-        {
-          value: 'OPERATING_SYSTEM',
-          text: this.$i18n.t('message.component_operating_system'),
-        },
-        { value: 'DEVICE', text: this.$i18n.t('message.component_device') },
-        { value: 'FIRMWARE', text: this.$i18n.t('message.component_firmware') },
-        { value: 'FILE', text: this.$i18n.t('message.component_file') },
-      ],
       parent: null,
       selectedParent: null,
       availableParents: [],
@@ -575,6 +582,8 @@ export default {
       tags: [], // An array of tags bound to the vue-tag-input
       tagsAutoCompleteItems: [],
       tagsAutoCompleteDebounce: null,
+      collectionTagTyping: '', // The contents of a collection tag as its being typed into the vue-tag-input
+      collectionTags: [], // An array of tags bound to the vue-tag-input for collection tag
       addOnKeys: [9, 13, 32, ':', ';', ','], // Separators used when typing tags into the vue-tag-input
       labelIcon: {
         dataOn: '\u2713',
@@ -724,11 +733,19 @@ export default {
     });
   },
   watch: {
-    tag: 'searchTags',
+    tag(input) {
+      this.searchTags(input);
+    },
+    collectionTagTyping(input) {
+      this.searchTags(input);
+    },
   },
   methods: {
     initializeTags: function () {
       this.tags = (this.project.tags || []).map((tag) => ({ text: tag.name }));
+      this.collectionTags = this.project.collectionTag
+        ? [{ text: this.project.collectionTag.name }]
+        : [];
     },
     syncReadOnlyNameField: function (value) {
       this.readOnlyProjectName = value;
@@ -755,6 +772,14 @@ export default {
           version: this.project.version,
           description: this.project.description,
           classifier: this.project.classifier,
+          collectionLogic: this.project.collectionLogic,
+          collectionTag:
+            this.project.collectionLogic ===
+              'AGGREGATE_DIRECT_CHILDREN_WITH_TAG' &&
+            this.collectionTags &&
+            this.collectionTags.length > 0
+              ? { name: this.collectionTags[0].text }
+              : null,
           parent: parent,
           cpe: this.project.cpe,
           purl: this.project.purl,
@@ -832,13 +857,14 @@ export default {
         });
       }
     },
-    searchTags: function () {
-      if (!this.tag) {
+    searchTags: function (input) {
+      clearTimeout(this.tagsAutoCompleteDebounce);
+      if (!input) {
+        this.tagsAutoCompleteItems = [];
         return;
       }
-      clearTimeout(this.tagsAutoCompleteDebounce);
       this.tagsAutoCompleteDebounce = setTimeout(() => {
-        const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(this.tag)}&pageNumber=1&pageSize=6`;
+        const url = `${this.$api.BASE_URL}/${this.$api.URL_TAG}?searchText=${encodeURIComponent(input)}&pageNumber=1&pageSize=6`;
         this.axios.get(url).then((response) => {
           this.tagsAutoCompleteItems = response.data.map((tag) => {
             return { text: tag.name };
@@ -852,6 +878,11 @@ export default {
     },
   },
   computed: {
+    showCollectionTags() {
+      return (
+        this.project.collectionLogic === 'AGGREGATE_DIRECT_CHILDREN_WITH_TAG'
+      );
+    },
     inactiveSinceTimestamp: function () {
       return this.project.inactiveSince
         ? this.$t('message.inactive_since') +
