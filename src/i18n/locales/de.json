@@ -397,6 +397,7 @@
     "collection_logic_metrics_by_aggregate_latest_version": "Die Metriken des Sammlungsprojekts werden durch die Aggregation der Anzahl der neuesten Versionen direkter untergeordneter Elemente berechnet.",
     "collection_project": "Sammlungsprojekt",
     "collection_projects": "Projekte in Sammlung",
+    "collection_projects_using_tag": "Projektsammlungen mit Tag {tag}",
     "comment": "Kommentar",
     "comments": "Kommentare",
     "completed": "Abgeschlossen",
