@@ -54,7 +54,7 @@
     </div>
     <token-paginated-table
       ref="table"
-      :base-url="tableBaseUrl"
+      :base-url="tableDataBaseUrl"
       :columns="columns"
       :options="tableOptions"
     />
@@ -126,71 +126,37 @@ export default {
     this.changeSearchUrl = true;
   },
   methods: {
-    createQueryParams: function () {
+    createQueryParams() {
+      let params = {};
+
       if (this.subject === 'COORDINATES') {
-        let params = {
-          group: common.trimToNull(this.coordinatesGroup),
-          name: common.trimToNull(this.coordinatesName),
-          version: common.trimToNull(this.coordinatesVersion),
-        };
-        let esc = encodeURIComponent;
-        return Object.keys(params)
-          .filter((k) => params[k])
-          .map((k) => esc(k) + '=' + esc(params[k]))
-          .join('&');
+        if (this.coordinatesGroup)
+          params.group = common.trimToNull(this.coordinatesGroup);
+        if (this.coordinatesName)
+          params.name = common.trimToNull(this.coordinatesName);
+        if (this.coordinatesVersion)
+          params.version = common.trimToNull(this.coordinatesVersion);
       } else if (this.subject === 'PACKAGE_URL') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'purl=' + encodeURIComponent(v) : '';
+        if (v) params.purl = v;
       } else if (this.subject === 'CPE') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'cpe=' + encodeURIComponent(v) : '';
+        if (v) params.cpe = v;
       } else if (this.subject === 'SWID_TAGID') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'swidTagId=' + encodeURIComponent(v) : '';
+        if (v) params.swidTagId = v;
       } else if (this.subject === 'HASH') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'hash=' + encodeURIComponent(v) : '';
+        if (v) params.hash = v;
       }
+
+      return params;
     },
     performSearch: function () {
-      let queryParams = this.createQueryParams();
-      let url = `${this.$api.BASE_URL}/api/v2/components?${queryParams}`;
-      this.tableBaseUrl = url;
+      this.appliedFilters = this.createQueryParams();
       this.$nextTick(() => {
         this.$refs.table.refresh({ silent: true });
       });
-
-      if (this.changeSearchUrl) {
-        if (this.subject === 'COORDINATES') {
-          let urlCoordinatesGroup = this.coordinatesGroup
-            ? encodeURIComponent(this.coordinatesGroup)
-            : '';
-          let urlCoordinatesName = this.coordinatesName
-            ? encodeURIComponent(this.coordinatesName)
-            : '';
-          let urlCoordinatesVersion = this.coordinatesVersion
-            ? encodeURIComponent(this.coordinatesVersion)
-            : '';
-          this.$router.replace({
-            path: 'components',
-            hash:
-              '#/search/' +
-              this.subject +
-              '/group=' +
-              urlCoordinatesGroup +
-              '/name=' +
-              urlCoordinatesName +
-              '/version=' +
-              urlCoordinatesVersion,
-          });
-        } else {
-          let urlValue = this.value ? encodeURIComponent(this.value) : '';
-          this.$router.replace({
-            path: 'components',
-            hash: '#/search/' + this.subject + '/' + urlValue,
-          });
-        }
-      }
     },
     onPreBody: function () {
       loadUserPreferencesForBootstrapTable(
@@ -200,6 +166,20 @@ export default {
       );
     },
   },
+  computed: {
+    tableDataBaseUrl() {
+      if (!this.appliedFilters) return null;
+      const url = `${this.$api.BASE_URL}/api/v2/components`;
+      const queryParams = { ...this.appliedFilters };
+      if (this.sortBy) {
+        queryParams.sort_by = this.sortBy;
+      }
+      if (this.sortDirection) {
+        queryParams.sort_direction = this.sortDirection.toUpperCase();
+      }
+      return common.setQueryParams(url, queryParams);
+    },
+  },
   data() {
     return {
       subject: this.subject,
@@ -207,6 +187,9 @@ export default {
       coordinatesGroup: null,
       coordinatesName: null,
       coordinatesVersion: null,
+      sortBy: null,
+      sortDirection: null,
+      appliedFilters: null,
       subjects: [
         { value: 'COORDINATES', text: this.$t('message.coordinates') },
         { value: 'PACKAGE_URL', text: this.$t('message.package_url') },
@@ -304,7 +287,7 @@ export default {
         {
           title: this.$t('message.license_name'),
           field: 'resolved_license.license_id',
-          sortable: true,
+          sortable: false,
           visible: false,
           formatter(resolved_license, row, index) {
             if (typeof resolved_license === 'undefined') {
@@ -358,6 +341,13 @@ export default {
         showRefresh: true,
         icons: {
           refresh: 'fa-refresh',
+        },
+        sortName: 'id',
+        sortOrder: 'desc',
+        customSort: () => {},
+        onSort: (name, order) => {
+          this.sortBy = name;
+          this.sortDirection = order;
         },
       },
       tableBaseUrl: null,
