@@ -397,6 +397,7 @@
     "collection_logic_metrics_by_aggregate_latest_version": "Les mesures du projet de collection sont calculées en agrégeant le nombre des dernières versions des enfants directs.",
     "collection_project": "Projet de collection",
     "collection_projects": "Projets de collecte",
+    "collection_projects_using_tag": "Projets de collecte à l'aide de tag {tag}",
     "comment": "Commentaire",
     "comments": "Commentaires",
     "completed": "Terminé",

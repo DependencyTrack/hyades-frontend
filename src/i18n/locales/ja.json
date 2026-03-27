@@ -397,6 +397,7 @@
     "collection_logic_metrics_by_aggregate_latest_version": "コレクション プロジェクトのメトリックは、直接の子の最新バージョンの数を集計することによって計算されます。",
     "collection_project": "コレクションプロジェクト",
     "collection_projects": "コレクションプロジェクト",
+    "collection_projects_using_tag": "タグ{tag}を使用したコレクションプロジェクト",
     "comment": "コメント",
     "comments": "コメント",
     "completed": "完了",
