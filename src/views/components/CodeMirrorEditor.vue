@@ -46,6 +46,10 @@ export default {
       type: String,
       default: null,
     },
+    completionSource: {
+      type: Function,
+      default: null,
+    },
   },
   data() {
     return {
@@ -60,7 +64,9 @@ export default {
       extensions: [
         basicSetup,
         this.language || javascript(),
-        autocompletion({ override: [] }),
+        autocompletion({
+          override: this.completionSource ? [this.completionSource] : [],
+        }),
         oneDark,
         ...(this.lineWrapping ? [EditorView.lineWrapping] : []),
         this.readOnlyCompartment.of(EditorState.readOnly.of(this.readOnly)),

@@ -24,6 +24,7 @@
     "add-missing-i18n": "vue-i18n-extract --add"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "6.20.1",
     "@codemirror/lang-javascript": "6.2.4",
     "@codemirror/lang-jinja": "6.0.0",
     "@codemirror/lint": "6.9.4",

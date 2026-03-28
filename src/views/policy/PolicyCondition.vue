@@ -154,6 +154,7 @@
           v-if="subject === 'EXPRESSION'"
           v-model="value"
           :markers="this.editorMarkers"
+          :completionSource="celCompletionSource"
           v-debounce:1s="saveCondition"
           :debounce-events="'keyup'"
         ></CodeMirrorEditor>
@@ -179,6 +180,7 @@ import BInputGroupFormSelect from '../../forms/BInputGroupFormSelect';
 import common from '../../shared/common';
 import ActionableListGroupItem from '../components/ActionableListGroupItem';
 import CodeMirrorEditor from '@/views/components/CodeMirrorEditor.vue';
+import { celCompletionSource } from './celCompletions';
 
 export default {
   props: {
@@ -203,6 +205,7 @@ export default {
   },
   data() {
     return {
+      celCompletionSource,
       uuid: null,
       subject: null,
       operator: null,
