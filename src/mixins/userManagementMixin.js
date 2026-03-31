@@ -14,28 +14,6 @@ export default {
   methods: {
     // -- public methods --
 
-    // Loads the user roles for a specific user. return data if targetField is null
-    loadUserProjects: async function (username) {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}/${username}/role`;
-      try {
-        const response = await this.axios.get(endpoint);
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
-    // Loads the user roles for a specific user. return data if targetField is null
-    loadAvailableProjectRoles: async function () {
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_ROLE}`;
-      try {
-        const response = await this.axios.get(endpoint);
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
     // TODO: internal server error 500
     _deleteUser: async function (endpoint) {
       this._userManagementMixin_checkReady();
@@ -110,44 +88,6 @@ export default {
         this._successfulResponse_update(response);
       } catch (error) {
         this.handleError(error);
-      }
-    },
-
-    _handleProjectRole: async function (action, projectRole, callbacks = null) {
-      this._userManagementMixin_checkReady();
-      const { role, project } = projectRole;
-      const endpoint = `${this.$api.BASE_URL}/${this.$api.URL_USER_ROLE}`;
-      const requestBody = {
-        [this._identifierField]: this.row[this._identifierField],
-        role,
-        project,
-      };
-
-      try {
-        let response;
-        let successMessage;
-        switch (action) {
-          case 'add':
-          case 'update':
-            response = await this.axios.put(endpoint, requestBody);
-            successMessage =
-              action === 'add'
-                ? this.$t('admin.role_assigned')
-                : this.$t('admin.role_updated');
-            break;
-          case 'remove':
-            response = await this.axios.delete(endpoint, { data: requestBody });
-            successMessage = this.$t('admin.role_deleted');
-            break;
-          default:
-            throw new Error(`Invalid action: ${action}`);
-        }
-
-        this.$toastr.s(successMessage);
-        callbacks?.success?.(response);
-      } catch (error) {
-        this.handleError(error);
-        callbacks?.error?.(error);
       }
     },
 
