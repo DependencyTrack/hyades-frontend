@@ -543,7 +543,7 @@
     "group_name": "Назва групи",
     "grouped_vulnerabilities": "Згруповані вразливості",
     "hashes": "Хеші",
-    "hashes_short_desc": "Хеш (MD5, SHA, SHA3, Blake2b, Blake3)",
+    "hashes_short_desc": "Хеш",
     "home": "додому",
     "id": "ID",
     "identifier": "Ідентифікатор",

@@ -543,7 +543,7 @@
     "group_name": "Nazwa grupy",
     "grouped_vulnerabilities": "Zgrupowane luki w zabezpieczeniach",
     "hashes": "Hasze",
-    "hashes_short_desc": "Hash (MD5, SHA, SHA3, Blake2b, Blake3)",
+    "hashes_short_desc": "Hash",
     "home": "Dom",
     "id": "ID",
     "identifier": "Identyfikator",

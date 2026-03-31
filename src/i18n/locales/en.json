@@ -543,7 +543,7 @@
     "group_name": "Group Name",
     "grouped_vulnerabilities": "Grouped Vulnerabilities",
     "hashes": "Hashes",
-    "hashes_short_desc": "Hash (MD5, SHA, SHA3, Blake2b, Blake3)",
+    "hashes_short_desc": "Hash",
     "home": "Home",
     "id": "ID",
     "identifier": "Identifier",

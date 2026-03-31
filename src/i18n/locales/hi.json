@@ -543,7 +543,7 @@
     "group_name": "समूह नाम",
     "grouped_vulnerabilities": "समूहीकृत कमज़ोरियाँ",
     "hashes": "हैश",
-    "hashes_short_desc": "हैश (MD5, SHA, SHA3, ब्लेक2b, ब्लेक3)",
+    "hashes_short_desc": "हैश",
     "home": "घर",
     "id": "आईडी",
     "identifier": "पहचानकर्ता",

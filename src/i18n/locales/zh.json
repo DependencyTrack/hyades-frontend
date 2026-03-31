@@ -543,7 +543,7 @@
     "group_name": "组名称",
     "grouped_vulnerabilities": "分组漏洞",
     "hashes": "哈希",
-    "hashes_short_desc": "哈希（MD5、SHA、SHA3、Blake2b、Blake3）",
+    "hashes_short_desc": "哈希",
     "home": "首页",
     "id": "ID",
     "identifier": "标识符",

@@ -543,7 +543,7 @@
     "group_name": "Имя группы",
     "grouped_vulnerabilities": "Группированные уязвимости",
     "hashes": "Хэши",
-    "hashes_short_desc": "Хэш (MD5, SHA, SHA3, Blake2b, Blake3)",
+    "hashes_short_desc": "Хэш",
     "home": "Главная",
     "id": "ID",
     "identifier": "Идентификатор",

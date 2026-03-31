@@ -543,7 +543,7 @@
     "group_name": "Nom de groupe",
     "grouped_vulnerabilities": "Vulnérabilités groupées",
     "hashes": "Condensats",
-    "hashes_short_desc": "Condensat (MD5, SHA, SHA3, Blake2b, Blake3)",
+    "hashes_short_desc": "Condensat",
     "home": "Accueil",
     "id": "ID",
     "identifier": "Identifiant",

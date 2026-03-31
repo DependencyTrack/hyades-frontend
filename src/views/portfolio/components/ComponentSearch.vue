@@ -13,7 +13,7 @@
         </b-col>
         <b-col md="7" lg="7">
           <b-input-group-form-input
-            v-if="subject !== 'COORDINATES'"
+            v-if="subject !== 'COORDINATES' && subject !== 'HASH'"
             id="input-value"
             required="true"
             type="text"
@@ -21,6 +21,21 @@
             lazy="true"
             v-on:keyup.enter="performSearch"
           />
+          <b-input-group v-else-if="subject === 'HASH'">
+            <b-form-select
+              placeholder="Select hash type"
+              v-model="hashType"
+              :options="hashTypes"
+              class="mr-2"
+            ></b-form-select>
+            <b-form-input
+              id="input-value-hash"
+              placeholder="Enter hash value"
+              type="text"
+              v-model="value"
+              v-on:keyup.enter="performSearch"
+            ></b-form-input>
+          </b-input-group>
           <b-input-group v-else-if="subject === 'COORDINATES'">
             <b-form-input
               id="input-value-coordinates-group"
@@ -46,9 +61,12 @@
           </b-input-group>
         </b-col>
         <b-col md="1" lg="1">
-          <b-button variant="outline-primary" v-on:click="performSearch">{{
-            $t('message.search')
-          }}</b-button>
+          <b-button
+            variant="outline-primary"
+            :disabled="isSearchDisabled"
+            v-on:click="performSearch"
+            >{{ $t('message.search') }}</b-button
+          >
         </b-col>
       </b-row>
     </div>
@@ -119,6 +137,13 @@ export default {
     subject() {
       if (localStorage) {
         localStorage.setItem('ComponentSearchSubject', this.subject);
+        // Reset ALL inputs when subject changes.
+        this.value = null;
+        this.hashType = null;
+        this.coordinatesGroup = null;
+        this.coordinatesName = null;
+        this.coordinatesVersion = null;
+        this.appliedFilters = null;
       }
     },
   },
@@ -144,10 +169,15 @@ export default {
         if (v) params.cpe = v;
       } else if (this.subject === 'SWID_TAGID') {
         let v = common.trimToNull(this.value);
-        if (v) params.swidTagId = v;
+        if (v) params.swid_tag_id = v;
       } else if (this.subject === 'HASH') {
         let v = common.trimToNull(this.value);
-        if (v) params.hash = v;
+        if (v) {
+          params.hash = v;
+          if (this.hashType) {
+            params.hash_type = this.hashType;
+          }
+        }
       }
 
       return params;
@@ -167,16 +197,29 @@ export default {
     },
   },
   computed: {
+    isSearchDisabled() {
+      if (this.subject === 'COORDINATES') {
+        return !(
+          this.coordinatesGroup ||
+          this.coordinatesName ||
+          this.coordinatesVersion
+        );
+      }
+
+      if (this.subject === 'HASH') {
+        return !(this.value && this.hashType);
+      }
+
+      return !this.value;
+    },
     tableDataBaseUrl() {
       if (!this.appliedFilters) return null;
       const url = `${this.$api.BASE_URL}/api/v2/components`;
       const queryParams = { ...this.appliedFilters };
-      if (this.sortBy) {
-        queryParams.sort_by = this.sortBy;
-      }
-      if (this.sortDirection) {
-        queryParams.sort_direction = this.sortDirection.toUpperCase();
-      }
+      const sortBy = this.sortBy || 'name';
+      const sortDirection = this.sortDirection || 'asc';
+      queryParams.sort_by = sortBy;
+      queryParams.sort_direction = sortDirection.toUpperCase();
       return common.setQueryParams(url, queryParams);
     },
   },
@@ -190,6 +233,21 @@ export default {
       sortBy: null,
       sortDirection: null,
       appliedFilters: null,
+      hashType: null,
+      hashTypes: [
+        { value: 'MD5', text: 'MD5' },
+        { value: 'SHA1', text: 'SHA1' },
+        { value: 'SHA_256', text: 'SHA_256' },
+        { value: 'SHA_384', text: 'SHA_256' },
+        { value: 'SHA_512', text: 'SHA_512' },
+        { value: 'SHA3_256', text: 'SHA3_256' },
+        { value: 'SHA3_384', text: 'SHA3_256' },
+        { value: 'SHA3_512', text: 'SHA3_512' },
+        { value: 'BLAKE2B_256', text: 'BLAKE2B_256' },
+        { value: 'BLAKE2B_384', text: 'BLAKE2B_256' },
+        { value: 'BLAKE2B_512', text: 'BLAKE2B_512' },
+        { value: 'BLAKE3', text: 'BLAKE3' },
+      ],
       subjects: [
         { value: 'COORDINATES', text: this.$t('message.coordinates') },
         { value: 'PACKAGE_URL', text: this.$t('message.package_url') },
@@ -211,10 +269,10 @@ export default {
                 '/dependencyGraph/' +
                 row.uuid,
             );
-            return row.project.direct_dependencies
-              ? `<a href="${dependencyGraphUrl}"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
-                  `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`
-              : `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
+            return (
+              `<a href="${dependencyGraphUrl}"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
+              `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`
+            );
           },
         },
         {
@@ -339,11 +397,13 @@ export default {
       tableOptions: {
         showColumns: true,
         showRefresh: true,
+        silentSort: false,
+        toolbar: '#componentSearchToolbar',
         icons: {
           refresh: 'fa-refresh',
         },
-        sortName: 'id',
-        sortOrder: 'desc',
+        sortName: 'name',
+        sortOrder: 'asc',
         customSort: () => {},
         onSort: (name, order) => {
           this.sortBy = name;
