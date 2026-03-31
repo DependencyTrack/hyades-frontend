@@ -47,26 +47,6 @@
         </div>
       </b-col>
     </b-row>
-    <b-row class="expanded-row p-3" colspan="2">
-      <div class="" style="width: 100%">
-        <div v-if="loading" class="d-flex justify-content-center">
-          <b-spinner variant="primary" type="grow" label="Loading"
-            >Loading ...
-          </b-spinner>
-        </div>
-        <div v-else>
-          <label for="">{{ this.$t('message.projects') }}</label>
-          <user-roles-table
-            :parentContext="{ row, index }"
-            :projectRoles="projectRoles"
-            :availableRoles="availableRoles"
-            @addProjectRole="addProjectRole"
-            @updateProjectRole="updateProjectRole"
-            @removeProjectRole="removeProjectRole"
-          />
-        </div>
-      </div>
-    </b-row>
     <select-team-modal
       :currentTeams="teams"
       v-on:selection="updateTeamSelection"
@@ -82,7 +62,6 @@
 import i18n from '../../../../i18n';
 import userManagementMixin from '../../../../mixins/userManagementMixin';
 import ActionableListGroupItem from '../../../components/ActionableListGroupItem.vue';
-import UserRolesTable from '../../../components/UserRolesTable.vue';
 import SelectPermissionModal from '../SelectPermissionModal.vue';
 import SelectTeamModal from '../SelectTeamModal.vue';
 
@@ -98,35 +77,13 @@ export default {
     ActionableListGroupItem,
     SelectTeamModal,
     SelectPermissionModal,
-    UserRolesTable,
   },
   data() {
     return {
       username: this.row.username,
       teams: this.row.teams,
       permissions: this.row.permissions,
-      projectRoles: null,
-      availableRoles: null,
-      loading: true,
     };
-  },
-  mounted() {
-    // Fetch user projects and available roles for each project (userManagementMixin)
-    Promise.all([
-      this.loadUserProjects(this.username),
-      this.loadAvailableProjectRoles(),
-    ])
-      .then((response) => {
-        this.projectRoles = response[0] || [];
-        this.availableRoles = response[1] || [];
-      })
-      .catch((error) => {
-        if (!this.axios.isAxiosError(error)) console.error(error);
-        this.$toastr.e(this.$t('condition.unsuccessful_action'));
-      })
-      .finally(() => {
-        this.loading = false;
-      });
   },
   methods: {
     deleteUser: function () {
@@ -148,24 +105,6 @@ export default {
 
     removePermission: function (permission) {
       this._removePermission(permission);
-    },
-
-    addProjectRole: function (projectRole, callbacks) {
-      this._handleProjectRole('add', projectRole, callbacks).then(async () => {
-        this.projectRoles = await this.loadUserProjects(this.username);
-      });
-    },
-
-    updateProjectRole: function (projectRole, callbacks) {
-      this._handleProjectRole('update', projectRole, callbacks);
-    },
-
-    removeProjectRole: function (projectRole, callbacks) {
-      this._handleProjectRole('remove', projectRole, callbacks).then(
-        async () => {
-          this.projectRoles = await this.loadUserProjects(this.username);
-        },
-      );
     },
   },
 };
