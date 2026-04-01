@@ -4,25 +4,27 @@
     :delete-icon="true"
     v-on:actionClicked="removeCondition()"
   >
-    <b-row>
+    <b-row v-if="subject !== 'EXPRESSION'">
       <b-col md="4" lg="3">
         <b-input-group-form-select
           id="input-subject"
           required="true"
+          :label="$t('message.condition_subject')"
           v-on:change="subjectChanged"
           v-model="subject"
           :options="subjects"
         />
       </b-col>
-      <b-col md="3" lg="2" v-if="subject !== 'EXPRESSION'">
+      <b-col md="3" lg="2">
         <b-input-group-form-select
           id="input-operator"
           required="true"
+          :label="$t('message.operator')"
           v-model="operator"
           :options="operators"
         />
       </b-col>
-      <b-col md="5" lg="5" v-if="subject !== 'EXPRESSION'">
+      <b-col md="4" lg="5">
         <b-input-group-form-select
           v-if="
             subject !== 'COORDINATES' &&
@@ -31,7 +33,7 @@
           "
           id="input-value"
           required="true"
-          v-on:change="saveCondition"
+          :label="$t('message.value')"
           v-model="value"
           :options="possibleValues"
         />
@@ -44,133 +46,160 @@
           "
           id="input-value"
           required="true"
+          :label="$t('message.value')"
           type="text"
           v-model="value"
           lazy="true"
-          v-debounce:750ms="saveCondition"
           :tooltip="valueInputTooltip()"
-          :debounce-events="'keyup'"
         />
 
-        <b-input-group v-else-if="subject === 'COORDINATES'">
-          <b-form-input
-            id="input-value-coordinates-group"
-            :placeholder="$t('message.group')"
-            type="text"
-            v-model="coordinatesGroup"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-form-input
-            id="input-value-coordinates-name"
-            :placeholder="$t('message.name')"
-            type="text"
-            v-model="coordinatesName"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-form-input
-            id="input-value-coordinates-version"
-            :placeholder="$t('message.version')"
-            type="text"
-            v-model="coordinatesVersion"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-tooltip
-            target="input-value-coordinates-version"
-            triggers="hover focus"
-            >{{ $t('message.coordinates_version_tooltip') }}</b-tooltip
-          >
-        </b-input-group>
+        <b-form-group
+          v-else-if="subject === 'COORDINATES'"
+          :label="$t('message.value')"
+          label-for="input-value-coordinates-group"
+        >
+          <b-input-group>
+            <b-form-input
+              id="input-value-coordinates-group"
+              :placeholder="$t('message.group')"
+              type="text"
+              v-model="coordinatesGroup"
+            ></b-form-input>
+            <b-form-input
+              id="input-value-coordinates-name"
+              :placeholder="$t('message.name')"
+              type="text"
+              v-model="coordinatesName"
+            ></b-form-input>
+            <b-form-input
+              id="input-value-coordinates-version"
+              :placeholder="$t('message.version')"
+              type="text"
+              v-model="coordinatesVersion"
+            ></b-form-input>
+            <b-tooltip
+              target="input-value-coordinates-version"
+              triggers="hover focus"
+              >{{ $t('message.coordinates_version_tooltip') }}</b-tooltip
+            >
+          </b-input-group>
+        </b-form-group>
 
-        <b-input-group v-else-if="subject === 'VERSION_DISTANCE'">
-          <b-form-input
-            id="input-value-distance-epoch"
-            :placeholder="$t('message.version_distance_epoch')"
-            type="number"
-            min="0"
-            oninput="validity.valid||(value='');"
-            v-model="versionDistance.epoch"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-form-input
-            id="input-value-distance-major"
-            :placeholder="$t('message.version_distance_major')"
-            type="number"
-            min="0"
-            oninput="validity.valid||(value='');"
-            v-model="versionDistance.major"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-form-input
-            id="input-value-distance-minor"
-            :placeholder="$t('message.version_distance_minor')"
-            type="number"
-            min="0"
-            oninput="validity.valid||(value='');"
-            v-model="versionDistance.minor"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-form-input
-            id="input-value-distance-patch"
-            :placeholder="$t('message.version_distance_patch')"
-            type="number"
-            min="0"
-            oninput="validity.valid||(value='');"
-            v-model="versionDistance.patch"
-            v-debounce:750ms="saveCondition"
-            :debounce-events="'keyup'"
-          ></b-form-input>
-          <b-tooltip
-            target="input-value-distance-epoch"
-            triggers="hover focus"
-            >{{ $t('message.version_distance_tooltip') }}</b-tooltip
-          >
-          <b-tooltip
-            target="input-value-distance-major"
-            triggers="hover focus"
-            >{{ $t('message.version_distance_tooltip') }}</b-tooltip
-          >
-          <b-tooltip
-            target="input-value-distance-minor"
-            triggers="hover focus"
-            >{{ $t('message.version_distance_tooltip') }}</b-tooltip
-          >
-          <b-tooltip
-            target="input-value-distance-patch"
-            triggers="hover focus"
-            >{{ $t('message.version_distance_tooltip') }}</b-tooltip
-          >
-        </b-input-group>
+        <b-form-group
+          v-else-if="subject === 'VERSION_DISTANCE'"
+          :label="$t('message.value')"
+          label-for="input-value-distance-epoch"
+        >
+          <b-input-group>
+            <b-form-input
+              id="input-value-distance-epoch"
+              :placeholder="$t('message.version_distance_epoch')"
+              type="number"
+              min="0"
+              oninput="validity.valid||(value='');"
+              v-model="versionDistance.epoch"
+            ></b-form-input>
+            <b-form-input
+              id="input-value-distance-major"
+              :placeholder="$t('message.version_distance_major')"
+              type="number"
+              min="0"
+              oninput="validity.valid||(value='');"
+              v-model="versionDistance.major"
+            ></b-form-input>
+            <b-form-input
+              id="input-value-distance-minor"
+              :placeholder="$t('message.version_distance_minor')"
+              type="number"
+              min="0"
+              oninput="validity.valid||(value='');"
+              v-model="versionDistance.minor"
+            ></b-form-input>
+            <b-form-input
+              id="input-value-distance-patch"
+              :placeholder="$t('message.version_distance_patch')"
+              type="number"
+              min="0"
+              oninput="validity.valid||(value='');"
+              v-model="versionDistance.patch"
+            ></b-form-input>
+            <b-tooltip
+              target="input-value-distance-epoch"
+              triggers="hover focus"
+              >{{ $t('message.version_distance_tooltip') }}</b-tooltip
+            >
+            <b-tooltip
+              target="input-value-distance-major"
+              triggers="hover focus"
+              >{{ $t('message.version_distance_tooltip') }}</b-tooltip
+            >
+            <b-tooltip
+              target="input-value-distance-minor"
+              triggers="hover focus"
+              >{{ $t('message.version_distance_tooltip') }}</b-tooltip
+            >
+            <b-tooltip
+              target="input-value-distance-patch"
+              triggers="hover focus"
+              >{{ $t('message.version_distance_tooltip') }}</b-tooltip
+            >
+          </b-input-group>
+        </b-form-group>
       </b-col>
-
-      <b-col v-if="subject === 'EXPRESSION'" lg="6">
-        <CodeMirrorEditor
-          id="input-value"
-          v-if="subject === 'EXPRESSION'"
-          v-model="value"
-          :markers="this.editorMarkers"
-          :completionSource="celCompletionSource"
-          v-debounce:1s="saveCondition"
-          :debounce-events="'keyup'"
-        ></CodeMirrorEditor>
+      <b-col cols="auto" class="d-flex align-items-end">
+        <b-button
+          variant="outline-primary"
+          :disabled="!isDirty"
+          @click="saveCondition"
+        >
+          <i class="fa fa-floppy-o"></i> {{ $t('message.update') }}
+        </b-button>
       </b-col>
-      <b-col v-if="subject === 'EXPRESSION'" lg="2">
-        <b-form-select
-          id="input-value-violationtype"
-          v-if="subject === 'EXPRESSION'"
-          v-on:change="saveCondition"
-          v-model="violationType"
-          :options="violationTypes"
-        ></b-form-select>
-      </b-col>
-
-      <b-col md="0" lg="2"> </b-col>
     </b-row>
+
+    <template v-if="subject === 'EXPRESSION'">
+      <b-row>
+        <b-col md="4" lg="3">
+          <b-input-group-form-select
+            id="input-subject"
+            required="true"
+            :label="$t('message.condition_subject')"
+            v-on:change="subjectChanged"
+            v-model="subject"
+            :options="subjects"
+          />
+        </b-col>
+        <b-col md="3" lg="2">
+          <b-input-group-form-select
+            id="input-value-violationtype"
+            required="true"
+            :label="$t('message.violation_type')"
+            v-model="violationType"
+            :options="violationTypes"
+          />
+        </b-col>
+        <b-col cols="auto" class="d-flex align-items-end">
+          <b-button
+            variant="outline-primary"
+            :disabled="!isDirty"
+            @click="saveCondition"
+          >
+            <i class="fa fa-floppy-o"></i> {{ $t('message.update') }}
+          </b-button>
+        </b-col>
+      </b-row>
+      <b-row class="mt-2">
+        <b-col lg="8" class="ml-3">
+          <CodeMirrorEditor
+            id="input-value"
+            v-model="value"
+            :markers="this.editorMarkers"
+            :completionSource="celCompletionSource"
+            @save="saveCondition"
+          ></CodeMirrorEditor>
+        </b-col>
+      </b-row>
+    </template>
   </actionable-list-group-item>
 </template>
 
@@ -202,6 +231,7 @@ export default {
       this.value = this.condition.value;
       this.violationType = this.condition.violationType;
     }
+    this.resetSavedState();
   },
   data() {
     return {
@@ -220,6 +250,7 @@ export default {
         minor: null,
         patch: null,
       },
+      savedState: null,
       subjects: [
         { value: 'AGE', text: this.$t('message.age') },
         //{value: 'ANALYZER', text: this.$t('message.analyzer')},
@@ -330,6 +361,20 @@ export default {
           return false;
       }
     },
+    isDirty: function () {
+      if (!this.savedState) return true;
+      return (
+        this.savedState.subject !== this.subject ||
+        this.savedState.operator !== this.operator ||
+        this.savedState.value !== this.value ||
+        this.savedState.violationType !== this.violationType ||
+        this.savedState.coordinatesGroup !== this.coordinatesGroup ||
+        this.savedState.coordinatesName !== this.coordinatesName ||
+        this.savedState.coordinatesVersion !== this.coordinatesVersion ||
+        JSON.stringify(this.savedState.versionDistance) !==
+          JSON.stringify(this.versionDistance)
+      );
+    },
   },
   beforeMount() {
     if (this.subject === 'COORDINATES') {
@@ -345,8 +390,21 @@ export default {
         this.versionDistance = v;
       }
     }
+    this.resetSavedState();
   },
   methods: {
+    resetSavedState: function () {
+      this.savedState = {
+        subject: this.subject,
+        operator: this.operator,
+        value: this.value,
+        violationType: this.violationType,
+        coordinatesGroup: this.coordinatesGroup,
+        coordinatesName: this.coordinatesName,
+        coordinatesVersion: this.coordinatesVersion,
+        versionDistance: { ...this.versionDistance },
+      };
+    },
     subjectChanged: function () {
       switch (this.subject) {
         case 'AGE':
@@ -406,7 +464,6 @@ export default {
         default:
           this.operators = [];
       }
-      this.saveCondition();
     },
     createDynamicValue: function () {
       if (this.subject === 'COORDINATES') {
@@ -458,6 +515,10 @@ export default {
       }
     },
     saveCondition: function () {
+      if (!this.isDirty) {
+        this.$toastr.i(this.$t('message.no_changes'));
+        return;
+      }
       let dynamicValue = this.createDynamicValue();
       if (!this.subject) {
         return;
@@ -489,6 +550,7 @@ export default {
             this.value = response.data.value;
             this.violationType = response.data.violationType;
             this.editorMarkers = [];
+            this.resetSavedState();
             this.$toastr.s(this.$t('message.updated'));
           })
           .catch((error) => {
@@ -530,6 +592,7 @@ export default {
             this.operator = response.data.operator;
             this.value = response.data.value;
             this.violationType = response.data.violationType;
+            this.resetSavedState();
             this.$toastr.s(this.$t('message.updated'));
           })
           .catch((error) => {
