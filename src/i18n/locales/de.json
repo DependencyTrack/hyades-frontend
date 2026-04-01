@@ -943,7 +943,7 @@
     "vulnerability_tags_updated": "Schwachstellen-Tags aktualisiert",
     "vulnerability_title": "Titel",
     "vulnerability_title_desc": "Der optionale Titel der Schwachstelle",
-    "vulnerability_updated": "Schwachstellen aktualisiert",
+    "vulnerability_updated": "Schwachstelle aktualisiert",
     "vulnerability_updated_desc": "Das Datum, an dem der Schwachstellendatensatz zuletzt aktualisiert wurde",
     "vulnerability_vuln_id": "Schwachstellen-ID",
     "vulnerability_vuln_id_desc": "Die Kennung, die diese Schwachstelle innerhalb derselben Quelle eindeutig identifiziert",
