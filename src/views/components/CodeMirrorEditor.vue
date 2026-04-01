@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import { EditorState, Compartment } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
+import { EditorState, Compartment, Prec } from '@codemirror/state';
+import { EditorView, keymap } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -80,6 +80,17 @@ export default {
             }
           }
         }),
+        Prec.highest(
+          keymap.of([
+            {
+              key: 'Mod-s',
+              run: () => {
+                self.$emit('save');
+                return true;
+              },
+            },
+          ]),
+        ),
         EditorView.theme({
           '&': { height: '100%' },
           '.cm-scroller': { overflow: 'auto' },
