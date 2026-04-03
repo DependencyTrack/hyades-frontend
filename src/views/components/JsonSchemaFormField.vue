@@ -14,8 +14,8 @@
           :title="$t('admin.secret_reference_field')"
         ></i>
       </template>
-      <template v-if="!isComplexType && schema.description" v-slot:description>
-        <showdown :markdown="schema.description" />
+      <template v-if="!isComplexType && description" v-slot:description>
+        <showdown :markdown="description" />
       </template>
       <component
         :is="fieldComponent"
@@ -84,8 +84,18 @@ export default {
     fieldId() {
       return `field-${this.propertyName}`;
     },
+    localizedSchema() {
+      const i18n = this.schema['x-i18n']?.[this.$i18n.locale];
+      if (!i18n) {
+        return this.schema;
+      }
+      return { ...this.schema, ...i18n };
+    },
     label() {
-      return this.schema.title || this.propertyName;
+      return this.localizedSchema.title || this.propertyName;
+    },
+    description() {
+      return this.localizedSchema.description;
     },
     isValid() {
       return !this.validationError;
@@ -176,7 +186,7 @@ export default {
         value: this.value,
         type: this.getInputType(),
         required: this.isRequired,
-        placeholder: this.schema.examples?.[0]?.toString() || '',
+        placeholder: this.localizedSchema.examples?.[0]?.toString() || '',
         min: this.schema.minimum,
         max: this.schema.maximum,
         minlength: this.schema.minLength,
