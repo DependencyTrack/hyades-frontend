@@ -1,8 +1,8 @@
 <template>
   <div>
     <showdown
-      v-if="schema.description"
-      :markdown="schema.description"
+      v-if="localizedDescription"
+      :markdown="localizedDescription"
       class="form-text text-muted small mb-2 d-block"
     />
 
@@ -97,11 +97,19 @@ export default {
     };
   },
   computed: {
+    localizedDescription() {
+      return (
+        this.schema['x-i18n']?.[this.$i18n.locale]?.description ??
+        this.schema.description
+      );
+    },
     itemSchema() {
       return this.schema.items || { type: 'string' };
     },
     addButtonText() {
-      const itemName = this.itemSchema.title || this.$t('message.item');
+      const i18nTitle = this.itemSchema['x-i18n']?.[this.$i18n.locale]?.title;
+      const itemName =
+        i18nTitle || this.itemSchema.title || this.$t('message.item');
       return this.$t('message.add_item', { item: itemName });
     },
     isMaxItemsReached() {
