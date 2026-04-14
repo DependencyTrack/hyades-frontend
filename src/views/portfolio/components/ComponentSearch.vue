@@ -184,9 +184,6 @@ export default {
     },
     performSearch: function () {
       this.appliedFilters = this.createQueryParams();
-      this.$nextTick(() => {
-        this.$refs.table.refresh({ silent: true });
-      });
     },
     onPreBody: function () {
       loadUserPreferencesForBootstrapTable(
@@ -235,18 +232,18 @@ export default {
       appliedFilters: null,
       hashType: null,
       hashTypes: [
-        { value: 'MD5', text: 'MD5' },
-        { value: 'SHA1', text: 'SHA1' },
-        { value: 'SHA_256', text: 'SHA_256' },
-        { value: 'SHA_384', text: 'SHA_256' },
-        { value: 'SHA_512', text: 'SHA_512' },
-        { value: 'SHA3_256', text: 'SHA3_256' },
-        { value: 'SHA3_384', text: 'SHA3_256' },
-        { value: 'SHA3_512', text: 'SHA3_512' },
-        { value: 'BLAKE2B_256', text: 'BLAKE2B_256' },
-        { value: 'BLAKE2B_384', text: 'BLAKE2B_256' },
-        { value: 'BLAKE2B_512', text: 'BLAKE2B_512' },
-        { value: 'BLAKE3', text: 'BLAKE3' },
+        { value: 'MD5', text: this.$t('hashes.md5') },
+        { value: 'SHA-1', text: this.$t('hashes.sha_1') },
+        { value: 'SHA-256', text: this.$t('hashes.sha_256') },
+        { value: 'SHA-384', text: this.$t('hashes.sha_384') },
+        { value: 'SHA-512', text: this.$t('hashes.sha_512') },
+        { value: 'SHA3-256', text: this.$t('hashes.sha3_256') },
+        { value: 'SHA3-384', text: this.$t('hashes.sha3_384') },
+        { value: 'SHA3-512', text: this.$t('hashes.sha3_512') },
+        { value: 'BLAKE2b-256', text: this.$t('hashes.blake_256') },
+        { value: 'BLAKE2b-384', text: this.$t('hashes.blake_384') },
+        { value: 'BLAKE2b-512', text: this.$t('hashes.blake_512') },
+        { value: 'BLAKE3', text: this.$t('hashes.blake3') },
       ],
       subjects: [
         { value: 'COORDINATES', text: this.$t('message.coordinates') },
