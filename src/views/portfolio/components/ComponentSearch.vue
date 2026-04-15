@@ -22,12 +22,10 @@
             v-on:keyup.enter="performSearch"
           />
           <b-input-group v-else-if="subject === 'HASH'">
-            <b-form-select
-              v-model="hashType"
-              :options="hashTypes"
-              class="mr-2"
-            >
-              <b-form-select-option :value="null" disabled>Select hash type</b-form-select-option>
+            <b-form-select v-model="hashType" :options="hashTypes" class="mr-2">
+              <b-form-select-option :value="null" disabled
+                >Select hash type</b-form-select-option
+              >
             </b-form-select>
             <b-form-input
               id="input-value-hash"
@@ -217,7 +215,10 @@ export default {
       return !this.value;
     },
     tableDataBaseUrl() {
-      if (!this.appliedFilters || Object.keys(this.appliedFilters).length === 0) {
+      if (
+        !this.appliedFilters ||
+        Object.keys(this.appliedFilters).length === 0
+      ) {
         return null;
       }
       const url = `${this.$api.BASE_URL}/api/v2/components`;
