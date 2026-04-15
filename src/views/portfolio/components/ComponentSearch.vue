@@ -13,7 +13,7 @@
         </b-col>
         <b-col md="7" lg="7">
           <b-input-group-form-input
-            v-if="subject !== 'COORDINATES'"
+            v-if="subject !== 'COORDINATES' && subject !== 'HASH'"
             id="input-value"
             required="true"
             type="text"
@@ -21,6 +21,20 @@
             lazy="true"
             v-on:keyup.enter="performSearch"
           />
+          <b-input-group v-else-if="subject === 'HASH'">
+            <b-form-select v-model="hashType" :options="hashTypes" class="mr-2">
+              <b-form-select-option :value="null" disabled
+                >Select hash type</b-form-select-option
+              >
+            </b-form-select>
+            <b-form-input
+              id="input-value-hash"
+              placeholder="Enter hash value"
+              type="text"
+              v-model="value"
+              v-on:keyup.enter="performSearch"
+            ></b-form-input>
+          </b-input-group>
           <b-input-group v-else-if="subject === 'COORDINATES'">
             <b-form-input
               id="input-value-coordinates-group"
@@ -46,20 +60,21 @@
           </b-input-group>
         </b-col>
         <b-col md="1" lg="1">
-          <b-button variant="outline-primary" v-on:click="performSearch">{{
-            $t('message.search')
-          }}</b-button>
+          <b-button
+            variant="outline-primary"
+            :disabled="isSearchDisabled"
+            v-on:click="performSearch"
+            >{{ $t('message.search') }}</b-button
+          >
         </b-col>
       </b-row>
     </div>
-    <bootstrap-table
+    <token-paginated-table
       ref="table"
+      :base-url="tableDataBaseUrl"
       :columns="columns"
-      :data="data"
-      :options="options"
-      @on-pre-body="onPreBody"
-    >
-    </bootstrap-table>
+      :options="tableOptions"
+    />
   </div>
 </template>
 
@@ -73,6 +88,7 @@ import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
 import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import xssFilters from 'xss-filters';
 import SeverityProgressBar from '@/views/components/SeverityProgressBar';
+import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
 import { loadUserPreferencesForBootstrapTable } from '@/shared/utils';
 
 export default {
@@ -82,6 +98,7 @@ export default {
     PortfolioWidgetRow,
     BInputGroupFormSelect,
     BInputGroupFormInput,
+    TokenPaginatedTable,
   },
   beforeCreate() {
     this.subject =
@@ -113,91 +130,104 @@ export default {
         }
       }
       this.changeSearchUrl = false;
+      this.$nextTick(() => {
+        if (!this.isSearchDisabled) {
+          this.performSearch();
+        }
+      });
     }
   },
   watch: {
+    baseUrl(newVal) {
+      if (!newVal) return;
+      this.loadPage(newVal);
+    },
     subject() {
       if (localStorage) {
         localStorage.setItem('ComponentSearchSubject', this.subject);
+        // Reset ALL inputs when subject changes.
+        this.value = null;
+        this.hashType = null;
+        this.coordinatesGroup = null;
+        this.coordinatesName = null;
+        this.coordinatesVersion = null;
       }
     },
   },
+  mounted() {
+    if (this.baseUrl) {
+      this.loadPage(this.baseUrl);
+    }
+  },
   methods: {
-    createQueryParams: function () {
+    createQueryParams() {
+      let params = {};
+
       if (this.subject === 'COORDINATES') {
-        let params = {
-          group: common.trimToNull(this.coordinatesGroup),
-          name: common.trimToNull(this.coordinatesName),
-          version: common.trimToNull(this.coordinatesVersion),
-        };
-        let esc = encodeURIComponent;
-        return Object.keys(params)
-          .filter((k) => params[k])
-          .map((k) => esc(k) + '=' + esc(params[k]))
-          .join('&');
+        if (this.coordinatesGroup)
+          params.group = common.trimToNull(this.coordinatesGroup);
+        if (this.coordinatesName)
+          params.name = common.trimToNull(this.coordinatesName);
+        if (this.coordinatesVersion)
+          params.version = common.trimToNull(this.coordinatesVersion);
       } else if (this.subject === 'PACKAGE_URL') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'purl=' + encodeURIComponent(v) : '';
+        if (v) params.purl = v;
       } else if (this.subject === 'CPE') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'cpe=' + encodeURIComponent(v) : '';
+        if (v) params.cpe = v;
       } else if (this.subject === 'SWID_TAGID') {
         let v = common.trimToNull(this.value);
-        return v != null ? 'swidTagId=' + encodeURIComponent(v) : '';
-      }
-    },
-    performSearch: function () {
-      if (this.subject === 'HASH') {
-        let hash = encodeURIComponent(common.trimToNull(this.value));
-        this.options.url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/hash/${hash}`;
-        this.$refs.table.refresh({ silent: true });
-      } else {
-        let queryParams = this.createQueryParams();
-        this.options.url = `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/identity?${queryParams}`;
-        this.$refs.table.refresh({ silent: true });
-      }
-      if (this.changeSearchUrl) {
-        if (this.subject === 'COORDINATES') {
-          let urlCoordinatesGroup = this.coordinatesGroup
-            ? encodeURIComponent(this.coordinatesGroup)
-            : '';
-          let urlCoordinatesName = this.coordinatesName
-            ? encodeURIComponent(this.coordinatesName)
-            : '';
-          let urlCoordinatesVersion = this.coordinatesVersion
-            ? encodeURIComponent(this.coordinatesVersion)
-            : '';
-          this.$router.replace({
-            path: 'components',
-            hash:
-              '#/search/' +
-              this.subject +
-              '/group=' +
-              urlCoordinatesGroup +
-              '/name=' +
-              urlCoordinatesName +
-              '/version=' +
-              urlCoordinatesVersion,
-          });
-        } else {
-          let urlValue = this.value ? encodeURIComponent(this.value) : '';
-          this.$router.replace({
-            path: 'components',
-            hash: '#/search/' + this.subject + '/' + urlValue,
-          });
+        if (v) params.swid_tag_id = v;
+      } else if (this.subject === 'HASH') {
+        let v = common.trimToNull(this.value);
+        if (v) {
+          params.hash = v;
+          if (this.hashType) {
+            params.hash_type = this.hashType;
+          }
         }
       }
+
+      return params;
     },
-    onPreBody: function () {
-      loadUserPreferencesForBootstrapTable(
-        this,
-        'ComponentSearch',
-        this.$refs.table.columns,
-      );
-      if (!this.changeSearchUrl) {
-        this.performSearch();
-        this.changeSearchUrl = true;
+    performSearch: function () {
+      if (this.isSearchDisabled) {
+        return;
       }
+      this.appliedFilters = this.createQueryParams();
+    },
+  },
+  computed: {
+    isSearchDisabled() {
+      if (this.subject === 'COORDINATES') {
+        return !(
+          this.coordinatesGroup ||
+          this.coordinatesName ||
+          this.coordinatesVersion
+        );
+      }
+
+      if (this.subject === 'HASH') {
+        return !(this.value && this.hashType);
+      }
+
+      return !this.value;
+    },
+    tableDataBaseUrl() {
+      if (
+        !this.appliedFilters ||
+        Object.keys(this.appliedFilters).length === 0
+      ) {
+        return null;
+      }
+      const url = `${this.$api.BASE_URL}/api/v2/components`;
+      const queryParams = { ...this.appliedFilters };
+      const sortBy = this.sortBy || 'name';
+      const sortDirection = this.sortDirection || 'asc';
+      queryParams.sort_by = sortBy;
+      queryParams.sort_direction = sortDirection.toUpperCase();
+      return common.setQueryParams(url, queryParams);
     },
   },
   data() {
@@ -207,6 +237,24 @@ export default {
       coordinatesGroup: null,
       coordinatesName: null,
       coordinatesVersion: null,
+      sortBy: null,
+      sortDirection: null,
+      appliedFilters: null,
+      hashType: null,
+      hashTypes: [
+        { value: 'MD5', text: this.$t('hashes.md5') },
+        { value: 'SHA1', text: this.$t('hashes.sha_1') },
+        { value: 'SHA_256', text: this.$t('hashes.sha_256') },
+        { value: 'SHA_384', text: this.$t('hashes.sha_384') },
+        { value: 'SHA_512', text: this.$t('hashes.sha_512') },
+        { value: 'SHA3_256', text: this.$t('hashes.sha3_256') },
+        { value: 'SHA3_384', text: this.$t('hashes.sha3_384') },
+        { value: 'SHA3_512', text: this.$t('hashes.sha3_512') },
+        { value: 'BLAKE2b_256', text: this.$t('hashes.blake_256') },
+        { value: 'BLAKE2b_384', text: this.$t('hashes.blake_384') },
+        { value: 'BLAKE2b_512', text: this.$t('hashes.blake_512') },
+        { value: 'BLAKE3', text: this.$t('hashes.blake3') },
+      ],
       subjects: [
         { value: 'COORDINATES', text: this.$t('message.coordinates') },
         { value: 'PACKAGE_URL', text: this.$t('message.package_url') },
@@ -228,10 +276,10 @@ export default {
                 '/dependencyGraph/' +
                 row.uuid,
             );
-            return row.project.directDependencies
-              ? `<a href="${dependencyGraphUrl}"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
-                  `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`
-              : `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
+            return (
+              `<a href="${dependencyGraphUrl}>"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
+              `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`
+            );
           },
         },
         {
@@ -261,7 +309,7 @@ export default {
         },
         {
           title: this.$t('message.internal'),
-          field: 'isInternal',
+          field: 'internal',
           sortable: false,
           align: 'center',
           class: 'tight',
@@ -279,7 +327,7 @@ export default {
         },
         {
           title: this.$t('message.swid_tagid'),
-          field: 'swidTagId',
+          field: 'swid_tag_id',
           sortable: true,
           formatter(value, row, index) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
@@ -303,24 +351,24 @@ export default {
         },
         {
           title: this.$t('message.license_name'),
-          field: 'resolvedLicense.licenseId',
-          sortable: true,
+          field: 'resolved_license.license_id',
+          sortable: false,
           visible: false,
-          formatter(resolvedLicense, row, index) {
-            if (typeof resolvedLicense === 'undefined') {
+          formatter(resolved_license, row, index) {
+            if (typeof resolved_license === 'undefined') {
               return '-'; // No resolvedLicense info available
             }
 
             let url = xssFilters.uriInUnQuotedAttr(
               '../licenses/' +
-                encodeURIComponent(row.resolvedLicense.licenseId),
+                encodeURIComponent(row.resolved_license.license_id),
             );
-            return `<a href="${url}">${xssFilters.inHTMLData(row.resolvedLicense.name)}</a>`;
+            return `<a href="${url}">${xssFilters.inHTMLData(row.resolved_license.name)}</a>`;
           },
         },
         {
           title: this.$t('message.risk_score'),
-          field: 'lastInheritedRiskScore',
+          field: 'last_inherited_risk_score',
           sortable: true,
           visible: false,
           class: 'tight',
@@ -353,60 +401,20 @@ export default {
           }.bind(this),
         },
       ],
-      data: [],
-      options: {
-        onPostBody: this.initializeTooltips,
-        search: false,
+      tableOptions: {
         showColumns: true,
         showRefresh: true,
-        pagination: true,
         silentSort: false,
         toolbar: '#componentSearchToolbar',
-        sidePagination: 'server',
-        queryParamsType: 'pageSize',
-        pageList: '[10, 25, 50, 100]',
-        pageSize:
-          localStorage &&
-          localStorage.getItem('ComponentSearchPageSize') !== null
-            ? Number(localStorage.getItem('ComponentSearchPageSize'))
-            : 10,
-        sortName:
-          localStorage &&
-          localStorage.getItem('ComponentSearchSortName') !== null
-            ? localStorage.getItem('ComponentSearchSortName')
-            : undefined,
-        sortOrder:
-          localStorage &&
-          localStorage.getItem('ComponentSearchSortOrder') !== null
-            ? localStorage.getItem('ComponentSearchSortOrder')
-            : undefined,
         icons: {
           refresh: 'fa-refresh',
         },
-        //toolbar: '#componentSearchToolbar',
-        responseHandler: function (res, xhr) {
-          res.total = xhr.getResponseHeader('X-Total-Count');
-          return res;
-        },
-        url: `${this.$api.BASE_URL}/${this.$api.URL_COMPONENT}/identity`,
-        onPageChange: (number, size) => {
-          if (localStorage) {
-            localStorage.setItem('ComponentSearchPageSize', size.toString());
-          }
-        },
-        onColumnSwitch: (field, checked) => {
-          if (localStorage) {
-            localStorage.setItem(
-              'ComponentSearchShow' + common.capitalize(field),
-              checked.toString(),
-            );
-          }
-        },
+        sortName: 'name',
+        sortOrder: 'asc',
+        customSort: () => {},
         onSort: (name, order) => {
-          if (localStorage) {
-            localStorage.setItem('ComponentSearchSortName', name);
-            localStorage.setItem('ComponentSearchSortOrder', order);
-          }
+          this.sortBy = name;
+          this.sortDirection = order;
         },
       },
     };

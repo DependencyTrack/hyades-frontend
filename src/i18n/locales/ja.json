@@ -539,7 +539,7 @@
     "group_name": "グループ名",
     "grouped_vulnerabilities": "グループ化された脆弱性",
     "hashes": "ハッシュ",
-    "hashes_short_desc": "ハッシュ (MD5、SHA、SHA3、Blake2b、Blake3)",
+    "hashes_short_desc": "ハッシュ",
     "home": "ホーム",
     "id": "ID",
     "identifier": "識別子",
