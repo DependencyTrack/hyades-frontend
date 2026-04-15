@@ -57,6 +57,8 @@
   "URL_USER_PERMISSION": "api/v1/permission/user",
   "URL_USER_SELF": "api/v1/user/self",
   "URL_USER_SELF_PERMISSIONS": "api/v1/user/self/permissions",
+  "URL_V2_VULNERABILITY_POLICY": "api/v2/vuln-policies",
+  "URL_V2_VULNERABILITY_POLICY_BUNDLE": "api/v2/vuln-policy-bundles",
   "URL_VEX": "api/v1/vex",
   "URL_VULNERABILITY": "api/v1/vulnerability",
   "URL_VULNERABILITY_POLICY": "api/v1/policy/vulnerability",

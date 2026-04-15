@@ -3,7 +3,6 @@
     id="policyBundleInfoModal"
     size="lg"
     hide-header-close
-    no-stacking
     :title="$t('message.policy_bundle_info')"
   >
     <b-tabs class="body-bg-color" style="border: 0; padding: 0">
@@ -65,56 +64,32 @@
 
 <script>
 import BInputGroupFormInput from '../../forms/BInputGroupFormInput';
-import BInputGroupFormSelect from '../../forms/BInputGroupFormSelect';
-import { Switch as cSwitch } from '@coreui/vue';
-import permissionsMixin from '../../mixins/permissionsMixin';
-import Multiselect from 'vue-multiselect';
-import VueTagsInput from '@johmun/vue-tags-input';
 import common from '../../shared/common';
 export default {
   name: 'PolicyBundleInfoModal',
-  mixins: [permissionsMixin],
   components: {
     BInputGroupFormInput,
-    VueTagsInput,
-    BInputGroupFormSelect,
-    cSwitch,
-    Multiselect,
   },
   props: {
-    bundleInfo: Object,
-  },
-  data() {
-    return {
-      syncToken: {},
-    };
+    bundleInfo: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   computed: {
-    bundleCreated: {
-      get() {
-        return typeof this.bundleInfo.created !== 'undefined' &&
-          this.bundleInfo.created != null
-          ? common.formatTimestamp(this.bundleInfo.created)
-          : '-';
-      },
+    bundleCreated() {
+      return this.bundleInfo && this.bundleInfo.created != null
+        ? common.formatTimestamp(this.bundleInfo.created)
+        : '-';
     },
-    bundleLastSynced: {
-      get() {
-        return typeof (
-          this.bundleInfo.lastSuccessfulSync != null &&
-          this.bundleInfo.lastSuccessfulSync === 'number'
-        )
-          ? common.formatTimestamp(this.bundleInfo.lastSuccessfulSync, true)
-          : '-';
-      },
+    bundleLastSynced() {
+      return this.bundleInfo && this.bundleInfo.last_successful_sync != null
+        ? common.formatTimestamp(this.bundleInfo.last_successful_sync, true)
+        : '-';
     },
   },
 };
 </script>
-
-<style lang="scss">
-@import '../../assets/scss/vendors/vue-tags-input/vue-tags-input';
-</style>
 
 <style scoped>
 .tab-content .tab-pane {
