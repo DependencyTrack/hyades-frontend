@@ -23,11 +23,12 @@
           />
           <b-input-group v-else-if="subject === 'HASH'">
             <b-form-select
-              placeholder="Select hash type"
               v-model="hashType"
               :options="hashTypes"
               class="mr-2"
-            ></b-form-select>
+            >
+              <b-form-select-option :value="null" disabled>Select hash type</b-form-select-option>
+            </b-form-select>
             <b-form-input
               id="input-value-hash"
               placeholder="Enter hash value"
@@ -131,9 +132,18 @@ export default {
         }
       }
       this.changeSearchUrl = false;
+      this.$nextTick(() => {
+        if (!this.isSearchDisabled) {
+          this.performSearch();
+        }
+      });
     }
   },
   watch: {
+    baseUrl(newVal) {
+      if (!newVal) return;
+      this.loadPage(newVal);
+    },
     subject() {
       if (localStorage) {
         localStorage.setItem('ComponentSearchSubject', this.subject);
@@ -143,12 +153,13 @@ export default {
         this.coordinatesGroup = null;
         this.coordinatesName = null;
         this.coordinatesVersion = null;
-        this.appliedFilters = null;
       }
     },
   },
   mounted() {
-    this.changeSearchUrl = true;
+    if (this.baseUrl) {
+      this.loadPage(this.baseUrl);
+    }
   },
   methods: {
     createQueryParams() {
@@ -183,14 +194,10 @@ export default {
       return params;
     },
     performSearch: function () {
+      if (this.isSearchDisabled) {
+        return;
+      }
       this.appliedFilters = this.createQueryParams();
-    },
-    onPreBody: function () {
-      loadUserPreferencesForBootstrapTable(
-        this,
-        'ComponentSearch',
-        this.$refs.table.columns,
-      );
     },
   },
   computed: {
@@ -210,7 +217,9 @@ export default {
       return !this.value;
     },
     tableDataBaseUrl() {
-      if (!this.appliedFilters) return null;
+      if (!this.appliedFilters || Object.keys(this.appliedFilters).length === 0) {
+        return null;
+      }
       const url = `${this.$api.BASE_URL}/api/v2/components`;
       const queryParams = { ...this.appliedFilters };
       const sortBy = this.sortBy || 'name';
@@ -233,16 +242,16 @@ export default {
       hashType: null,
       hashTypes: [
         { value: 'MD5', text: this.$t('hashes.md5') },
-        { value: 'SHA-1', text: this.$t('hashes.sha_1') },
-        { value: 'SHA-256', text: this.$t('hashes.sha_256') },
-        { value: 'SHA-384', text: this.$t('hashes.sha_384') },
-        { value: 'SHA-512', text: this.$t('hashes.sha_512') },
-        { value: 'SHA3-256', text: this.$t('hashes.sha3_256') },
-        { value: 'SHA3-384', text: this.$t('hashes.sha3_384') },
-        { value: 'SHA3-512', text: this.$t('hashes.sha3_512') },
-        { value: 'BLAKE2b-256', text: this.$t('hashes.blake_256') },
-        { value: 'BLAKE2b-384', text: this.$t('hashes.blake_384') },
-        { value: 'BLAKE2b-512', text: this.$t('hashes.blake_512') },
+        { value: 'SHA1', text: this.$t('hashes.sha_1') },
+        { value: 'SHA_256', text: this.$t('hashes.sha_256') },
+        { value: 'SHA_384', text: this.$t('hashes.sha_384') },
+        { value: 'SHA_512', text: this.$t('hashes.sha_512') },
+        { value: 'SHA3_256', text: this.$t('hashes.sha3_256') },
+        { value: 'SHA3_384', text: this.$t('hashes.sha3_384') },
+        { value: 'SHA3_512', text: this.$t('hashes.sha3_512') },
+        { value: 'BLAKE2b_256', text: this.$t('hashes.blake_256') },
+        { value: 'BLAKE2b_384', text: this.$t('hashes.blake_384') },
+        { value: 'BLAKE2b_512', text: this.$t('hashes.blake_512') },
         { value: 'BLAKE3', text: this.$t('hashes.blake3') },
       ],
       subjects: [
@@ -267,7 +276,7 @@ export default {
                 row.uuid,
             );
             return (
-              `<a href="${dependencyGraphUrl}"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
+              `<a href="${dependencyGraphUrl}>"<i class="fa fa-sitemap" aria-hidden="true" style="float:right; padding-top: 4px; cursor:pointer" data-toggle="tooltip" data-placement="bottom" title="Show in dependency graph"></i></a> ` +
               `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`
             );
           },
@@ -407,7 +416,6 @@ export default {
           this.sortDirection = order;
         },
       },
-      tableBaseUrl: null,
     };
   },
 };
