@@ -196,7 +196,11 @@ export default {
         if (total) {
           this.totalCount = total.count;
           this.totalCountType = total.type;
+        } else {
+          this.totalCount = null;
+          this.totalCountType = null;
         }
+        this.$emit('total', this.totalCountDisplay);
       } catch (err) {
         if (requestId !== this.currentRequestId) {
           return;
@@ -210,6 +214,7 @@ export default {
         this.pageUrlHistory = [];
         this.totalCount = null;
         this.totalCountType = null;
+        this.$emit('total', this.totalCountDisplay);
       } finally {
         if (requestId === this.currentRequestId) {
           this.$refs.table.hideLoading();

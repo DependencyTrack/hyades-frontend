@@ -211,7 +211,7 @@ const CEL_GLOBALS = [
 // identifier name -> element type (e.g. { v: 'Vulnerability' }).
 // Relies on left-to-right regex matching so outer bindings are resolved
 // before inner ones (e.g. `v` is known when resolving `v.aliases.exists(a,`).
-function findMacroBindings(text) {
+function findMacroBindings(text, topLevel) {
   const bindings = {};
   const re =
     /(\w+(?:\.\w+)*)\.(exists_one|exists|all|filter|map)\(\s*(\w+)\s*,/g;
@@ -219,7 +219,7 @@ function findMacroBindings(text) {
   while ((m = re.exec(text)) !== null) {
     const listPath = m[1];
     const varName = m[3];
-    const rawType = resolveFieldType(listPath, bindings);
+    const rawType = resolveFieldType(listPath, bindings, topLevel);
     if (rawType && rawType.startsWith('repeated ')) {
       bindings[varName] = rawType.replace(/^repeated\s+/, '');
     }
@@ -230,9 +230,9 @@ function findMacroBindings(text) {
 // Returns the raw type string (e.g. "string", "repeated Vulnerability", "License").
 // When traversing intermediate path segments, repeated types are only resolved
 // if the variable comes from a macro binding (i.e. iterating over the list).
-function resolveFieldType(path, macroBindings) {
+function resolveFieldType(path, macroBindings, topLevel) {
   const parts = path.split('.');
-  let rawType = TOP_LEVEL[parts[0]];
+  let rawType = topLevel[parts[0]];
   if (!rawType && macroBindings && macroBindings[parts[0]]) {
     rawType = macroBindings[parts[0]];
   }
@@ -270,58 +270,68 @@ function methodsForType(rawType) {
   return TYPE_METHODS[rawType] || [];
 }
 
-export function celCompletionSource(context) {
-  const beforeCursor = context.state.doc.sliceString(0, context.pos);
+export function createCelCompletionSource(topLevelOverrides) {
+  const mergedTopLevel = Object.fromEntries(
+    Object.entries({ ...TOP_LEVEL, ...topLevelOverrides }).filter(
+      ([, v]) => v !== undefined,
+    ),
+  );
 
-  const macroBindings = findMacroBindings(beforeCursor);
+  return function (context) {
+    const beforeCursor = context.state.doc.sliceString(0, context.pos);
 
-  const dotMatch = beforeCursor.match(/(\w+(?:\.\w+)*)\.(\w*)$/);
-  if (dotMatch) {
-    const path = dotMatch[1];
-    const partial = dotMatch[2];
-    const rawType = resolveFieldType(path, macroBindings);
-    if (!rawType) {
+    const macroBindings = findMacroBindings(beforeCursor, mergedTopLevel);
+
+    const dotMatch = beforeCursor.match(/(\w+(?:\.\w+)*)\.(\w*)$/);
+    if (dotMatch) {
+      const path = dotMatch[1];
+      const partial = dotMatch[2];
+      const rawType = resolveFieldType(path, macroBindings, mergedTopLevel);
+      if (!rawType) {
+        return null;
+      }
+
+      const isRepeated = rawType.startsWith('repeated ');
+      const baseType = rawType.replace(/^repeated\s+/, '');
+      const fields =
+        !isRepeated && !PRIMITIVES.includes(baseType) ? TYPES[baseType] : null;
+      const fieldOptions = fields
+        ? Object.entries(fields).map(([field, fieldType]) => ({
+            label: field,
+            type: 'property',
+            detail: fieldType,
+          }))
+        : [];
+      const methods = methodsForType(rawType);
+
+      if (fieldOptions.length === 0 && methods.length === 0) {
+        return null;
+      }
+
+      return {
+        from: context.pos - partial.length,
+        options: [...fieldOptions, ...methods],
+        validFor: /^\w*$/,
+      };
+    }
+
+    const word = context.matchBefore(/\w+/);
+    if (!word && !context.explicit) {
       return null;
     }
 
-    const isRepeated = rawType.startsWith('repeated ');
-    const baseType = rawType.replace(/^repeated\s+/, '');
-    const fields =
-      !isRepeated && !PRIMITIVES.includes(baseType) ? TYPES[baseType] : null;
-    const fieldOptions = fields
-      ? Object.entries(fields).map(([field, fieldType]) => ({
-          label: field,
-          type: 'property',
-          detail: fieldType,
-        }))
-      : [];
-    const methods = methodsForType(rawType);
-
-    if (fieldOptions.length === 0 && methods.length === 0) {
-      return null;
-    }
+    const topLevelOptions = Object.keys(mergedTopLevel).map((name) => ({
+      label: name,
+      type: 'variable',
+      detail: mergedTopLevel[name],
+    }));
 
     return {
-      from: context.pos - partial.length,
-      options: [...fieldOptions, ...methods],
+      from: word ? word.from : context.pos,
+      options: [...topLevelOptions, ...CEL_GLOBALS],
       validFor: /^\w*$/,
     };
-  }
-
-  const word = context.matchBefore(/\w+/);
-  if (!word && !context.explicit) {
-    return null;
-  }
-
-  const topLevelOptions = Object.keys(TOP_LEVEL).map((name) => ({
-    label: name,
-    type: 'variable',
-    detail: TOP_LEVEL[name],
-  }));
-
-  return {
-    from: word ? word.from : context.pos,
-    options: [...topLevelOptions, ...CEL_GLOBALS],
-    validFor: /^\w*$/,
   };
 }
+
+export const celCompletionSource = createCelCompletionSource({});

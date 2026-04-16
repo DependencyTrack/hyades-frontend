@@ -19,6 +19,8 @@
         :required="isRequired"
         :readonly="readonly"
         :disabled="isDisabled"
+        :reset-button="!isRequired && !isDisabled"
+        :label-reset-button="$t('message.reset')"
         v-on="inputListeners"
         :date-format-options="{
           year: 'numeric',
@@ -70,17 +72,18 @@ export default {
     return {
       isFocused: false,
       isRequired: false,
-      isDisabled: false,
       hadFocus: false,
     };
   },
   beforeMount() {
     this.isFocused = common.toBoolean(this.autofocus);
     this.isRequired = common.toBoolean(this.required);
-    this.isDisabled = common.toBoolean(this.disabled);
     this.readonly = common.toBoolean(this.readonly);
   },
   computed: {
+    isDisabled() {
+      return common.toBoolean(this.disabled);
+    },
     innerValue: {
       get: function () {
         if (this.value && this.value.length > 0) {
