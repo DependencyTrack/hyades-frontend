@@ -1,7 +1,7 @@
 <template>
   <div class="filter-pill-wrapper">
     <b-dropdown
-      :id="`text-filter-pill-${fieldName}`"
+      :id="`text-search-filter-pill-${fieldName}`"
       class="filter-pill"
       ref="dropdown"
       size="sm"
@@ -15,18 +15,17 @@
         <div class="d-flex align-items-center">
           <span v-if="!hasFilter">
             {{ fieldLabel }}
-            <span class="fa fa-filter"></span>
+            <span class="fa fa-search"></span>
           </span>
           <span v-else>
-            {{ fieldLabel }} <em>{{ operatorAbbrev }}</em
-            >&nbsp;<code>"{{ value.value }}"</code>
+            {{ fieldLabel }} <em>~</em>&nbsp;<code>"{{ value.value }}"</code>
           </span>
 
           <b-button
             class="btn-filter-pill-clear"
             v-if="hasFilter"
             size="sm"
-            :title="`Clear ${fieldLabel} filter`"
+            :title="$t('message.clear')"
             @click.stop="clearFilter"
           >
             <span class="fa fa-remove"></span>
@@ -34,31 +33,34 @@
         </div>
       </template>
       <b-dropdown-form class="filter-pill-form pt-2 pb-2" @submit.stop.prevent>
-        <b-input-group class="mb-2">
-          <b-input-group-prepend>
-            <b-form-select
-              :id="`text-filter-pill-operator-${fieldName}`"
-              v-model="tmpOperator"
-              :options="operators"
-              :disabled="operators.length < 2"
-              size="sm"
-            ></b-form-select>
-          </b-input-group-prepend>
+        <b-form-group class="mb-2">
           <b-form-input
-            :id="`text-filter-pill-value-${fieldName}`"
+            :id="`text-search-filter-pill-value-${fieldName}`"
             ref="valueInput"
             v-model="tmpValue"
-            :maxlength="maxLength"
+            :placeholder="$t('message.search') + '...'"
             size="sm"
             @keyup.enter="applyFilter"
           ></b-form-input>
-        </b-input-group>
+        </b-form-group>
+        <b-form-group
+          :label="$t('message.search_in')"
+          label-size="sm"
+          class="mb-2"
+        >
+          <b-form-checkbox-group
+            v-model="tmpFields"
+            :options="fields"
+            stacked
+            size="sm"
+          ></b-form-checkbox-group>
+        </b-form-group>
         <div class="d-flex justify-content-end">
           <b-button
             variant="primary"
             size="sm"
             @click="applyFilter"
-            :disabled="!tmpValue"
+            :disabled="!tmpValue || tmpFields.length === 0"
             >{{ $t('message.apply') }}
           </b-button>
         </div>
@@ -68,19 +70,8 @@
 </template>
 
 <script>
-const supportedOperators = [
-  {
-    name: 'equals',
-    symbol: '=',
-  },
-  {
-    name: 'contains',
-    symbol: '~',
-  },
-];
-
 export default {
-  name: 'TextFilterPill',
+  name: 'TextSearchFilterPill',
   props: {
     fieldName: {
       type: String,
@@ -90,27 +81,9 @@ export default {
       type: String,
       required: true,
     },
-    operators: {
+    fields: {
       type: Array,
-      validator: (value) => {
-        if (!value) {
-          return false;
-        }
-
-        for (const operator of value) {
-          if (!supportedOperators.find((op) => op.name === operator)) {
-            console.error(`Unknown operator ${operator}`);
-            return false;
-          }
-        }
-
-        return true;
-      },
-      default: () => supportedOperators.map((op) => op.name),
-    },
-    maxLength: {
-      type: Number,
-      default: 255,
+      required: true,
     },
     value: {
       type: Object,
@@ -119,7 +92,7 @@ export default {
   },
   data() {
     return {
-      tmpOperator: this.operators[0],
+      tmpFields: this.allFieldValues(),
       tmpValue: '',
     };
   },
@@ -127,11 +100,11 @@ export default {
     value: {
       immediate: true,
       handler(val) {
-        if (val && val.operator && val.value) {
-          this.tmpOperator = val.operator;
+        if (val && val.fields && val.value) {
+          this.tmpFields = [...val.fields];
           this.tmpValue = val.value;
         } else {
-          this.tmpOperator = this.operators[0];
+          this.tmpFields = this.allFieldValues();
           this.tmpValue = '';
         }
       },
@@ -139,13 +112,18 @@ export default {
   },
   computed: {
     hasFilter() {
-      return this.value && this.value.operator && this.value.value;
-    },
-    operatorAbbrev() {
-      return supportedOperators.find((op) => op.name === this.tmpOperator).name;
+      return (
+        this.value &&
+        this.value.fields &&
+        this.value.fields.length > 0 &&
+        this.value.value
+      );
     },
   },
   methods: {
+    allFieldValues() {
+      return this.fields.map((f) => (typeof f === 'object' ? f.value : f));
+    },
     onDropdownShow() {
       this.$nextTick(() => {
         if (this.$refs.valueInput) {
@@ -154,25 +132,25 @@ export default {
       });
     },
     onDropdownHide() {
-      if (!this.hasFilter) {
-        this.tmpOperator = this.operators[0];
+      if (this.hasFilter) {
+        this.tmpFields = [...this.value.fields];
+        this.tmpValue = this.value.value;
+      } else {
+        this.tmpFields = this.allFieldValues();
         this.tmpValue = '';
       }
     },
     applyFilter() {
       const trimmed = this.tmpValue ? this.tmpValue.trim() : '';
-      if (!trimmed) {
-        return;
-      }
-
+      if (!trimmed || this.tmpFields.length === 0) return;
       this.$emit('input', {
-        operator: this.tmpOperator,
+        fields: [...this.tmpFields],
         value: trimmed,
       });
       this.$refs.dropdown.hide();
     },
     clearFilter() {
-      this.tmpOperator = this.operators[0];
+      this.tmpFields = this.allFieldValues();
       this.tmpValue = '';
       this.$emit('input', null);
     },
