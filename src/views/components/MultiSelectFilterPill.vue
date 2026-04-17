@@ -13,11 +13,23 @@
       <template #button-content>
         <div class="d-flex align-items-center">
           <span v-if="!hasFilter">
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
             {{ fieldLabel }}
-            <span class="fa fa-filter"></span>
           </span>
           <span v-else>
-            {{ fieldLabel }} <em>=</em>&nbsp;<code>{{ displayValue }}</code>
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
+            {{ fieldLabel }} <em>=</em>&nbsp;<strong
+              class="filter-pill-value"
+              >{{ displayValue }}</strong
+            >
           </span>
 
           <b-button
@@ -25,9 +37,10 @@
             v-if="hasFilter"
             size="sm"
             :title="$t('message.clear')"
+            :aria-label="$t('message.clear') + ' ' + fieldLabel"
             @click.stop="clearFilter"
           >
-            <span class="fa fa-remove"></span>
+            <span class="fa fa-times-circle" aria-hidden="true"></span>
           </b-button>
         </div>
       </template>
@@ -72,6 +85,10 @@ export default {
       type: String,
       required: true,
     },
+    icon: {
+      type: String,
+      default: null,
+    },
     options: {
       type: Array,
       required: true,
@@ -80,6 +97,9 @@ export default {
       type: Array,
       default: () => [],
     },
+  },
+  beforeDestroy() {
+    this._destroying = true;
   },
   data() {
     return {
@@ -119,11 +139,17 @@ export default {
     deselectAll() {
       this.tmpValue = [];
     },
+    open() {
+      this.$refs.dropdown.show();
+    },
     onDropdownHide() {
       if (this.hasFilter) {
         this.tmpValue = [...this.value];
       } else {
         this.tmpValue = [];
+        if (!this._destroying) {
+          this.$emit('dismiss');
+        }
       }
     },
     applyFilter() {
@@ -135,7 +161,8 @@ export default {
     },
     clearFilter() {
       this.tmpValue = [];
-      this.$emit('input', []);
+      this.$refs.dropdown.hide();
+      this.$emit('input', null);
     },
   },
 };
