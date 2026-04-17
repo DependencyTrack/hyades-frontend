@@ -38,6 +38,8 @@ import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
 import VueTagsInput from '@johmun/vue-tags-input';
 import { Switch as cSwitch } from '@coreui/vue';
 import ExtensionConfigForm from '../../components/ExtensionConfigForm';
+import CodeMirrorEditor from '../../components/CodeMirrorEditor';
+import { createCelCompletionSource } from '../../policy/celCompletions';
 
 export default {
   props: {
@@ -150,6 +152,13 @@ export default {
                     <b-form-group id="fieldset-3" :label="this.$t('admin.notification_level')" label-for="input-3">
                       <b-form-select id="input-3" v-model="notificationLevel" :options="availableLevels" required></b-form-select>
                     </b-form-group>
+                    <b-form-group :label="$t('admin.filter_expression')">
+                      <b-button :variant="filterExpressionMarkers.length > 0 ? 'outline-danger' : 'outline-primary'" size="sm" @click="showFilterExpressionModal = true">
+                        <i class="fa fa-filter"></i> {{ filterExpression ? $t('message.edit') : $t('message.add') }}
+                        <b-badge v-if="filterExpressionMarkers.length > 0" variant="danger" class="ml-1">!</b-badge>
+                      </b-button>
+                      <span v-if="filterExpression" class="ml-2 text-muted font-sm" style="font-family: monospace" :title="filterExpression">{{ filterExpression.length > 32 ? filterExpression.substring(0, 32) + '...' : filterExpression }}</span>
+                    </b-form-group>
                     <extension-config-form
                       v-if="alert.publisher && alert.publisher.uuid && isPublisherConfigurable === true"
                       ref="extensionConfigForm"
@@ -238,6 +247,35 @@ export default {
                        <b-button variant="primary" @click="updateNotificationRule">{{ $t('admin.submit') }}</b-button>
                     </div>
                   </b-col>
+                  <b-modal v-model="showFilterExpressionModal" :title="$t('admin.filter_expression')" size="lg">
+                    <p class="text-muted font-sm">{{ $t('admin.filter_expression_help') }}<br/>{{ $t('admin.filter_expression_help_fail_open') }}</p>
+                    <div class="mb-3">
+                      <b-button @click="showFilterExpressionReference = !showFilterExpressionReference" variant="outline-info" size="sm" class="mr-2">
+                        <i class="fa fa-book"></i> {{ $t('admin.filter_expression_reference') }}
+                      </b-button>
+                      <b-dropdown variant="outline-primary" size="sm">
+                        <template #button-content>
+                          <i class="fa fa-magic"></i> {{ $t('admin.filter_expression_insert_template') }}
+                        </template>
+                        <b-dropdown-item v-for="tpl in filterExpressionTemplates" :key="tpl.label" @click="insertFilterExpressionTemplate(tpl)">
+                          {{ tpl.label }}
+                        </b-dropdown-item>
+                      </b-dropdown>
+                      <b-button v-if="filterExpression" variant="outline-danger" size="sm" class="ml-2" @click="filterExpression = ''">
+                        <i class="fa fa-times"></i> {{ $t('message.clear') }}
+                      </b-button>
+                    </div>
+                    <b-collapse v-model="showFilterExpressionReference" class="mb-3">
+                      <b-card>
+                        <p class="mb-3">
+                          {{ $t('message.policy_expression_cel_hint') }}
+                          <a href="https://cel.dev/overview/cel-overview" target="_blank" rel="noopener noreferrer">{{ $t('message.policy_cel_overview_link') }}</a>
+                        </p>
+                        <b-table-lite :items="filterExpressionReferenceItems" :fields="filterExpressionReferenceFields" small bordered />
+                      </b-card>
+                    </b-collapse>
+                    <code-mirror-editor v-model="filterExpression" :completion-source="celCompletionSource" :markers="filterExpressionMarkers" initial-height="200px" />
+                  </b-modal>
                   <select-project-modal v-on:selection="updateProjectSelection"/>
                   <select-team-modal v-on:selection="updateTeamSelection"></select-team-modal>
                 </b-row>
@@ -252,6 +290,7 @@ export default {
               VueTagsInput,
               cSwitch,
               ExtensionConfigForm,
+              CodeMirrorEditor,
             },
             data() {
               return {
@@ -297,6 +336,77 @@ export default {
                   { value: 'ERROR', text: 'Error' },
                 ],
                 isPublisherConfigurable: null,
+                filterExpression: row.filterExpression || '',
+                filterExpressionMarkers: [],
+                showFilterExpressionModal: false,
+                showFilterExpressionReference: false,
+                celCompletionSource: createCelCompletionSource({
+                  component: undefined,
+                  project: undefined,
+                  vulns: undefined,
+                  now: undefined,
+                  level: 'int',
+                  scope: 'int',
+                  group: 'int',
+                  title: 'string',
+                  content: 'string',
+                  timestamp: 'Timestamp',
+                  subject: 'dyn',
+                }),
+                filterExpressionReferenceFields: [
+                  { key: 'variable', label: i18n.t('message.variable') },
+                  { key: 'type', label: i18n.t('message.type') },
+                  { key: 'description', label: i18n.t('message.description') },
+                ],
+                filterExpressionReferenceItems: [
+                  {
+                    variable: 'level',
+                    type: 'int',
+                    description: i18n.t('admin.filter_expression_var_level'),
+                  },
+                  {
+                    variable: 'scope',
+                    type: 'int',
+                    description: i18n.t('admin.filter_expression_var_scope'),
+                  },
+                  {
+                    variable: 'group',
+                    type: 'int',
+                    description: i18n.t('admin.filter_expression_var_group'),
+                  },
+                  {
+                    variable: 'title',
+                    type: 'string',
+                    description: i18n.t('admin.filter_expression_var_title'),
+                  },
+                  {
+                    variable: 'content',
+                    type: 'string',
+                    description: i18n.t('admin.filter_expression_var_content'),
+                  },
+                  {
+                    variable: 'timestamp',
+                    type: 'Timestamp',
+                    description: i18n.t(
+                      'admin.filter_expression_var_timestamp',
+                    ),
+                  },
+                  {
+                    variable: 'subject',
+                    type: 'dyn',
+                    description: i18n.t('admin.filter_expression_var_subject'),
+                  },
+                ],
+                filterExpressionTemplates: [
+                  {
+                    label: i18n.t('admin.filter_expression_tpl_severity'),
+                    cel: 'subject.vulnerability.severity == "CRITICAL"',
+                  },
+                  {
+                    label: i18n.t('admin.filter_expression_tpl_project_name'),
+                    cel: 'subject.project.name == "my-project"',
+                  },
+                ],
               };
             },
             created() {
@@ -311,6 +421,9 @@ export default {
             watch: {
               alert() {
                 this.initializeTags();
+              },
+              filterExpression() {
+                this.filterExpressionMarkers = [];
               },
               tag: 'searchTags',
             },
@@ -396,6 +509,7 @@ export default {
                   triggerType: this.triggerType,
                   publisherConfig: publisherConfig,
                   notifyOn: this.notifyOn,
+                  filterExpression: this.filterExpression,
                   tags: this.tags.map((tag) => {
                     return { name: tag.text };
                   }),
@@ -404,11 +518,45 @@ export default {
                   payload.scheduleCron = this.scheduleCron;
                   payload.scheduleSkipUnchanged = this.scheduleSkipUnchanged;
                 }
-                this.axios.post(url, payload).then((response) => {
-                  this.alert = response.data;
-                  EventBus.$emit('admin:alerts:rowUpdate', index, this.alert);
-                  this.$toastr.s(this.$t('message.updated'));
-                });
+                this.axios
+                  .post(url, payload, {
+                    validateStatus: (status) =>
+                      (status >= 200 && status < 300) || status === 400,
+                  })
+                  .then((response) => {
+                    if (response.status === 400) {
+                      if (
+                        response.data &&
+                        Array.isArray(response.data.errors)
+                      ) {
+                        this.filterExpressionMarkers = response.data.errors.map(
+                          (err) => ({
+                            startLineNumber: err.line || 1,
+                            endLineNumber: err.line || 1,
+                            startColumn: err.column || 1,
+                            endColumn: (err.column || 1) + 3,
+                            message: err.message || 'Compilation error',
+                          }),
+                        );
+                        this.showFilterExpressionModal = true;
+                        this.$toastr.w(
+                          this.$t('admin.filter_expression_invalid'),
+                        );
+                      } else {
+                        this.$toastr.w(
+                          this.$t('condition.unsuccessful_action'),
+                        );
+                      }
+                      return;
+                    }
+                    this.filterExpressionMarkers = [];
+                    this.alert = response.data;
+                    EventBus.$emit('admin:alerts:rowUpdate', index, this.alert);
+                    this.$toastr.s(this.$t('message.updated'));
+                  })
+                  .catch(() => {
+                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
+                  });
               },
               deleteNotificationRule: function () {
                 let url = `${this.$api.BASE_URL}/${this.$api.URL_NOTIFICATION_RULE}`;
@@ -523,6 +671,14 @@ export default {
                   .catch(() => {
                     this.$toastr.w(this.$t('condition.unsuccessful_action'));
                   });
+              },
+              insertFilterExpressionTemplate: function (tpl) {
+                if (!this.filterExpression.trim()) {
+                  this.filterExpression = tpl.cel;
+                } else {
+                  this.filterExpression =
+                    this.filterExpression + '\n\n' + tpl.cel;
+                }
               },
               searchTags: function () {
                 if (!this.tag) {
