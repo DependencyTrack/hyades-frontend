@@ -105,6 +105,10 @@ export default {
 
     this.updateMinHeight(this.view.state.doc);
     this.view.dom.addEventListener('keyup', (e) => e.stopPropagation());
+
+    if (this.markers && this.markers.length > 0) {
+      this.applyMarkers(this.markers);
+    }
   },
   beforeDestroy() {
     if (this.view) {
@@ -119,6 +123,41 @@ export default {
       }
       const lines = Math.min(Math.max(3, doc.lines + 2), 8);
       this.view.dom.style.minHeight = lines * 1.4 + 'em';
+    },
+    applyMarkers(markers) {
+      if (!this.view) {
+        return;
+      }
+      if (!markers || markers.length === 0) {
+        this.view.dispatch(setDiagnostics(this.view.state, []));
+        return;
+      }
+      const doc = this.view.state.doc;
+      const diagnostics = markers
+        .map((marker) => {
+          try {
+            const startLine = doc.line(marker.startLineNumber);
+            const endLine = doc.line(marker.endLineNumber);
+            const from = Math.min(
+              startLine.from + marker.startColumn - 1,
+              startLine.to,
+            );
+            const to = Math.max(
+              from,
+              Math.min(endLine.from + marker.endColumn - 1, endLine.to),
+            );
+            return {
+              from,
+              to,
+              severity: 'error',
+              message: marker.message,
+            };
+          } catch (e) {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      this.view.dispatch(setDiagnostics(this.view.state, diagnostics));
     },
   },
   watch: {
@@ -143,31 +182,7 @@ export default {
       }
     },
     markers(newMarkers) {
-      if (!this.view) {
-        return;
-      }
-      if (!newMarkers || newMarkers.length === 0) {
-        this.view.dispatch(setDiagnostics(this.view.state, []));
-        return;
-      }
-      const doc = this.view.state.doc;
-      const diagnostics = newMarkers
-        .map((marker) => {
-          try {
-            const startLine = doc.line(marker.startLineNumber);
-            const endLine = doc.line(marker.endLineNumber);
-            return {
-              from: startLine.from + marker.startColumn - 1,
-              to: endLine.from + marker.endColumn - 1,
-              severity: 'error',
-              message: marker.message,
-            };
-          } catch (e) {
-            return null;
-          }
-        })
-        .filter(Boolean);
-      this.view.dispatch(setDiagnostics(this.view.state, diagnostics));
+      this.applyMarkers(newMarkers);
     },
   },
 };
