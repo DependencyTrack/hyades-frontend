@@ -13,11 +13,22 @@
       <template #button-content>
         <div class="d-flex align-items-center">
           <span v-if="!hasFilter">
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
             {{ fieldLabel }}
-            <span class="fa fa-filter"></span>
           </span>
           <span v-else>
-            {{ fieldLabel }}&nbsp;<code>{{ displayValue }}</code>
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
+            {{ fieldLabel }}&nbsp;<strong class="filter-pill-value">{{
+              displayValue
+            }}</strong>
           </span>
 
           <b-button
@@ -25,9 +36,10 @@
             v-if="hasFilter"
             size="sm"
             :title="$t('message.clear')"
+            :aria-label="$t('message.clear') + ' ' + fieldLabel"
             @click.stop="clearFilter"
           >
-            <span class="fa fa-remove"></span>
+            <span class="fa fa-times-circle" aria-hidden="true"></span>
           </b-button>
         </div>
       </template>
@@ -47,8 +59,9 @@
                 :disabled="!tmpFrom"
                 @click="tmpFrom = ''"
                 :title="$t('message.clear')"
+                :aria-label="$t('message.clear') + ' ' + $t('message.from')"
               >
-                <span class="fa fa-remove"></span>
+                <span class="fa fa-times-circle" aria-hidden="true"></span>
               </b-button>
             </b-input-group-append>
           </b-input-group>
@@ -68,8 +81,9 @@
                 :disabled="!tmpTo"
                 @click="tmpTo = ''"
                 :title="$t('message.clear')"
+                :aria-label="$t('message.clear') + ' ' + $t('message.to')"
               >
-                <span class="fa fa-remove"></span>
+                <span class="fa fa-times-circle" aria-hidden="true"></span>
               </b-button>
             </b-input-group-append>
           </b-input-group>
@@ -100,6 +114,10 @@ export default {
       type: String,
       required: true,
     },
+    icon: {
+      type: String,
+      default: null,
+    },
     dateOnly: {
       type: Boolean,
       default: false,
@@ -108,6 +126,9 @@ export default {
       type: Object,
       default: () => null,
     },
+  },
+  beforeDestroy() {
+    this._destroying = true;
   },
   data() {
     return {
@@ -155,7 +176,8 @@ export default {
     formatDisplayValue(val) {
       if (!val) return '';
       if (this.dateOnly) {
-        const date = new Date(val);
+        const [y, m, d] = val.split('-');
+        const date = new Date(y, m - 1, d);
         return date.toLocaleDateString(undefined, {
           year: 'numeric',
           month: 'short',
@@ -195,6 +217,9 @@ export default {
       // Emit as epoch millis
       return new Date(inputStr).getTime();
     },
+    open() {
+      this.$refs.dropdown.show();
+    },
     onDropdownHide() {
       if (this.hasFilter) {
         this.tmpFrom = this.value.from
@@ -204,6 +229,9 @@ export default {
       } else {
         this.tmpFrom = '';
         this.tmpTo = '';
+        if (!this._destroying) {
+          this.$emit('dismiss');
+        }
       }
     },
     applyFilter() {
@@ -220,6 +248,7 @@ export default {
     clearFilter() {
       this.tmpFrom = '';
       this.tmpTo = '';
+      this.$refs.dropdown.hide();
       this.$emit('input', null);
     },
   },

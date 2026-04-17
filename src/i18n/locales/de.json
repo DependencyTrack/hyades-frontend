@@ -606,7 +606,6 @@
     "matrix": "Matrix",
     "method": "Methode",
     "metric_refresh_requested": "Eine Aktualisierung wurde angefordert. Die Metriken werden aktualisiert, wenn die Aktualisierungsaufgabe abgeschlossen ist.",
-    "more_filters": null,
     "name": "Name",
     "next": "Nächste",
     "no_changes": null,

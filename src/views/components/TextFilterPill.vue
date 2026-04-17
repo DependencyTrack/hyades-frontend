@@ -14,22 +14,34 @@
       <template #button-content>
         <div class="d-flex align-items-center">
           <span v-if="!hasFilter">
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
             {{ fieldLabel }}
-            <span class="fa fa-filter"></span>
           </span>
           <span v-else>
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
             {{ fieldLabel }} <em>{{ operatorAbbrev }}</em
-            >&nbsp;<code>"{{ value.value }}"</code>
+            >&nbsp;<strong class="filter-pill-value"
+              >"{{ value.value }}"</strong
+            >
           </span>
 
           <b-button
             class="btn-filter-pill-clear"
             v-if="hasFilter"
             size="sm"
-            :title="`Clear ${fieldLabel} filter`"
+            :title="$t('message.clear')"
+            :aria-label="$t('message.clear') + ' ' + fieldLabel"
             @click.stop="clearFilter"
           >
-            <span class="fa fa-remove"></span>
+            <span class="fa fa-times-circle" aria-hidden="true"></span>
           </b-button>
         </div>
       </template>
@@ -90,6 +102,10 @@ export default {
       type: String,
       required: true,
     },
+    icon: {
+      type: String,
+      default: null,
+    },
     operators: {
       type: Array,
       validator: (value) => {
@@ -117,6 +133,9 @@ export default {
       default: () => null,
     },
   },
+  beforeDestroy() {
+    this._destroying = true;
+  },
   data() {
     return {
       tmpOperator: this.operators[0],
@@ -142,7 +161,8 @@ export default {
       return this.value && this.value.operator && this.value.value;
     },
     operatorAbbrev() {
-      return supportedOperators.find((op) => op.name === this.tmpOperator).name;
+      return supportedOperators.find((op) => op.name === this.tmpOperator)
+        .symbol;
     },
   },
   methods: {
@@ -153,10 +173,19 @@ export default {
         }
       });
     },
+    open() {
+      this.$refs.dropdown.show();
+    },
     onDropdownHide() {
-      if (!this.hasFilter) {
+      if (this.hasFilter) {
+        this.tmpOperator = this.value.operator;
+        this.tmpValue = this.value.value;
+      } else {
         this.tmpOperator = this.operators[0];
         this.tmpValue = '';
+        if (!this._destroying) {
+          this.$emit('dismiss');
+        }
       }
     },
     applyFilter() {
@@ -174,6 +203,7 @@ export default {
     clearFilter() {
       this.tmpOperator = this.operators[0];
       this.tmpValue = '';
+      this.$refs.dropdown.hide();
       this.$emit('input', null);
     },
   },

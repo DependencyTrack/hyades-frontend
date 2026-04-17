@@ -4,6 +4,11 @@
 
 .filter-pill-wrapper >>> .btn-outline-primary {
   border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.filter-pill-wrapper >>> .filter-pill-value {
+  color: var(--primary-lighter);
 }
 
 .filter-pill-form {
@@ -13,16 +18,32 @@
 .btn-filter-pill-clear {
   line-height: 1;
   border: none !important;
-  padding: 2px !important;
+  border-left: 1px solid currentcolor !important;
+  border-radius: 0 !important;
+  background: none !important;
+  padding: 0 0 0 6px !important;
   margin-left: 8px !important;
-  border-radius: 50%;
+  color: inherit !important;
+  opacity: 0.4;
 }
 
 .btn-filter-pill-clear:hover {
-  background-color: rgb(255 255 255 / 20%) !important;
-  color: white !important;
+  opacity: 1 !important;
 }
 
 .btn-filter-pill-clear:focus {
   box-shadow: none !important;
+  outline: 2px solid currentcolor;
+  outline-offset: 1px;
+}
+
+.boolean-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  color: var(--primary);
+  white-space: nowrap;
 }

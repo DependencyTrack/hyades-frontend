@@ -606,7 +606,6 @@
     "matrix": "Matrix",
     "method": "Method",
     "metric_refresh_requested": "A refresh has been requested. Metrics will be updated when the refresh task has completed.",
-    "more_filters": "More Filters",
     "name": "Name",
     "next": "Next",
     "no_changes": "No changes to save",

@@ -13,11 +13,22 @@
       <template #button-content>
         <div class="d-flex align-items-center">
           <span v-if="!hasFilter">
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
             {{ fieldLabel }}
-            <span class="fa fa-filter"></span>
           </span>
           <span v-else>
-            {{ fieldLabel }}&nbsp;<code>{{ displayValue }}</code>
+            <span
+              v-if="icon"
+              :class="['fa', icon, 'mr-1']"
+              aria-hidden="true"
+            ></span>
+            {{ fieldLabel }}&nbsp;<strong class="filter-pill-value">{{
+              displayValue
+            }}</strong>
           </span>
 
           <b-button
@@ -25,9 +36,10 @@
             v-if="hasFilter"
             size="sm"
             :title="$t('message.clear')"
+            :aria-label="$t('message.clear') + ' ' + fieldLabel"
             @click.stop="clearFilter"
           >
-            <span class="fa fa-remove"></span>
+            <span class="fa fa-times-circle" aria-hidden="true"></span>
           </b-button>
         </div>
       </template>
@@ -84,6 +96,10 @@ export default {
       type: String,
       required: true,
     },
+    icon: {
+      type: String,
+      default: null,
+    },
     min: {
       type: Number,
       default: 0,
@@ -100,6 +116,9 @@ export default {
       type: Object,
       default: () => null,
     },
+  },
+  beforeDestroy() {
+    this._destroying = true;
   },
   data() {
     return {
@@ -166,6 +185,9 @@ export default {
     },
   },
   methods: {
+    open() {
+      this.$refs.dropdown.show();
+    },
     onDropdownHide() {
       if (this.hasFilter) {
         this.tmpFrom =
@@ -179,6 +201,9 @@ export default {
       } else {
         this.tmpFrom = '';
         this.tmpTo = '';
+        if (!this._destroying) {
+          this.$emit('dismiss');
+        }
       }
     },
     applyFilter() {
@@ -193,6 +218,7 @@ export default {
     clearFilter() {
       this.tmpFrom = '';
       this.tmpTo = '';
+      this.$refs.dropdown.hide();
       this.$emit('input', null);
     },
   },
