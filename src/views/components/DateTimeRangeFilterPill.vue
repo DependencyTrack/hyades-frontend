@@ -1,110 +1,78 @@
 <template>
-  <div class="filter-pill-wrapper">
-    <b-dropdown
-      :id="`datetime-range-filter-pill-${fieldName}`"
-      class="filter-pill"
-      ref="dropdown"
-      size="sm"
-      variant="outline-primary"
-      no-caret
-      boundary="viewport"
-      @hide="onDropdownHide"
-    >
-      <template #button-content>
-        <div class="d-flex align-items-center">
-          <span v-if="!hasFilter">
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }}
-          </span>
-          <span v-else>
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }}&nbsp;<strong class="filter-pill-value">{{
-              displayValue
-            }}</strong>
-          </span>
+  <filter-pill-dropdown
+    ref="pill"
+    :field-name="fieldName"
+    :field-label="fieldLabel"
+    :icon="icon"
+    :has-filter="hasFilter"
+    @hide="onDropdownHide"
+    @clear="clearFilter"
+    @dismiss="$emit('dismiss')"
+  >
+    <template #value>{{ displayValue }}</template>
 
+    <b-form-group :label="$t('message.from')" label-size="sm" class="mb-2">
+      <b-input-group>
+        <b-form-input
+          :id="`datetime-range-filter-pill-from-${fieldName}`"
+          v-model="tmpFrom"
+          :type="dateOnly ? 'date' : 'datetime-local'"
+          size="sm"
+        ></b-form-input>
+        <b-input-group-append>
           <b-button
-            class="btn-filter-pill-clear"
-            v-if="hasFilter"
             size="sm"
+            variant="outline-secondary"
+            :disabled="!tmpFrom"
+            @click="tmpFrom = ''"
             :title="$t('message.clear')"
-            :aria-label="$t('message.clear') + ' ' + fieldLabel"
-            @click.stop="clearFilter"
+            :aria-label="$t('message.clear') + ' ' + $t('message.from')"
           >
             <span class="fa fa-times-circle" aria-hidden="true"></span>
           </b-button>
-        </div>
-      </template>
-      <b-dropdown-form class="filter-pill-form pt-2 pb-2" @submit.stop.prevent>
-        <b-form-group :label="$t('message.from')" label-size="sm" class="mb-2">
-          <b-input-group>
-            <b-form-input
-              :id="`datetime-range-filter-pill-from-${fieldName}`"
-              v-model="tmpFrom"
-              :type="dateOnly ? 'date' : 'datetime-local'"
-              size="sm"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                size="sm"
-                variant="outline-secondary"
-                :disabled="!tmpFrom"
-                @click="tmpFrom = ''"
-                :title="$t('message.clear')"
-                :aria-label="$t('message.clear') + ' ' + $t('message.from')"
-              >
-                <span class="fa fa-times-circle" aria-hidden="true"></span>
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group :label="$t('message.to')" label-size="sm" class="mb-2">
-          <b-input-group>
-            <b-form-input
-              :id="`datetime-range-filter-pill-to-${fieldName}`"
-              v-model="tmpTo"
-              :type="dateOnly ? 'date' : 'datetime-local'"
-              size="sm"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                size="sm"
-                variant="outline-secondary"
-                :disabled="!tmpTo"
-                @click="tmpTo = ''"
-                :title="$t('message.clear')"
-                :aria-label="$t('message.clear') + ' ' + $t('message.to')"
-              >
-                <span class="fa fa-times-circle" aria-hidden="true"></span>
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <div class="d-flex justify-content-end">
+        </b-input-group-append>
+      </b-input-group>
+    </b-form-group>
+    <b-form-group :label="$t('message.to')" label-size="sm" class="mb-2">
+      <b-input-group>
+        <b-form-input
+          :id="`datetime-range-filter-pill-to-${fieldName}`"
+          v-model="tmpTo"
+          :type="dateOnly ? 'date' : 'datetime-local'"
+          size="sm"
+        ></b-form-input>
+        <b-input-group-append>
           <b-button
-            variant="primary"
             size="sm"
-            @click="applyFilter"
-            :disabled="!tmpFrom && !tmpTo"
-            >{{ $t('message.apply') }}
+            variant="outline-secondary"
+            :disabled="!tmpTo"
+            @click="tmpTo = ''"
+            :title="$t('message.clear')"
+            :aria-label="$t('message.clear') + ' ' + $t('message.to')"
+          >
+            <span class="fa fa-times-circle" aria-hidden="true"></span>
           </b-button>
-        </div>
-      </b-dropdown-form>
-    </b-dropdown>
-  </div>
+        </b-input-group-append>
+      </b-input-group>
+    </b-form-group>
+    <div class="d-flex justify-content-end">
+      <b-button
+        variant="primary"
+        size="sm"
+        @click="applyFilter"
+        :disabled="!tmpFrom && !tmpTo"
+        >{{ $t('message.apply') }}
+      </b-button>
+    </div>
+  </filter-pill-dropdown>
 </template>
 
 <script>
+import FilterPillDropdown from '@/views/components/FilterPillDropdown.vue';
+
 export default {
   name: 'DateTimeRangeFilterPill',
+  components: { FilterPillDropdown },
   props: {
     fieldName: {
       type: String,
@@ -126,9 +94,6 @@ export default {
       type: Object,
       default: () => null,
     },
-  },
-  beforeDestroy() {
-    this._destroying = true;
   },
   data() {
     return {
@@ -196,10 +161,8 @@ export default {
     toInputValue(val) {
       if (!val) return '';
       if (this.dateOnly) {
-        // val is a YYYY-MM-DD string
         return val;
       }
-      // val is epoch millis
       const date = new Date(val);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -211,14 +174,12 @@ export default {
     toEmitValue(inputStr) {
       if (!inputStr) return null;
       if (this.dateOnly) {
-        // Emit as YYYY-MM-DD string directly
         return inputStr;
       }
-      // Emit as epoch millis
       return new Date(inputStr).getTime();
     },
     open() {
-      this.$refs.dropdown.show();
+      this.$refs.pill.open();
     },
     onDropdownHide() {
       if (this.hasFilter) {
@@ -229,9 +190,6 @@ export default {
       } else {
         this.tmpFrom = '';
         this.tmpTo = '';
-        if (!this._destroying) {
-          this.$emit('dismiss');
-        }
       }
     },
     applyFilter() {
@@ -243,16 +201,14 @@ export default {
         from: this.toEmitValue(this.tmpFrom),
         to: this.toEmitValue(this.tmpTo),
       });
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
     },
     clearFilter() {
       this.tmpFrom = '';
       this.tmpTo = '';
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
       this.$emit('input', null);
     },
   },
 };
 </script>
-
-<style scoped src="./filter-pill.css"></style>

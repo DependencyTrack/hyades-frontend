@@ -1,22 +1,13 @@
 <template>
   <b-card no-body :header="$t('admin.workflow_runs')">
     <b-card-body>
-      <div class="filter-bar">
-        <span class="filter-bar-label"
-          ><span class="fa fa-filter" aria-hidden="true"></span>
-          {{ $t('message.filters') }}</span
-        >
+      <div
+        id="workflowRunToolbar"
+        class="filter-bar"
+        role="toolbar"
+        :aria-label="$t('message.filters')"
+      >
         <div class="filter-pills">
-          <b-button
-            v-show="hasActiveFilters"
-            size="sm"
-            variant="outline-danger"
-            class="btn-clear-all-filters"
-            @click="clearAllFilters"
-          >
-            {{ $t('message.clear_all') }}
-            <span class="fa fa-remove" aria-hidden="true"></span>
-          </b-button>
           <text-filter-pill
             v-if="isFilterVisible('workflowName')"
             ref="filter_workflowName"
@@ -64,7 +55,7 @@
           >
             <template #button-content>
               <span class="fa fa-plus" aria-hidden="true"></span>
-              {{ $t('message.add') }}
+              {{ $t('message.add_filter') }}
             </template>
             <b-dropdown-item
               v-for="filter in addFilterOptions"
@@ -77,6 +68,16 @@
               >{{ filter.label }}</b-dropdown-item
             >
           </b-dropdown>
+          <b-button
+            v-show="activeFilterCount >= 2"
+            size="sm"
+            variant="outline-danger"
+            class="btn-clear-all-filters"
+            @click="clearAllFilters"
+          >
+            <span class="fa fa-remove" aria-hidden="true"></span>
+            {{ $t('message.clear_all') }}
+          </b-button>
         </div>
       </div>
       <token-paginated-table
@@ -121,6 +122,7 @@ export default {
         { value: 'SUSPENDED', text: this.$t(`message.status_suspended`) },
       ],
       tableOptions: {
+        toolbar: '#workflowRunToolbar',
         sortName: 'id',
         sortOrder: 'desc',
         // Suppress client-side sorting.
@@ -270,11 +272,16 @@ export default {
   },
   methods: {
     clearAllFilters() {
-      this.workflowNameFilter = null;
-      this.statusFilter = null;
-      this.createdFilter = null;
-      this.completedFilter = null;
-      this.clearPendingFilters();
+      this._clearing = true;
+      try {
+        this.workflowNameFilter = null;
+        this.statusFilter = null;
+        this.createdFilter = null;
+        this.completedFilter = null;
+        this.clearPendingFilters();
+      } finally {
+        this._clearing = false;
+      }
     },
   },
 };

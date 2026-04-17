@@ -1,85 +1,51 @@
 <template>
-  <div class="filter-pill-wrapper">
-    <b-dropdown
-      :id="`text-filter-pill-${fieldName}`"
-      class="filter-pill"
-      ref="dropdown"
-      size="sm"
-      variant="outline-primary"
-      no-caret
-      boundary="viewport"
-      @show="onDropdownShow"
-      @hide="onDropdownHide"
-    >
-      <template #button-content>
-        <div class="d-flex align-items-center">
-          <span v-if="!hasFilter">
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }}
-          </span>
-          <span v-else>
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }} <em>{{ operatorAbbrev }}</em
-            >&nbsp;<strong class="filter-pill-value"
-              >"{{ value.value }}"</strong
-            >
-          </span>
+  <filter-pill-dropdown
+    ref="pill"
+    :field-name="fieldName"
+    :field-label="fieldLabel"
+    :icon="icon"
+    :has-filter="hasFilter"
+    @show="onDropdownShow"
+    @hide="onDropdownHide"
+    @clear="clearFilter"
+    @dismiss="$emit('dismiss')"
+  >
+    <template #value>{{ operatorAbbrev }} "{{ value.value }}"</template>
 
-          <b-button
-            class="btn-filter-pill-clear"
-            v-if="hasFilter"
-            size="sm"
-            :title="$t('message.clear')"
-            :aria-label="$t('message.clear') + ' ' + fieldLabel"
-            @click.stop="clearFilter"
-          >
-            <span class="fa fa-times-circle" aria-hidden="true"></span>
-          </b-button>
-        </div>
-      </template>
-      <b-dropdown-form class="filter-pill-form pt-2 pb-2" @submit.stop.prevent>
-        <b-input-group class="mb-2">
-          <b-input-group-prepend>
-            <b-form-select
-              :id="`text-filter-pill-operator-${fieldName}`"
-              v-model="tmpOperator"
-              :options="operators"
-              :disabled="operators.length < 2"
-              size="sm"
-            ></b-form-select>
-          </b-input-group-prepend>
-          <b-form-input
-            :id="`text-filter-pill-value-${fieldName}`"
-            ref="valueInput"
-            v-model="tmpValue"
-            :maxlength="maxLength"
-            size="sm"
-            @keyup.enter="applyFilter"
-          ></b-form-input>
-        </b-input-group>
-        <div class="d-flex justify-content-end">
-          <b-button
-            variant="primary"
-            size="sm"
-            @click="applyFilter"
-            :disabled="!tmpValue"
-            >{{ $t('message.apply') }}
-          </b-button>
-        </div>
-      </b-dropdown-form>
-    </b-dropdown>
-  </div>
+    <b-input-group class="mb-2">
+      <b-input-group-prepend>
+        <b-form-select
+          :id="`text-filter-pill-operator-${fieldName}`"
+          v-model="tmpOperator"
+          :options="operators"
+          :disabled="operators.length < 2"
+          size="sm"
+        ></b-form-select>
+      </b-input-group-prepend>
+      <b-form-input
+        :id="`text-filter-pill-value-${fieldName}`"
+        ref="valueInput"
+        v-model="tmpValue"
+        :maxlength="maxLength"
+        size="sm"
+        @keyup.enter="applyFilter"
+      ></b-form-input>
+    </b-input-group>
+    <div class="d-flex justify-content-end">
+      <b-button
+        variant="primary"
+        size="sm"
+        @click="applyFilter"
+        :disabled="!tmpValue"
+        >{{ $t('message.apply') }}
+      </b-button>
+    </div>
+  </filter-pill-dropdown>
 </template>
 
 <script>
+import FilterPillDropdown from '@/views/components/FilterPillDropdown.vue';
+
 const supportedOperators = [
   {
     name: 'equals',
@@ -89,10 +55,15 @@ const supportedOperators = [
     name: 'contains',
     symbol: '~',
   },
+  {
+    name: 'starts_with',
+    symbol: '^',
+  },
 ];
 
 export default {
   name: 'TextFilterPill',
+  components: { FilterPillDropdown },
   props: {
     fieldName: {
       type: String,
@@ -133,9 +104,6 @@ export default {
       default: () => null,
     },
   },
-  beforeDestroy() {
-    this._destroying = true;
-  },
   data() {
     return {
       tmpOperator: this.operators[0],
@@ -174,7 +142,7 @@ export default {
       });
     },
     open() {
-      this.$refs.dropdown.show();
+      this.$refs.pill.open();
     },
     onDropdownHide() {
       if (this.hasFilter) {
@@ -183,9 +151,6 @@ export default {
       } else {
         this.tmpOperator = this.operators[0];
         this.tmpValue = '';
-        if (!this._destroying) {
-          this.$emit('dismiss');
-        }
       }
     },
     applyFilter() {
@@ -198,16 +163,14 @@ export default {
         operator: this.tmpOperator,
         value: trimmed,
       });
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
     },
     clearFilter() {
       this.tmpOperator = this.operators[0];
       this.tmpValue = '';
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
       this.$emit('input', null);
     },
   },
 };
 </script>
-
-<style scoped src="./filter-pill.css"></style>

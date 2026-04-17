@@ -1,10 +1,13 @@
+import jQuery from 'jquery';
+
 export default {
   data: () => ({
     pendingFilters: {},
   }),
   computed: {
-    hasActiveFilters() {
-      return this.allFilterDefs.some((f) => this.hasFilterValue(f.name));
+    activeFilterCount() {
+      return this.allFilterDefs.filter((f) => this.hasFilterValue(f.name))
+        .length;
     },
     addFilterOptions() {
       return this.allFilterDefs.filter((f) => !this.isFilterVisible(f.name));
@@ -28,7 +31,53 @@ export default {
       });
     });
   },
+  mounted() {
+    // Move bootstrap-table's built-in toolbar controls (refresh, column toggle)
+    // into the filter bar so they appear in one cohesive row.
+    //
+    // This depends on bootstrap-table rendering a `.columns` div as a direct
+    // child of `.fixed-table-toolbar` during its mounted() hook.
+    //
+    // We also listen for bootstrap-table's post-body event to re-run the move,
+    // since initToolbar() can recreate the `.columns` div (e.g. on option changes).
+    this.$nextTick(() => {
+      this._adoptTableControls();
+      const table = this.$el.querySelector('table');
+      if (table) {
+        jQuery(table).on('post-body.bs.table.filterPillsMixin', () => {
+          this._adoptTableControls();
+        });
+      }
+    });
+  },
+  beforeDestroy() {
+    const table = this.$el.querySelector('table');
+    if (table) {
+      jQuery(table).off('post-body.bs.table.filterPillsMixin');
+    }
+  },
   methods: {
+    _adoptTableControls() {
+      const filterBar = this.$el.querySelector('.filter-bar');
+      if (!filterBar) return;
+      const toolbar = filterBar.closest('.fixed-table-toolbar');
+      if (!toolbar) return;
+      const columns = toolbar.querySelector(':scope > .columns');
+      if (!columns) return;
+      columns.style.setProperty('float', 'none', 'important');
+      columns.style.marginLeft = 'auto';
+      columns.style.flexShrink = '0';
+      columns.style.alignSelf = 'flex-start';
+      columns.style.borderLeft = '1px solid rgb(255 255 255 / 10%)';
+      columns.style.paddingLeft = '0.5rem';
+      columns.querySelectorAll('.btn').forEach((btn) => {
+        if (!btn.getAttribute('aria-label') && !btn.textContent.trim()) {
+          const title = btn.getAttribute('title') || btn.getAttribute('name');
+          if (title) btn.setAttribute('aria-label', title);
+        }
+      });
+      filterBar.appendChild(columns);
+    },
     hasFilterValue(name) {
       if (this.booleanFilters && this.booleanFilters.includes(name)) {
         return !!this[name];

@@ -1,279 +1,247 @@
 <template>
   <div class="animated fadeIn" v-permission="PERMISSIONS.VIEW_POLICY_VIOLATION">
-    <b-row>
-      <b-col xs="6" sm="4" md="4" lg="2" id="filter-controls">
-        <div>
-          <h3 style="display: inline">{{ this.$t('message.filters') }}</h3>
-          <b-button
-            size="md"
-            variant="outline-primary"
-            style="float: right"
-            @click="clearAllFilters()"
-          >
-            {{ this.$t('message.clear_all') }}</b-button
-          >
-          <br /><br />
-          <b-form-group
-            id="showInactive-form-group"
-            :label="this.$t('message.projects')"
-          >
-            <b-form-checkbox
-              id="showInactive-form-checkbox"
-              v-model="showInactive"
-              value="true"
-              unchecked-value="false"
-            >
-              {{ this.$t('message.show_inactive_projects') }}
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group
-            id="showSuppressed-form-group"
-            :label="this.$t('message.analysis_status')"
-          >
-            <b-form-checkbox
-              id="showSuppressed-form-checkbox"
-              v-model="showSuppressed"
-              value="true"
-              unchecked-value="false"
-            >
-              {{ this.$t('message.show_suppressed_violations') }}
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group
-            id="violation-state-form-group"
-            :label="this.$t('message.violation_state')"
-          >
-            <b-form-checkbox-group
-              id="violation-state-form-checkbox-group"
-              v-model="violationStateSelected"
-              :options="violationStateOptions"
-              stacked
-            >
-            </b-form-checkbox-group>
-          </b-form-group>
-          <b-form-group
-            id="risk-type-form-group"
-            :label="this.$t('message.risk_type')"
-          >
-            <b-form-checkbox-group
-              id="risk-type-form-checkbox-group"
-              v-model="riskTypeSelected"
-              :options="riskTypeOptions"
-              stacked
-            >
-            </b-form-checkbox-group>
-          </b-form-group>
-          <b-form-group
-            id="analysis-type-form-group"
-            :label="this.$t('message.analysis_state')"
-          >
-            <b-form-checkbox-group
-              id="analysis-type-form-checkbox-group"
-              v-model="analysisStateSelected"
-              :options="analysisStateOptions"
-              stacked
-            >
-            </b-form-checkbox-group>
-          </b-form-group>
-          <b-form-group
-            id="occurred-on-date-form-group"
-            :label="this.$t('message.occurred_on')"
-          >
-            <b-datepicker
-              id="occurred-on-datepicker-from"
-              v-model="occurredOnDateFrom"
-              :max="occurredOnDateTo"
-              :placeholder="this.$t('message.from')"
-            ></b-datepicker>
-            <b-datepicker
-              id="occurred-on-datepicker-to"
-              v-model="occurredOnDateTo"
-              :min="occurredOnDateFrom"
-              :placeholder="this.$t('message.to')"
-            ></b-datepicker>
-          </b-form-group>
-          <b-form-group
-            id="text-search-form-group"
-            :label="this.$t('message.text_search')"
-          >
-            <b-form-input
-              id="text-search-form-input"
-              v-model="textSearchInput"
-              debounce="750"
-              :placeholder="this.$t('message.search')"
-            ></b-form-input>
-            Search in:
-            <b-form-checkbox-group
-              id="text-search-form-checkbox-group"
-              v-model="textSearchSelected"
-              :options="textSearchOptions"
-              stacked
-            >
-            </b-form-checkbox-group>
-          </b-form-group>
-          <b-form-group
-            id="policy-form-group"
-            :label="this.$t('message.policies')"
-            v-permission="PERMISSIONS.POLICY_MANAGEMENT"
-          >
-            <b-form-checkbox-group
-              id="policy-form-checkbox-group"
-              v-model="policySelected"
-              :options="policyOptions"
-              stacked
-            >
-            </b-form-checkbox-group>
-          </b-form-group>
-        </div>
-      </b-col>
-      <b-col xs="6" sm="8" md="8" lg="10">
-        <bootstrap-table
-          ref="table"
-          :columns="columns"
-          :data="data"
-          :options="options"
-          @on-load-success="onLoadSuccess"
+    <div
+      id="policyViolationAuditToolbar"
+      class="filter-bar"
+      role="toolbar"
+      :aria-label="$t('message.filters')"
+    >
+      <div class="filter-pills">
+        <multi-select-filter-pill
+          v-if="isFilterVisible('violationState')"
+          ref="filter_violationState"
+          :field-label="$t('message.violation_state')"
+          field-name="violationState"
+          icon="fa-exclamation-circle"
+          :options="violationStateOptions"
+          v-model="violationStateFilter"
+          @dismiss="onFilterDismiss('violationState')"
+        />
+        <multi-select-filter-pill
+          v-if="isFilterVisible('riskType')"
+          ref="filter_riskType"
+          :field-label="$t('message.risk_type')"
+          field-name="riskType"
+          icon="fa-shield"
+          :options="riskTypeOptions"
+          v-model="riskTypeFilter"
+          @dismiss="onFilterDismiss('riskType')"
+        />
+        <multi-select-filter-pill
+          v-if="isFilterVisible('analysisState')"
+          ref="filter_analysisState"
+          :field-label="$t('message.analysis_state')"
+          field-name="analysisState"
+          icon="fa-tasks"
+          :options="analysisStateOptions"
+          v-model="analysisStateFilter"
+          @dismiss="onFilterDismiss('analysisState')"
+        />
+        <text-search-filter-pill
+          v-if="isFilterVisible('textSearch')"
+          ref="filter_textSearch"
+          :field-label="$t('message.search')"
+          field-name="textSearch"
+          icon="fa-search"
+          :fields="textSearchFields"
+          v-model="textSearchFilter"
+          @dismiss="onFilterDismiss('textSearch')"
+        />
+        <date-time-range-filter-pill
+          v-if="isFilterVisible('occurredOn')"
+          ref="filter_occurredOn"
+          :field-label="$t('message.occurred_on')"
+          field-name="occurredOn"
+          icon="fa-calendar"
+          date-only
+          v-model="occurredOnFilter"
+          @dismiss="onFilterDismiss('occurredOn')"
+        />
+        <boolean-filter-pill
+          v-if="isFilterVisible('showInactive')"
+          :field-label="$t('message.show_inactive_projects')"
+          field-name="showInactive"
+          icon="fa-eye"
+          v-model="showInactive"
+        />
+        <boolean-filter-pill
+          v-if="isFilterVisible('showSuppressed')"
+          :field-label="$t('message.show_suppressed_violations')"
+          field-name="showSuppressed"
+          icon="fa-eye"
+          v-model="showSuppressed"
+        />
+        <b-dropdown
+          v-if="addFilterOptions.length > 0"
+          size="sm"
+          variant="outline-primary"
+          class="btn-more-filters"
+          no-caret
         >
-        </bootstrap-table>
-      </b-col>
-    </b-row>
+          <template #button-content>
+            <span class="fa fa-plus" aria-hidden="true"></span>
+            {{ $t('message.add_filter') }}
+          </template>
+          <b-dropdown-item
+            v-for="filter in addFilterOptions"
+            :key="filter.name"
+            @click="showFilter(filter.name)"
+            ><span
+              :class="['fa', filter.icon, 'mr-2']"
+              aria-hidden="true"
+            ></span
+            >{{ filter.label }}</b-dropdown-item
+          >
+        </b-dropdown>
+        <b-button
+          v-show="activeFilterCount >= 2"
+          size="sm"
+          variant="outline-danger"
+          class="btn-clear-all-filters"
+          @click="clearAllFilters"
+        >
+          <span class="fa fa-remove" aria-hidden="true"></span>
+          {{ $t('message.clear_all') }}
+        </b-button>
+      </div>
+    </div>
+    <bootstrap-table
+      ref="table"
+      :columns="columns"
+      :data="data"
+      :options="options"
+      @on-load-success="onLoadSuccess"
+    >
+    </bootstrap-table>
   </div>
 </template>
 
 <script>
 import permissionsMixin from '../../mixins/permissionsMixin';
+import filterPillsMixin from '@/mixins/filterPillsMixin';
 import common from '@/shared/common';
 import xssFilters from 'xss-filters';
 import { loadUserPreferencesForBootstrapTable } from '@/shared/utils';
-import { hasPermission } from '@/shared/permissions';
-import * as permissions from '@/shared/permissions';
+import MultiSelectFilterPill from '@/views/components/MultiSelectFilterPill.vue';
+import TextSearchFilterPill from '@/views/components/TextSearchFilterPill.vue';
+import DateTimeRangeFilterPill from '@/views/components/DateTimeRangeFilterPill.vue';
+import BooleanFilterPill from '@/views/components/BooleanFilterPill.vue';
 
 export default {
-  mixins: [permissionsMixin],
+  mixins: [permissionsMixin, filterPillsMixin],
+  components: {
+    MultiSelectFilterPill,
+    TextSearchFilterPill,
+    DateTimeRangeFilterPill,
+    BooleanFilterPill,
+  },
   computed: {
-    watchers() {
+    allFilterDefs() {
       return [
-        this.showInactive,
-        this.showSuppressed,
-        this.violationStateSelected,
-        this.riskTypeSelected,
-        this.policySelected,
-        this.analysisStateSelected,
-        this.occurredOnDateFrom,
-        this.occurredOnDateTo,
+        {
+          name: 'violationState',
+          label: this.$t('message.violation_state'),
+          icon: 'fa-exclamation-circle',
+        },
+        {
+          name: 'riskType',
+          label: this.$t('message.risk_type'),
+          icon: 'fa-shield',
+        },
+        {
+          name: 'analysisState',
+          label: this.$t('message.analysis_state'),
+          icon: 'fa-tasks',
+        },
+        {
+          name: 'textSearch',
+          label: this.$t('message.search'),
+          icon: 'fa-search',
+        },
+        {
+          name: 'occurredOn',
+          label: this.$t('message.occurred_on'),
+          icon: 'fa-calendar',
+        },
+        {
+          name: 'showInactive',
+          label: this.$t('message.show_inactive_projects'),
+          icon: 'fa-eye',
+        },
+        {
+          name: 'showSuppressed',
+          label: this.$t('message.show_suppressed_violations'),
+          icon: 'fa-eye',
+        },
       ];
     },
   },
-  beforeMount() {
-    this.initializeWatchers();
-    this.initializePolicies();
-    this.textSearchSelected = this.textSearchOptions.map(
-      (option) => option.value,
-    );
+  beforeDestroy() {
+    if (this._refreshTimer) {
+      clearTimeout(this._refreshTimer);
+    }
   },
   methods: {
-    initializePolicies: function () {
-      let policyUrl = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}`;
-      if (
-        hasPermission(permissions.POLICY_MANAGEMENT) ||
-        hasPermission(permissions.ACCESS_MANAGEMENT)
-      ) {
-        this.axios
-          .get(policyUrl)
-          .then((response) => {
-            if (response.data) {
-              response.data.forEach((policy) =>
-                this.policyOptions.push({
-                  text: policy.name,
-                  value: policy.uuid,
-                }),
-              );
-            }
-          })
-          .catch((error) => {
-            this.$toastr.w(this.$t('condition.unsuccessful_action'));
-          });
+    apiUrl() {
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY_VIOLATION}`;
+      const params = {
+        showInactive: this.showInactive === true,
+        suppressed: this.showSuppressed === true,
+      };
+      if (this.violationStateFilter && this.violationStateFilter.length > 0) {
+        params.violationState = this.violationStateFilter.join(',');
       }
-    },
-    initializeWatchers: function () {
-      this.simpleWatcher = this.$watch('watchers', () => this.refreshTable());
-      this.textSearchSelectedWatcher = this.$watch('textSearchSelected', () => {
-        if (this.textSearchInput.trim().length !== 0) {
-          this.refreshTable();
+      if (this.riskTypeFilter && this.riskTypeFilter.length > 0) {
+        params.riskType = this.riskTypeFilter.join(',');
+      }
+      if (this.analysisStateFilter && this.analysisStateFilter.length > 0) {
+        params.analysisState = this.analysisStateFilter.join(',');
+      }
+      if (this.occurredOnFilter) {
+        if (this.occurredOnFilter.from) {
+          params.occurredOnDateFrom = this.occurredOnFilter.from;
         }
-      });
-      this.textSearchInputWatcher = this.$watch(
-        'textSearchInput',
-        (newInput, oldInput) => {
-          if (!(newInput.trim().length === 0 && oldInput.trim().length === 0)) {
-            this.refreshTable();
-          }
-        },
-      );
+        if (this.occurredOnFilter.to) {
+          params.occurredOnDateTo = this.occurredOnFilter.to;
+        }
+      }
+      if (this.textSearchFilter && this.textSearchFilter.value) {
+        params.textSearchField = this.textSearchFilter.fields.join(',');
+        params.textSearchInput = this.textSearchFilter.value;
+      }
+      return common.setQueryParams(url, params);
     },
-    apiUrl: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY_VIOLATION}`;
-      url +=
-        '?showInactive=' +
-        (this.showInactive === 'true') +
-        '&suppressed=' +
-        (this.showSuppressed === 'true');
-      if (
-        this.violationStateSelected &&
-        this.violationStateSelected.length > 0
-      ) {
-        url += '&violationState=' + this.violationStateSelected;
+    refreshTable() {
+      if (this._refreshTimer) {
+        clearTimeout(this._refreshTimer);
       }
-      if (this.riskTypeSelected && this.riskTypeSelected.length > 0) {
-        url += '&riskType=' + this.riskTypeSelected;
-      }
-      if (this.policySelected && this.policySelected.length > 0) {
-        url += '&policy=' + this.policySelected;
-      }
-      if (this.analysisStateSelected && this.analysisStateSelected.length > 0) {
-        url += '&analysisState=' + this.analysisStateSelected;
-      }
-      if (this.occurredOnDateFrom && this.occurredOnDateFrom.length > 0) {
-        url += '&occurredOnDateFrom=' + this.occurredOnDateFrom;
-      }
-      if (this.occurredOnDateTo && this.occurredOnDateTo.length > 0) {
-        url += '&occurredOnDateTo=' + this.occurredOnDateTo;
-      }
-      if (this.textSearchInput && this.textSearchInput.trim().length > 0) {
-        url +=
-          '&textSearchField=' +
-          this.textSearchSelected +
-          '&textSearchInput=' +
-          this.textSearchInput.trim();
-      }
-      return url;
+      this._refreshTimer = setTimeout(() => {
+        if (this.$refs.table) {
+          this.$refs.table.refresh({
+            url: this.apiUrl(),
+            silent: true,
+            pageNumber: 1,
+          });
+        }
+      }, 200);
     },
-    clearAllFilters: function () {
-      this.simpleWatcher();
-      this.textSearchSelectedWatcher();
-      this.textSearchInputWatcher();
-      this.showInactive = false;
-      this.showSuppressed = false;
-      this.violationStateSelected = [];
-      this.riskTypeSelected = [];
-      this.policySelected = [];
-      this.analysisStateSelected = [];
-      this.occurredOnDateFrom = '';
-      this.occurredOnDateTo = '';
-      this.textSearchInput = '';
-      this.textSearchSelected = this.textSearchOptions.map(
-        (option) => option.value,
-      );
+    clearAllFilters() {
+      this._clearing = true;
+      try {
+        this.showInactive = false;
+        this.showSuppressed = false;
+        this.violationStateFilter = [];
+        this.riskTypeFilter = [];
+        this.analysisStateFilter = [];
+        this.occurredOnFilter = null;
+        this.textSearchFilter = null;
+        this.clearPendingFilters();
+      } finally {
+        this._clearing = false;
+      }
       this.refreshTable();
-      this.initializeWatchers();
     },
-    refreshTable: function () {
-      this.$refs.table.refresh({
-        url: this.apiUrl(),
-        silent: true,
-      });
-    },
-    onLoadSuccess: function () {
+    onLoadSuccess() {
       loadUserPreferencesForBootstrapTable(
         this,
         'PolicyViolationAudit',
@@ -283,41 +251,35 @@ export default {
   },
   data() {
     return {
-      simpleWatcher: null,
-      textSearchSelectedWatcher: null,
-      textSearchInputWatcher: null,
       showInactive: false,
       showSuppressed: false,
-      violationStateSelected: [],
+      booleanFilters: ['showInactive', 'showSuppressed'],
+      violationStateFilter: [],
       violationStateOptions: [
         { text: 'Fail', value: 'FAIL' },
         { text: 'Warn', value: 'WARN' },
         { text: 'Info', value: 'INFO' },
       ],
-      riskTypeSelected: [],
+      riskTypeFilter: [],
       riskTypeOptions: [
         { text: 'License', value: 'LICENSE' },
         { text: 'Security', value: 'SECURITY' },
         { text: 'Operational', value: 'OPERATIONAL' },
       ],
-      policySelected: [],
-      policyOptions: [],
-      analysisStateSelected: [],
+      analysisStateFilter: [],
       analysisStateOptions: [
         { text: 'Not Set', value: 'NOT_SET' },
         { text: 'Rejected', value: 'REJECTED' },
         { text: 'Approved', value: 'APPROVED' },
       ],
-      occurredOnDateFrom: '',
-      occurredOnDateTo: '',
-      textSearchInput: '',
-      textSearchOptions: [
+      occurredOnFilter: null,
+      textSearchFilter: null,
+      textSearchFields: [
         { text: 'Policy Name', value: 'policy_name' },
         { text: 'Component', value: 'component' },
         { text: 'License', value: 'license' },
         { text: 'Project Name', value: 'project_name' },
       ],
-      textSearchSelected: [],
       columns: [
         {
           title: this.$t('message.state'),
@@ -412,6 +374,7 @@ export default {
           title: this.$t('message.suppressed'),
           field: 'analysis.isSuppressed',
           sortable: false,
+          visible: false,
           class: 'tight',
           formatter(value, row, index) {
             return value === true ? '<i class="fa fa-check-square-o" />' : '';
@@ -421,6 +384,7 @@ export default {
           title: this.$t('message.license'),
           field: 'component.license',
           sortable: true,
+          visible: false,
           formatter(value, row, index) {
             if (
               Object.prototype.hasOwnProperty.call(
@@ -446,6 +410,7 @@ export default {
       data: [],
       options: {
         search: false,
+        toolbar: '#policyViolationAuditToolbar',
         showColumns: true,
         showRefresh: true,
         pagination: true,
@@ -503,3 +468,5 @@ export default {
   },
 };
 </script>
+
+<style scoped src="../components/filter-pills.css"></style>

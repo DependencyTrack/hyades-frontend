@@ -323,6 +323,16 @@ h6 {
 .bs-table-custom-toolbar > :not(:first-child) {
   margin-left: .25rem;
 }
+.fixed-table-toolbar .bs-bars:has(.filter-bar) {
+  float: none;
+  width: 100%;
+}
+.fixed-table-toolbar .filter-bar {
+  margin-bottom: 0;
+}
+.fixed-table-toolbar .filter-bar > .columns .btn {
+  padding: .15rem .35rem;
+}
 .bootstrap-table .fixed-table-container .fixed-table-body .fixed-table-loading {
   background: $grey-750  !important;
 }

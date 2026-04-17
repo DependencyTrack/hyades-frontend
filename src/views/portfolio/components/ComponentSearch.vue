@@ -1,73 +1,114 @@
 <template>
   <div class="componentSearch animated fadeIn" v-permission="'VIEW_PORTFOLIO'">
-    <portfolio-widget-row :fetch="true" />
-    <div id="componentSearchToolbar">
-      <b-row>
-        <b-col md="4" lg="4">
-          <b-input-group-form-select
-            id="input-subject"
-            required="true"
-            v-model="subject"
-            :options="subjects"
-          />
-        </b-col>
-        <b-col md="7" lg="7">
-          <b-input-group-form-input
-            v-if="subject !== 'COORDINATES' && subject !== 'HASH'"
-            id="input-value"
-            required="true"
-            type="text"
-            v-model="value"
-            lazy="true"
-            v-on:keyup.enter="performSearch"
-          />
-          <b-input-group v-else-if="subject === 'HASH'">
-            <b-form-select v-model="hashType" :options="hashTypes" class="mr-2">
-              <b-form-select-option :value="null" disabled
-                >Select hash type</b-form-select-option
-              >
-            </b-form-select>
-            <b-form-input
-              id="input-value-hash"
-              placeholder="Enter hash value"
-              type="text"
-              v-model="value"
-              v-on:keyup.enter="performSearch"
-            ></b-form-input>
-          </b-input-group>
-          <b-input-group v-else-if="subject === 'COORDINATES'">
-            <b-form-input
-              id="input-value-coordinates-group"
-              :placeholder="$t('message.group')"
-              type="text"
-              v-model="coordinatesGroup"
-              v-on:keyup.enter="performSearch"
-            ></b-form-input>
-            <b-form-input
-              id="input-value-coordinates-name"
-              :placeholder="$t('message.name')"
-              type="text"
-              v-model="coordinatesName"
-              v-on:keyup.enter="performSearch"
-            ></b-form-input>
-            <b-form-input
-              id="input-value-coordinates-version"
-              :placeholder="$t('message.version')"
-              type="text"
-              v-model="coordinatesVersion"
-              v-on:keyup.enter="performSearch"
-            ></b-form-input>
-          </b-input-group>
-        </b-col>
-        <b-col md="1" lg="1">
-          <b-button
-            variant="outline-primary"
-            :disabled="isSearchDisabled"
-            v-on:click="performSearch"
-            >{{ $t('message.search') }}</b-button
+    <div
+      id="componentSearchToolbar"
+      class="filter-bar"
+      role="toolbar"
+      :aria-label="$t('message.filters')"
+    >
+      <div class="filter-pills">
+        <text-filter-pill
+          v-if="isFilterVisible('group')"
+          ref="filter_group"
+          :field-label="$t('message.group')"
+          field-name="group"
+          icon="fa-archive"
+          :operators="['contains']"
+          v-model="groupFilter"
+          @dismiss="onFilterDismiss('group')"
+        />
+        <text-filter-pill
+          v-if="isFilterVisible('name')"
+          ref="filter_name"
+          :field-label="$t('message.name')"
+          field-name="name"
+          icon="fa-cube"
+          :operators="['contains']"
+          v-model="nameFilter"
+          @dismiss="onFilterDismiss('name')"
+        />
+        <text-filter-pill
+          v-if="isFilterVisible('version')"
+          ref="filter_version"
+          :field-label="$t('message.version')"
+          field-name="version"
+          icon="fa-bookmark-o"
+          :operators="['contains']"
+          v-model="versionFilter"
+          @dismiss="onFilterDismiss('version')"
+        />
+        <text-filter-pill
+          v-if="isFilterVisible('purl')"
+          ref="filter_purl"
+          :field-label="$t('message.package_url')"
+          field-name="purl"
+          icon="fa-gift"
+          :operators="['starts_with']"
+          v-model="purlFilter"
+          @dismiss="onFilterDismiss('purl')"
+        />
+        <text-filter-pill
+          v-if="isFilterVisible('cpe')"
+          ref="filter_cpe"
+          :field-label="$t('message.cpe')"
+          field-name="cpe"
+          icon="fa-shield"
+          :operators="['contains']"
+          v-model="cpeFilter"
+          @dismiss="onFilterDismiss('cpe')"
+        />
+        <text-filter-pill
+          v-if="isFilterVisible('swidTagId')"
+          ref="filter_swidTagId"
+          :field-label="$t('message.swid_tagid')"
+          field-name="swid_tag_id"
+          icon="fa-tag"
+          :operators="['contains']"
+          v-model="swidTagIdFilter"
+          @dismiss="onFilterDismiss('swidTagId')"
+        />
+        <hash-filter-pill
+          v-if="isFilterVisible('hash')"
+          ref="filter_hash"
+          field-name="hash"
+          :field-label="$t('message.hashes_short_desc')"
+          :hash-types="hashTypeOptions"
+          v-model="hashFilter"
+          @dismiss="onFilterDismiss('hash')"
+        />
+        <b-dropdown
+          v-if="addFilterOptions.length > 0"
+          size="sm"
+          variant="outline-primary"
+          class="btn-more-filters"
+          no-caret
+        >
+          <template #button-content>
+            <span class="fa fa-plus" aria-hidden="true"></span>
+            {{ $t('message.add_filter') }}
+          </template>
+          <b-dropdown-item
+            v-for="filter in addFilterOptions"
+            :key="filter.name"
+            @click="showFilter(filter.name)"
+            ><span
+              :class="['fa', filter.icon, 'mr-2']"
+              aria-hidden="true"
+            ></span
+            >{{ filter.label }}</b-dropdown-item
           >
-        </b-col>
-      </b-row>
+        </b-dropdown>
+        <b-button
+          v-show="activeFilterCount >= 2"
+          size="sm"
+          variant="outline-danger"
+          class="btn-clear-all-filters"
+          @click="clearAllFilters"
+        >
+          <span class="fa fa-remove" aria-hidden="true"></span>
+          {{ $t('message.clear_all') }}
+        </b-button>
+      </div>
     </div>
     <token-paginated-table
       ref="table"
@@ -81,148 +122,122 @@
 <script>
 import Vue from 'vue';
 import common from '../../../shared/common';
-import { Switch as cSwitch } from '@coreui/vue';
-import PortfolioWidgetRow from '../../dashboard/PortfolioWidgetRow';
 import permissionsMixin from '../../../mixins/permissionsMixin';
-import BInputGroupFormSelect from '../../../forms/BInputGroupFormSelect';
-import BInputGroupFormInput from '../../../forms/BInputGroupFormInput';
+import filterPillsMixin from '../../../mixins/filterPillsMixin';
 import xssFilters from 'xss-filters';
 import SeverityProgressBar from '@/views/components/SeverityProgressBar';
 import TokenPaginatedTable from '@/views/components/TokenPaginatedTable.vue';
-import { loadUserPreferencesForBootstrapTable } from '@/shared/utils';
+import TextFilterPill from '@/views/components/TextFilterPill.vue';
+import HashFilterPill from '@/views/components/HashFilterPill.vue';
 
 export default {
-  mixins: [permissionsMixin],
+  mixins: [permissionsMixin, filterPillsMixin],
   components: {
-    cSwitch,
-    PortfolioWidgetRow,
-    BInputGroupFormSelect,
-    BInputGroupFormInput,
     TokenPaginatedTable,
-  },
-  beforeCreate() {
-    this.subject =
-      localStorage && localStorage.getItem('ComponentSearchSubject') !== null
-        ? localStorage.getItem('ComponentSearchSubject')
-        : 'COORDINATES';
+    TextFilterPill,
+    HashFilterPill,
   },
   beforeMount() {
-    if (this.$route.hash) {
-      let pattern =
-        /#\/search\/(COORDINATES)\/group=([^\/)]*)\/name=([^\/]*)\/version=([^\/]*)/gi;
-      let matches = pattern.exec(this.$route.hash);
-      if (matches) {
-        this.subject = matches[1].toUpperCase();
-        this.coordinatesGroup = decodeURIComponent(matches[2]);
-        this.coordinatesName = decodeURIComponent(matches[3]);
-        this.coordinatesVersion = decodeURIComponent(matches[4]);
-      } else {
-        pattern = /#\/search\/(?!COORDINATES)([^\/]*)\/(.*)/gi;
-        matches = pattern.exec(this.$route.hash);
-        if (
-          matches &&
-          this.subjects.some(
-            (subject) => subject.value === matches[1].toUpperCase(),
-          )
-        ) {
-          this.subject = matches[1].toUpperCase();
-          this.value = decodeURIComponent(matches[2]);
-        }
-      }
-      this.changeSearchUrl = false;
-      this.$nextTick(() => {
-        if (!this.isSearchDisabled) {
-          this.performSearch();
-        }
-      });
-    }
-  },
-  watch: {
-    baseUrl(newVal) {
-      if (!newVal) return;
-      this.loadPage(newVal);
-    },
-    subject() {
-      if (localStorage) {
-        localStorage.setItem('ComponentSearchSubject', this.subject);
-        // Reset ALL inputs when subject changes.
-        this.value = null;
-        this.hashType = null;
-        this.coordinatesGroup = null;
-        this.coordinatesName = null;
-        this.coordinatesVersion = null;
-      }
-    },
-  },
-  mounted() {
-    if (this.baseUrl) {
-      this.loadPage(this.baseUrl);
-    }
+    const q = this.$route.query;
+    if (q.group) this.groupFilter = { operator: 'contains', value: q.group };
+    if (q.name) this.nameFilter = { operator: 'contains', value: q.name };
+    if (q.version)
+      this.versionFilter = { operator: 'contains', value: q.version };
+    if (q.purl) this.purlFilter = { operator: 'starts_with', value: q.purl };
+    if (q.cpe) this.cpeFilter = { operator: 'contains', value: q.cpe };
+    if (q.swid_tag_id)
+      this.swidTagIdFilter = { operator: 'contains', value: q.swid_tag_id };
+    if (q.hash && q.hash_type)
+      this.hashFilter = { hashType: q.hash_type, hash: q.hash };
   },
   methods: {
-    createQueryParams() {
-      let params = {};
-
-      if (this.subject === 'COORDINATES') {
-        if (this.coordinatesGroup)
-          params.group = common.trimToNull(this.coordinatesGroup);
-        if (this.coordinatesName)
-          params.name = common.trimToNull(this.coordinatesName);
-        if (this.coordinatesVersion)
-          params.version = common.trimToNull(this.coordinatesVersion);
-      } else if (this.subject === 'PACKAGE_URL') {
-        let v = common.trimToNull(this.value);
-        if (v) params.purl = v;
-      } else if (this.subject === 'CPE') {
-        let v = common.trimToNull(this.value);
-        if (v) params.cpe = v;
-      } else if (this.subject === 'SWID_TAGID') {
-        let v = common.trimToNull(this.value);
-        if (v) params.swid_tag_id = v;
-      } else if (this.subject === 'HASH') {
-        let v = common.trimToNull(this.value);
-        if (v) {
-          params.hash = v;
-          if (this.hashType) {
-            params.hash_type = this.hashType;
-          }
-        }
+    clearAllFilters() {
+      this._clearing = true;
+      try {
+        this.groupFilter = null;
+        this.nameFilter = null;
+        this.versionFilter = null;
+        this.purlFilter = null;
+        this.cpeFilter = null;
+        this.swidTagIdFilter = null;
+        this.hashFilter = null;
+        this.clearPendingFilters();
+      } finally {
+        this._clearing = false;
       }
-
+      this.syncQueryParams();
+    },
+    refreshTable() {
+      this.syncQueryParams();
+    },
+    buildFilterParams() {
+      const params = {};
+      if (this.groupFilter && this.groupFilter.value)
+        params.group = this.groupFilter.value;
+      if (this.nameFilter && this.nameFilter.value)
+        params.name = this.nameFilter.value;
+      if (this.versionFilter && this.versionFilter.value)
+        params.version = this.versionFilter.value;
+      if (this.purlFilter && this.purlFilter.value)
+        params.purl = this.purlFilter.value;
+      if (this.cpeFilter && this.cpeFilter.value)
+        params.cpe = this.cpeFilter.value;
+      if (this.swidTagIdFilter && this.swidTagIdFilter.value)
+        params.swid_tag_id = this.swidTagIdFilter.value;
+      if (this.hashFilter && this.hashFilter.hash) {
+        params.hash = this.hashFilter.hash;
+        params.hash_type = this.hashFilter.hashType;
+      }
       return params;
     },
-    performSearch: function () {
-      if (this.isSearchDisabled) {
-        return;
+    syncQueryParams() {
+      const query = this.buildFilterParams();
+      const currentQuery = this.$route.query;
+      const keys = new Set([
+        ...Object.keys(query),
+        ...Object.keys(currentQuery),
+      ]);
+      const isSame = [...keys].every((k) => query[k] === currentQuery[k]);
+      if (!isSame) {
+        this.$router.replace({ query }).catch(() => {});
       }
-      this.appliedFilters = this.createQueryParams();
     },
   },
   computed: {
-    isSearchDisabled() {
-      if (this.subject === 'COORDINATES') {
-        return !(
-          this.coordinatesGroup ||
-          this.coordinatesName ||
-          this.coordinatesVersion
-        );
-      }
-
-      if (this.subject === 'HASH') {
-        return !(this.value && this.hashType);
-      }
-
-      return !this.value;
+    allFilterDefs() {
+      return [
+        {
+          name: 'group',
+          label: this.$t('message.group'),
+          icon: 'fa-archive',
+        },
+        { name: 'name', label: this.$t('message.name'), icon: 'fa-cube' },
+        {
+          name: 'version',
+          label: this.$t('message.version'),
+          icon: 'fa-bookmark-o',
+        },
+        {
+          name: 'purl',
+          label: this.$t('message.package_url'),
+          icon: 'fa-gift',
+        },
+        { name: 'cpe', label: this.$t('message.cpe'), icon: 'fa-shield' },
+        {
+          name: 'swidTagId',
+          label: this.$t('message.swid_tagid'),
+          icon: 'fa-tag',
+        },
+        {
+          name: 'hash',
+          label: this.$t('message.hashes_short_desc'),
+          icon: 'fa-hashtag',
+        },
+      ];
     },
     tableDataBaseUrl() {
-      if (
-        !this.appliedFilters ||
-        Object.keys(this.appliedFilters).length === 0
-      ) {
-        return null;
-      }
       const url = `${this.$api.BASE_URL}/api/v2/components`;
-      const queryParams = { ...this.appliedFilters };
+      const queryParams = this.buildFilterParams();
       const sortBy = this.sortBy || 'name';
       const sortDirection = this.sortDirection || 'asc';
       queryParams.sort_by = sortBy;
@@ -232,16 +247,16 @@ export default {
   },
   data() {
     return {
-      subject: this.subject,
-      value: null,
-      coordinatesGroup: null,
-      coordinatesName: null,
-      coordinatesVersion: null,
+      groupFilter: null,
+      nameFilter: null,
+      versionFilter: null,
+      purlFilter: null,
+      cpeFilter: null,
+      swidTagIdFilter: null,
+      hashFilter: null,
       sortBy: null,
       sortDirection: null,
-      appliedFilters: null,
-      hashType: null,
-      hashTypes: [
+      hashTypeOptions: [
         { value: 'MD5', text: this.$t('hashes.md5') },
         { value: 'SHA1', text: this.$t('hashes.sha_1') },
         { value: 'SHA_256', text: this.$t('hashes.sha_256') },
@@ -255,14 +270,6 @@ export default {
         { value: 'BLAKE2b_512', text: this.$t('hashes.blake_512') },
         { value: 'BLAKE3', text: this.$t('hashes.blake3') },
       ],
-      subjects: [
-        { value: 'COORDINATES', text: this.$t('message.coordinates') },
-        { value: 'PACKAGE_URL', text: this.$t('message.package_url') },
-        { value: 'CPE', text: this.$t('message.cpe_full') },
-        { value: 'SWID_TAGID', text: this.$t('message.swid_tagid') },
-        { value: 'HASH', text: this.$t('message.hashes_short_desc') },
-      ],
-      changeSearchUrl: false,
       columns: [
         {
           title: this.$t('message.component'),
@@ -311,6 +318,7 @@ export default {
           title: this.$t('message.internal'),
           field: 'internal',
           sortable: false,
+          visible: false,
           align: 'center',
           class: 'tight',
           formatter: function (value, row, index) {
@@ -329,6 +337,7 @@ export default {
           title: this.$t('message.swid_tagid'),
           field: 'swid_tag_id',
           sortable: true,
+          visible: false,
           formatter(value, row, index) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
@@ -356,7 +365,7 @@ export default {
           visible: false,
           formatter(resolved_license, row, index) {
             if (typeof resolved_license === 'undefined') {
-              return '-'; // No resolvedLicense info available
+              return '-';
             }
 
             let url = xssFilters.uriInUnQuotedAttr(
@@ -380,10 +389,9 @@ export default {
           visible: false,
           formatter: function (metrics, row, index) {
             if (typeof metrics === 'undefined') {
-              return '-'; // No vulnerability info available
+              return '-';
             }
 
-            // Programmatically instantiate SeverityProgressBar Vue component
             let ComponentClass = Vue.extend(SeverityProgressBar);
             let progressBar = new ComponentClass({
               propsData: {
@@ -402,10 +410,10 @@ export default {
         },
       ],
       tableOptions: {
+        toolbar: '#componentSearchToolbar',
         showColumns: true,
         showRefresh: true,
         silentSort: false,
-        toolbar: '#componentSearchToolbar',
         icons: {
           refresh: 'fa-refresh',
         },
@@ -422,8 +430,4 @@ export default {
 };
 </script>
 
-<style>
-.componentSearch .bootstrap-table .fixed-table-toolbar .bs-bars {
-  width: 80%;
-}
-</style>
+<style scoped src="../../components/filter-pills.css"></style>
