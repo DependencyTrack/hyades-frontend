@@ -2,48 +2,144 @@
   display: inline-block;
 }
 
+.filter-pill-wrapper.filter-pill-active {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  color: var(--primary);
+}
+
+.filter-pill-wrapper.filter-pill-active:hover,
+.filter-pill-wrapper.filter-pill-active:has(.show) {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.filter-pill-wrapper.filter-pill-active:hover .filter-pill-segment-value,
+.filter-pill-wrapper.filter-pill-active:has(.show) .filter-pill-segment-value {
+  color: inherit;
+}
+
 .filter-pill-wrapper >>> .btn-outline-primary {
   border-radius: 20px;
   font-size: 0.85rem;
 }
 
-.filter-pill-wrapper >>> .filter-pill-value {
-  color: var(--primary-lighter);
+/* Strip button chrome when wrapper owns the pill border */
+.filter-pill-wrapper.filter-pill-active >>> .btn-outline-primary {
+  padding: 0;
+  border: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* Restore visual feedback for dropdown-open / focus / active states */
+.filter-pill-wrapper.filter-pill-active >>> .show > .btn-outline-primary,
+.filter-pill-wrapper.filter-pill-active >>> .btn-outline-primary:focus,
+.filter-pill-wrapper.filter-pill-active >>> .btn-outline-primary:active {
+  background: var(--primary) !important;
+  color: #fff !important;
 }
 
 .filter-pill-form {
   min-width: 280px;
 }
 
-.btn-filter-pill-clear {
-  line-height: 1;
-  border: none !important;
-  border-left: 1px solid currentcolor !important;
-  border-radius: 0 !important;
-  background: none !important;
-  padding: 0 0 0 6px !important;
-  margin-left: 8px !important;
-  color: inherit !important;
-  opacity: 0.4;
+/* --- Segmented pill layout --- */
+
+.filter-pill-segments {
+  display: inline-flex;
+  align-items: stretch;
 }
 
-.btn-filter-pill-clear:hover {
-  opacity: 1 !important;
+.filter-pill-segment {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  white-space: nowrap;
 }
 
-.btn-filter-pill-clear:focus {
-  box-shadow: none !important;
+.filter-pill-segment + .filter-pill-segment {
+  border-left: 1px solid rgb(255 255 255 / 20%);
+}
+
+.filter-pill-wrapper.filter-pill-active:hover
+  .filter-pill-segment
+  + .filter-pill-segment,
+.filter-pill-wrapper.filter-pill-active:hover .filter-pill-clear,
+.filter-pill-wrapper.filter-pill-active:has(.show)
+  .filter-pill-segment
+  + .filter-pill-segment,
+.filter-pill-wrapper.filter-pill-active:has(.show) .filter-pill-clear {
+  border-left-color: rgb(255 255 255 / 25%);
+}
+
+.filter-pill-segment-value {
+  color: var(--primary-lighter);
+}
+
+/* --- External clear button (sibling of b-dropdown) --- */
+
+.filter-pill-clear {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  border: none;
+  border-left: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 0 20px 20px 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+  font-size: 0.85rem;
+}
+
+.filter-pill-clear:hover,
+.filter-pill-clear:focus {
+  background: rgb(0 0 0 / 12%);
+  opacity: 1;
+}
+
+.filter-pill-clear:focus-visible {
   outline: 2px solid currentcolor;
   outline-offset: 1px;
 }
 
+/* --- Clear segment (used by BooleanFilterPill) --- */
+
+.filter-pill-segment-clear {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.filter-pill-segment-clear:hover,
+.filter-pill-segment-clear:focus {
+  opacity: 1;
+}
+
+.filter-pill-segment-clear:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 1px;
+}
+
+/* --- Boolean pill (no dropdown) --- */
+
 .boolean-filter-pill {
   display: inline-flex;
-  align-items: center;
+  align-items: stretch;
   font-size: 0.85rem;
-  padding: 0.25rem 0.75rem;
+  padding: 0;
   border: 1px solid var(--primary);
   border-radius: 20px;
   color: var(--primary);
   white-space: nowrap;
+}
+
+.boolean-filter-pill:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }

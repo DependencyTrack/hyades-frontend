@@ -3,39 +3,37 @@
     ref="pill"
     :field-name="fieldName"
     :field-label="fieldLabel"
-    :icon="icon"
+    icon="fa-hashtag"
     :has-filter="hasFilter"
     @show="onDropdownShow"
     @hide="onDropdownHide"
     @clear="clearFilter"
     @dismiss="$emit('dismiss')"
   >
-    <template #value>~ "{{ value.value }}"</template>
+    <template #value>{{ value.hashType }} = "{{ value.hash }}"</template>
 
-    <b-form-group class="mb-2">
+    <b-input-group class="mb-2">
+      <b-input-group-prepend>
+        <b-form-select
+          v-model="tmpHashType"
+          :options="hashTypeOptions"
+          size="sm"
+        ></b-form-select>
+      </b-input-group-prepend>
       <b-form-input
-        :id="`text-search-filter-pill-value-${fieldName}`"
         ref="valueInput"
-        v-model="tmpValue"
-        :placeholder="$t('message.search') + '...'"
+        v-model="tmpHash"
+        :placeholder="$t('message.value')"
         size="sm"
         @keyup.enter="applyFilter"
       ></b-form-input>
-    </b-form-group>
-    <b-form-group :label="$t('message.search_in')" label-size="sm" class="mb-2">
-      <b-form-checkbox-group
-        v-model="tmpFields"
-        :options="fields"
-        stacked
-        size="sm"
-      ></b-form-checkbox-group>
-    </b-form-group>
+    </b-input-group>
     <div class="d-flex justify-content-end">
       <b-button
         variant="primary"
         size="sm"
         @click="applyFilter"
-        :disabled="!tmpValue || tmpFields.length === 0"
+        :disabled="!tmpHash || !tmpHashType"
         >{{ $t('message.apply') }}
       </b-button>
     </div>
@@ -46,7 +44,7 @@
 import FilterPillDropdown from '@/views/components/FilterPillDropdown.vue';
 
 export default {
-  name: 'TextSearchFilterPill',
+  name: 'HashFilterPill',
   components: { FilterPillDropdown },
   props: {
     fieldName: {
@@ -57,11 +55,7 @@ export default {
       type: String,
       required: true,
     },
-    icon: {
-      type: String,
-      default: null,
-    },
-    fields: {
+    hashTypes: {
       type: Array,
       required: true,
     },
@@ -72,38 +66,40 @@ export default {
   },
   data() {
     return {
-      tmpFields: this.allFieldValues(),
-      tmpValue: '',
+      tmpHashType: null,
+      tmpHash: '',
     };
   },
   watch: {
     value: {
       immediate: true,
       handler(val) {
-        if (val && val.fields && val.value) {
-          this.tmpFields = [...val.fields];
-          this.tmpValue = val.value;
+        if (val && val.hashType && val.hash) {
+          this.tmpHashType = val.hashType;
+          this.tmpHash = val.hash;
         } else {
-          this.tmpFields = this.allFieldValues();
-          this.tmpValue = '';
+          this.tmpHashType = null;
+          this.tmpHash = '';
         }
       },
     },
   },
   computed: {
     hasFilter() {
-      return (
-        this.value &&
-        this.value.fields &&
-        this.value.fields.length > 0 &&
-        this.value.value
-      );
+      return this.value && this.value.hashType && this.value.hash;
+    },
+    hashTypeOptions() {
+      return [
+        {
+          value: null,
+          text: `-- ${this.$t('message.hash_type')} --`,
+          disabled: true,
+        },
+        ...this.hashTypes,
+      ];
     },
   },
   methods: {
-    allFieldValues() {
-      return this.fields.map((f) => (typeof f === 'object' ? f.value : f));
-    },
     onDropdownShow() {
       this.$nextTick(() => {
         if (this.$refs.valueInput) {
@@ -116,25 +112,28 @@ export default {
     },
     onDropdownHide() {
       if (this.hasFilter) {
-        this.tmpFields = [...this.value.fields];
-        this.tmpValue = this.value.value;
+        this.tmpHashType = this.value.hashType;
+        this.tmpHash = this.value.hash;
       } else {
-        this.tmpFields = this.allFieldValues();
-        this.tmpValue = '';
+        this.tmpHashType = null;
+        this.tmpHash = '';
       }
     },
     applyFilter() {
-      const trimmed = this.tmpValue ? this.tmpValue.trim() : '';
-      if (!trimmed || this.tmpFields.length === 0) return;
+      const trimmed = this.tmpHash ? this.tmpHash.trim() : '';
+      if (!trimmed || !this.tmpHashType) {
+        return;
+      }
+
       this.$emit('input', {
-        fields: [...this.tmpFields],
-        value: trimmed,
+        hashType: this.tmpHashType,
+        hash: trimmed,
       });
       this.$refs.pill.hide();
     },
     clearFilter() {
-      this.tmpFields = this.allFieldValues();
-      this.tmpValue = '';
+      this.tmpHashType = null;
+      this.tmpHash = '';
       this.$refs.pill.hide();
       this.$emit('input', null);
     },

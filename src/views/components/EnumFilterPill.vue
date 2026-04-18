@@ -1,75 +1,42 @@
 <template>
-  <div class="filter-pill-wrapper">
-    <b-dropdown
-      :id="`enum-filter-pill-${fieldName}`"
-      class="filter-pill"
-      ref="dropdown"
-      size="sm"
-      variant="outline-primary"
-      no-caret
-      boundary="viewport"
-      @hide="onDropdownHide"
-    >
-      <template #button-content>
-        <div class="d-flex align-items-center">
-          <span v-if="!hasFilter">
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }}
-          </span>
-          <span v-else>
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }} <em>=</em>&nbsp;<strong
-              class="filter-pill-value"
-              >{{ displayValue }}</strong
-            >
-          </span>
+  <filter-pill-dropdown
+    ref="pill"
+    :field-name="fieldName"
+    :field-label="fieldLabel"
+    :icon="icon"
+    :has-filter="hasFilter"
+    @hide="onDropdownHide"
+    @clear="clearFilter"
+    @dismiss="$emit('dismiss')"
+  >
+    <template #value>= {{ displayValue }}</template>
 
-          <b-button
-            class="btn-filter-pill-clear"
-            v-if="hasFilter"
-            size="sm"
-            :title="$t('message.clear')"
-            :aria-label="$t('message.clear') + ' ' + fieldLabel"
-            @click.stop="clearFilter"
-          >
-            <span class="fa fa-times-circle" aria-hidden="true"></span>
-          </b-button>
-        </div>
-      </template>
-      <b-dropdown-form class="filter-pill-form pt-2 pb-2" @submit.stop.prevent>
-        <b-form-group class="mb-2">
-          <b-form-select
-            :id="`enum-filter-pill-value-${fieldName}`"
-            v-model="tmpValue"
-            :options="selectOptions"
-            size="sm"
-          ></b-form-select>
-        </b-form-group>
-        <div class="d-flex justify-content-end">
-          <b-button
-            variant="primary"
-            size="sm"
-            @click="applyFilter"
-            :disabled="!tmpValue"
-            >{{ $t('message.apply') }}
-          </b-button>
-        </div>
-      </b-dropdown-form>
-    </b-dropdown>
-  </div>
+    <b-form-group class="mb-2">
+      <b-form-select
+        :id="`enum-filter-pill-value-${fieldName}`"
+        v-model="tmpValue"
+        :options="selectOptions"
+        size="sm"
+      ></b-form-select>
+    </b-form-group>
+    <div class="d-flex justify-content-end">
+      <b-button
+        variant="primary"
+        size="sm"
+        @click="applyFilter"
+        :disabled="!tmpValue"
+        >{{ $t('message.apply') }}
+      </b-button>
+    </div>
+  </filter-pill-dropdown>
 </template>
 
 <script>
+import FilterPillDropdown from '@/views/components/FilterPillDropdown.vue';
+
 export default {
   name: 'EnumFilterPill',
+  components: { FilterPillDropdown },
   props: {
     fieldName: {
       type: String,
@@ -97,9 +64,6 @@ export default {
       type: String,
       default: null,
     },
-  },
-  beforeDestroy() {
-    this._destroying = true;
   },
   data() {
     return {
@@ -146,16 +110,13 @@ export default {
   },
   methods: {
     open() {
-      this.$refs.dropdown.show();
+      this.$refs.pill.open();
     },
     onDropdownHide() {
       if (this.hasFilter) {
         this.tmpValue = this.value;
       } else {
         this.tmpValue = null;
-        if (!this._destroying) {
-          this.$emit('dismiss');
-        }
       }
     },
     applyFilter() {
@@ -164,15 +125,13 @@ export default {
       }
 
       this.$emit('input', this.tmpValue);
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
     },
     clearFilter() {
       this.tmpValue = null;
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
       this.$emit('input', null);
     },
   },
 };
 </script>
-
-<style scoped src="./filter-pill.css"></style>

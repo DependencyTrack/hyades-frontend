@@ -1,92 +1,60 @@
 <template>
-  <div class="filter-pill-wrapper">
-    <b-dropdown
-      :id="`numeric-range-filter-pill-${fieldName}`"
-      class="filter-pill"
-      ref="dropdown"
-      size="sm"
-      variant="outline-primary"
-      no-caret
-      boundary="viewport"
-      @hide="onDropdownHide"
-    >
-      <template #button-content>
-        <div class="d-flex align-items-center">
-          <span v-if="!hasFilter">
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }}
-          </span>
-          <span v-else>
-            <span
-              v-if="icon"
-              :class="['fa', icon, 'mr-1']"
-              aria-hidden="true"
-            ></span>
-            {{ fieldLabel }}&nbsp;<strong class="filter-pill-value">{{
-              displayValue
-            }}</strong>
-          </span>
+  <filter-pill-dropdown
+    ref="pill"
+    :field-name="fieldName"
+    :field-label="fieldLabel"
+    :icon="icon"
+    :has-filter="hasFilter"
+    @hide="onDropdownHide"
+    @clear="clearFilter"
+    @dismiss="$emit('dismiss')"
+  >
+    <template #value>{{ displayValue }}</template>
 
-          <b-button
-            class="btn-filter-pill-clear"
-            v-if="hasFilter"
-            size="sm"
-            :title="$t('message.clear')"
-            :aria-label="$t('message.clear') + ' ' + fieldLabel"
-            @click.stop="clearFilter"
-          >
-            <span class="fa fa-times-circle" aria-hidden="true"></span>
-          </b-button>
-        </div>
-      </template>
-      <b-dropdown-form class="filter-pill-form pt-2 pb-2" @submit.stop.prevent>
-        <b-form-group :label="$t('message.from')" label-size="sm" class="mb-2">
-          <b-form-input
-            :id="`numeric-range-filter-pill-from-${fieldName}`"
-            v-model="tmpFrom"
-            type="number"
-            :min="min"
-            :max="tmpTo || max"
-            :step="step"
-            :state="fromState"
-            size="sm"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group :label="$t('message.to')" label-size="sm" class="mb-2">
-          <b-form-input
-            :id="`numeric-range-filter-pill-to-${fieldName}`"
-            v-model="tmpTo"
-            type="number"
-            :min="tmpFrom || min"
-            :max="max"
-            :step="step"
-            :state="toState"
-            size="sm"
-          ></b-form-input>
-        </b-form-group>
-        <div class="d-flex justify-content-end">
-          <b-button
-            variant="primary"
-            size="sm"
-            @click="applyFilter"
-            :disabled="
-              (!tmpFrom && !tmpTo) || fromState === false || toState === false
-            "
-            >{{ $t('message.apply') }}
-          </b-button>
-        </div>
-      </b-dropdown-form>
-    </b-dropdown>
-  </div>
+    <b-form-group :label="$t('message.from')" label-size="sm" class="mb-2">
+      <b-form-input
+        :id="`numeric-range-filter-pill-from-${fieldName}`"
+        v-model="tmpFrom"
+        type="number"
+        :min="min"
+        :max="tmpTo || max"
+        :step="step"
+        :state="fromState"
+        size="sm"
+      ></b-form-input>
+    </b-form-group>
+    <b-form-group :label="$t('message.to')" label-size="sm" class="mb-2">
+      <b-form-input
+        :id="`numeric-range-filter-pill-to-${fieldName}`"
+        v-model="tmpTo"
+        type="number"
+        :min="tmpFrom || min"
+        :max="max"
+        :step="step"
+        :state="toState"
+        size="sm"
+      ></b-form-input>
+    </b-form-group>
+    <div class="d-flex justify-content-end">
+      <b-button
+        variant="primary"
+        size="sm"
+        @click="applyFilter"
+        :disabled="
+          (!tmpFrom && !tmpTo) || fromState === false || toState === false
+        "
+        >{{ $t('message.apply') }}
+      </b-button>
+    </div>
+  </filter-pill-dropdown>
 </template>
 
 <script>
+import FilterPillDropdown from '@/views/components/FilterPillDropdown.vue';
+
 export default {
   name: 'NumericRangeFilterPill',
+  components: { FilterPillDropdown },
   props: {
     fieldName: {
       type: String,
@@ -116,9 +84,6 @@ export default {
       type: Object,
       default: () => null,
     },
-  },
-  beforeDestroy() {
-    this._destroying = true;
   },
   data() {
     return {
@@ -186,7 +151,7 @@ export default {
   },
   methods: {
     open() {
-      this.$refs.dropdown.show();
+      this.$refs.pill.open();
     },
     onDropdownHide() {
       if (this.hasFilter) {
@@ -201,9 +166,6 @@ export default {
       } else {
         this.tmpFrom = '';
         this.tmpTo = '';
-        if (!this._destroying) {
-          this.$emit('dismiss');
-        }
       }
     },
     applyFilter() {
@@ -213,16 +175,14 @@ export default {
         from: this.tmpFrom ? Number(this.tmpFrom) : null,
         to: this.tmpTo ? Number(this.tmpTo) : null,
       });
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
     },
     clearFilter() {
       this.tmpFrom = '';
       this.tmpTo = '';
-      this.$refs.dropdown.hide();
+      this.$refs.pill.hide();
       this.$emit('input', null);
     },
   },
 };
 </script>
-
-<style scoped src="./filter-pill.css"></style>

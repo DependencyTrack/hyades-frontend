@@ -1,17 +1,26 @@
 <template>
   <div class="filter-pill-wrapper">
     <span class="boolean-filter-pill">
-      <span v-if="icon" :class="['fa', icon, 'mr-1']" aria-hidden="true"></span>
-      {{ fieldLabel }}
-      <b-button
-        class="btn-filter-pill-clear"
-        size="sm"
+      <span class="filter-pill-segment">
+        <span
+          v-if="icon"
+          :class="['fa', icon, 'mr-1']"
+          aria-hidden="true"
+        ></span>
+        {{ fieldLabel }}
+      </span>
+      <span
+        class="filter-pill-segment filter-pill-segment-clear"
+        role="button"
+        tabindex="0"
         :title="$t('message.clear')"
         :aria-label="$t('message.clear') + ' ' + fieldLabel"
         @click="clearFilter"
+        @keydown.enter.stop.prevent="clearFilter"
+        @keydown.space.stop.prevent="clearFilter"
       >
         <span class="fa fa-times-circle" aria-hidden="true"></span>
-      </b-button>
+      </span>
     </span>
   </div>
 </template>
@@ -20,6 +29,10 @@
 export default {
   name: 'BooleanFilterPill',
   props: {
+    fieldName: {
+      type: String,
+      required: true,
+    },
     fieldLabel: {
       type: String,
       required: true,

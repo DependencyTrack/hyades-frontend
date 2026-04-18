@@ -5,31 +5,28 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 6px;
-  background: rgb(255 255 255 / 3%);
+  background: rgb(255 255 255 / 5%);
   margin-bottom: 0.75rem;
+  flex-grow: 1;
 }
 
-.filter-bar-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgb(255 255 255 / 50%);
-  white-space: nowrap;
-}
 
 .filter-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.75rem;
   align-items: center;
+  min-height: calc(1.5em + 0.5rem + 2px);
 }
 
 .btn-clear-all-filters {
   border-radius: 20px;
+  font-size: 0.85rem;
 }
 
 .btn-more-filters >>> button {
   border-radius: 20px;
   border-style: dashed !important;
+  font-size: 0.85rem;
 }
+
