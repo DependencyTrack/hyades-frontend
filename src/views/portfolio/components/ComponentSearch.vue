@@ -53,7 +53,7 @@
           :field-label="$t('message.cpe')"
           field-name="cpe"
           icon="fa-shield"
-          :operators="['contains']"
+          :operators="['equals']"
           v-model="cpeFilter"
           @dismiss="onFilterDismiss('cpe')"
         />
@@ -139,14 +139,20 @@ export default {
   },
   beforeMount() {
     const q = this.$route.query;
-    if (q.group) this.groupFilter = { operator: 'contains', value: q.group };
-    if (q.name) this.nameFilter = { operator: 'contains', value: q.name };
+    if (q.group)
+      this.groupFilter = { operator: 'contains', value: q.group_contains };
+    if (q.name)
+      this.nameFilter = { operator: 'contains', value: q.name_contains };
     if (q.version)
-      this.versionFilter = { operator: 'contains', value: q.version };
-    if (q.purl) this.purlFilter = { operator: 'starts_with', value: q.purl };
-    if (q.cpe) this.cpeFilter = { operator: 'contains', value: q.cpe };
+      this.versionFilter = { operator: 'contains', value: q.version_contains };
+    if (q.purl)
+      this.purlFilter = { operator: 'starts_with', value: q.purl_prefix };
+    if (q.cpe) this.cpeFilter = { operator: 'equals', value: q.cpe };
     if (q.swid_tag_id)
-      this.swidTagIdFilter = { operator: 'contains', value: q.swid_tag_id };
+      this.swidTagIdFilter = {
+        operator: 'contains',
+        value: q.swid_tag_id_contains,
+      };
     if (q.hash && q.hash_type)
       this.hashFilter = { hashType: q.hash_type, hash: q.hash };
   },
@@ -173,17 +179,17 @@ export default {
     buildFilterParams() {
       const params = {};
       if (this.groupFilter && this.groupFilter.value)
-        params.group = this.groupFilter.value;
+        params.group_contains = this.groupFilter.value;
       if (this.nameFilter && this.nameFilter.value)
-        params.name = this.nameFilter.value;
+        params.name_contains = this.nameFilter.value;
       if (this.versionFilter && this.versionFilter.value)
-        params.version = this.versionFilter.value;
+        params.version_contains = this.versionFilter.value;
       if (this.purlFilter && this.purlFilter.value)
-        params.purl = this.purlFilter.value;
+        params.purl_prefix = this.purlFilter.value;
       if (this.cpeFilter && this.cpeFilter.value)
         params.cpe = this.cpeFilter.value;
       if (this.swidTagIdFilter && this.swidTagIdFilter.value)
-        params.swid_tag_id = this.swidTagIdFilter.value;
+        params.swid_tag_id_contains = this.swidTagIdFilter.value;
       if (this.hashFilter && this.hashFilter.hash) {
         params.hash = this.hashFilter.hash;
         params.hash_type = this.hashFilter.hashType;
@@ -275,7 +281,7 @@ export default {
           title: this.$t('message.component'),
           field: 'name',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value, row) {
             let url = xssFilters.uriInUnQuotedAttr('../components/' + row.uuid);
             let dependencyGraphUrl = xssFilters.uriInUnQuotedAttr(
               '../../../projects/' +
@@ -294,7 +300,7 @@ export default {
           field: 'version',
           sortable: true,
           visible: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -302,7 +308,7 @@ export default {
           title: this.$t('message.group'),
           field: 'group',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -310,7 +316,7 @@ export default {
           title: this.$t('message.package_url'),
           field: 'purl',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -321,7 +327,7 @@ export default {
           visible: false,
           align: 'center',
           class: 'tight',
-          formatter: function (value, row, index) {
+          formatter: function (value) {
             return value === true ? '<i class="fa fa-check-square-o" />' : '';
           },
         },
@@ -329,16 +335,16 @@ export default {
           title: this.$t('message.cpe'),
           field: 'cpe',
           sortable: true,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
         {
           title: this.$t('message.swid_tagid'),
           field: 'swid_tag_id',
-          sortable: true,
+          sortable: false,
           visible: false,
-          formatter(value, row, index) {
+          formatter(value) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
           },
         },
@@ -346,7 +352,7 @@ export default {
           title: this.$t('message.project_name'),
           field: 'project.name',
           sortable: false,
-          formatter(value, row, index) {
+          formatter(_, row) {
             let url = xssFilters.uriInUnQuotedAttr(
               '../projects/' + row.project.uuid,
             );
@@ -363,7 +369,7 @@ export default {
           field: 'resolved_license.license_id',
           sortable: false,
           visible: false,
-          formatter(resolved_license, row, index) {
+          formatter(resolved_license, row) {
             if (typeof resolved_license === 'undefined') {
               return '-';
             }
@@ -387,7 +393,7 @@ export default {
           field: 'metrics',
           sortable: false,
           visible: false,
-          formatter: function (metrics, row, index) {
+          formatter: function (metrics) {
             if (typeof metrics === 'undefined') {
               return '-';
             }
