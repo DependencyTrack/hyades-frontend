@@ -3,11 +3,11 @@
     <b-card-body>
       <div v-for="(propSchema, propName) in schema.properties" :key="propName">
         <json-schema-form-field
-          :schema="enrichSchema(propSchema, propName)"
+          :schema="enrichSchema(propSchema, propName, schema)"
           :property-name="`${propertyName}.${propName}`"
-          :value="localValue[propName]"
+          :value="currentValue[propName]"
           :validation-error="validationErrors[propName]"
-          :validation-errors="getNestedValidationErrors(propName)"
+          :validation-errors="nestedErrorMap[propName] || {}"
           @input="onPropertyChange(propName, $event)"
         />
       </div>
@@ -17,6 +17,10 @@
 
 <script>
 import JsonSchemaFormField from './JsonSchemaFormField.vue';
+import {
+  enrichSchema,
+  buildNestedValidationErrorMap,
+} from '@/shared/jsonSchemaForm';
 
 export default {
   name: 'JsonSchemaObjectField',
@@ -41,44 +45,18 @@ export default {
       default: () => ({}),
     },
   },
-  data() {
-    const obj = this.value || {};
-    return {
-      localValue: obj,
-    };
+  computed: {
+    currentValue() {
+      return this.value || {};
+    },
+    nestedErrorMap() {
+      return buildNestedValidationErrorMap(this.validationErrors);
+    },
   },
   methods: {
+    enrichSchema,
     onPropertyChange(propName, propValue) {
-      // Prevent component from re-rendering on every keystroke
-      // by modifying the value in-place rather than emitting an
-      // entirely new object. This is a bit of a hack but could
-      // possibly be revisited after migration to Vue 3,
-      // which is supposed to handle cases like this a bit better.
-      this.$set(this.localValue, propName, propValue);
-      this.$emit('input', this.localValue);
-    },
-    // Make it easier to detect whether a field is required
-    // by attaching the required property directly to it.
-    enrichSchema(propSchema, propName) {
-      return {
-        ...propSchema,
-        isRequired: this.schema.required?.includes(propName) || false,
-      };
-    },
-    // Extract nested validation errors for a given property,
-    // e.g. for propName "foo", extract "foo.bar" -> "bar".
-    getNestedValidationErrors(propName) {
-      const prefix = `${propName}.`;
-      const nestedErrors = {};
-
-      Object.keys(this.validationErrors).forEach((key) => {
-        if (key.startsWith(prefix)) {
-          const nestedKey = key.substring(prefix.length);
-          nestedErrors[nestedKey] = this.validationErrors[key];
-        }
-      });
-
-      return nestedErrors;
+      this.$emit('input', { ...this.currentValue, [propName]: propValue });
     },
   },
 };
