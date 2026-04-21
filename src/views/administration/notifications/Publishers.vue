@@ -79,7 +79,7 @@ export default {
         const response = await this.axios.get(
           `${this.$api.BASE_URL}/api/v2/extension-points/notification-publisher/extensions`,
         );
-        this.extensions = response.data.extensions || [];
+        this.extensions = response.data.items || [];
         if (this.extensions.length > 0) {
           await this.checkPublisherConfigurability();
         }

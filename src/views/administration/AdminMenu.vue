@@ -86,7 +86,7 @@ export default {
         .then((response) => {
           const extensions = Array.isArray(response.data)
             ? response.data
-            : response.data.extensions || [];
+            : response.data.items || [];
           section.children = extensions.map((ext) => {
             const encodedName = encodeURIComponent(ext.name);
             const route = routePrefix + '/' + encodedName;

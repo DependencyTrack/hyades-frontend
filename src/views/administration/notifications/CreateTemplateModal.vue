@@ -135,8 +135,8 @@ export default {
       try {
         const url = `${this.$api.BASE_URL}/api/v2/extension-points/notification-publisher/extensions`;
         const response = await this.axios.get(url);
-        const extensions = Array.isArray(response?.data?.extensions)
-          ? response.data.extensions
+        const extensions = Array.isArray(response?.data?.items)
+          ? response.data.items
           : [];
         this.availableExtensions = extensions.map((extension) => ({
           value: extension.name,
