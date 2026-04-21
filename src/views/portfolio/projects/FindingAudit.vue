@@ -112,6 +112,62 @@
           trim
         />
       </b-form-group>
+      <b-form-group
+        v-if="owaspVector"
+        id="fieldset-owasp-vector"
+        label="OWASP RR Vector"
+        label-for="input-owasp-vector"
+      >
+        <b-form-input
+          id="input-owasp-vector"
+          :value="owaspVector"
+          class="form-control disabled"
+          readonly
+          trim
+        />
+      </b-form-group>
+      <b-form-group
+        v-if="owaspScore"
+        id="fieldset-owasp-score"
+        label="OWASP RR Score"
+        label-for="input-owasp-score"
+      >
+        <b-form-input
+          id="input-owasp-score"
+          :value="owaspScore"
+          class="form-control disabled"
+          readonly
+          trim
+        />
+      </b-form-group>
+      <b-form-group
+        v-if="owaspSeverity"
+        id="fieldset-owasp-severity"
+        label="OWASP RR Severity"
+        label-for="input-owasp-severity"
+      >
+        <b-form-input
+          id="input-owasp-severity"
+          :value="owaspSeverity"
+          class="form-control disabled"
+          readonly
+          trim
+        />
+      </b-form-group>
+      <b-form-group
+        v-if="analysisSource"
+        id="fieldset-analysis-source"
+        label="Analysis Source"
+        label-for="input-analysis-source"
+      >
+        <b-form-input
+          id="input-analysis-source"
+          :value="analysisSource"
+          class="form-control disabled"
+          readonly
+          trim
+        />
+      </b-form-group>
     </b-col>
     <b-col sm="6">
       <b-form-group
@@ -351,6 +407,10 @@ export default {
       analysisJustification: null,
       analysisResponse: null,
       analysisDetails: null,
+      owaspVector: null,
+      owaspScore: null,
+      owaspSeverity: null,
+      analysisSource: null,
     };
   },
   watch: {
@@ -432,6 +492,18 @@ export default {
         this.isSuppressed = analysis.isSuppressed;
       } else {
         this.isSuppressed = false;
+      }
+      if (Object.prototype.hasOwnProperty.call(analysis, 'owaspVector')) {
+        this.owaspVector = analysis.owaspVector;
+      }
+      if (Object.prototype.hasOwnProperty.call(analysis, 'owaspScore')) {
+        this.owaspScore = analysis.owaspScore;
+      }
+      if (Object.prototype.hasOwnProperty.call(analysis, 'owaspSeverity')) {
+        this.owaspSeverity = analysis.owaspSeverity;
+      }
+      if (Object.prototype.hasOwnProperty.call(analysis, 'source')) {
+        this.analysisSource = analysis.source;
       }
     },
     makeAnalysis: function () {
