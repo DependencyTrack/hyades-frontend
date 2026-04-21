@@ -21,18 +21,21 @@ export default {
         props.push(prop);
       }
       let url = `${this.$api.BASE_URL}/${this.$api.URL_CONFIG_PROPERTY}/aggregate`;
-      this.axios
+      return this.axios
         .post(url, props)
         .then((response) => {
           let errors = response.data.filter((item) => typeof item === 'string');
           if (errors.length > 0) {
             errors.forEach((error) => this.$toastr.w(error));
+            return false;
           } else {
             this.$toastr.s(this.$t('admin.configuration_saved'));
+            return true;
           }
         })
         .catch((error) => {
           this.$toastr.w(this.$t('condition.unsuccessful_action'));
+          return false;
         });
     },
     /*

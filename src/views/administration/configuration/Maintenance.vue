@@ -1,5 +1,11 @@
 <template>
-  <b-card no-body :header="header">
+  <b-card no-body>
+    <template #header>
+      {{ header }}
+      <b-badge v-if="hasUnsavedChanges" variant="info" class="ml-2">
+        {{ $t('message.unsaved_changes_badge') }}
+      </b-badge>
+    </template>
     <b-card-body>
       <b-form-group
         :label="$t('admin.metrics')"
@@ -7,12 +13,24 @@
         label-class="font-weight-bold pt-0 mb-0"
       >
         <b-form-group :label="$t('admin.retention')">
-          <b-input-group :append="$t('admin.days')">
+          <b-form-text class="mb-2">
+            {{ $t('admin.metrics_retention_help') }}
+          </b-form-text>
+          <div class="d-flex align-items-center">
             <b-form-input
-              type="number"
+              type="range"
               v-model="metricsRetentionDays"
-            ></b-form-input>
-          </b-input-group>
+              min="1"
+              max="365"
+              step="1"
+              class="flex-grow-1"
+            />
+            <span
+              class="ml-2 font-weight-bold"
+              style="min-width: 6em; text-align: right; white-space: nowrap"
+              >{{ metricsRetentionDays }} {{ $t('admin.days') }}</span
+            >
+          </div>
         </b-form-group>
       </b-form-group>
       <b-form-group
@@ -21,98 +39,108 @@
         label-class="font-weight-bold pt-0 mb-0"
       >
         <b-form-group>
-          <c-switch
-            color="primary"
-            v-model="enableProjectRetention"
-            label
-            v-bind="switchLabelIcon"
-          />
-          {{ $t('admin.project_retention_enable') }}
+          <label class="d-flex align-items-center mb-0">
+            <c-switch
+              color="primary"
+              v-model="enableProjectRetention"
+              label
+              v-bind="switchLabelIcon"
+            />
+            <span class="ml-1">{{ $t('admin.project_retention_enable') }}</span>
+          </label>
+          <b-form-text>
+            {{ $t('admin.project_retention_enable_help') }}
+          </b-form-text>
         </b-form-group>
-        <b-form-group
-          :label="$t('message.project_retention_type')"
-          v-slot="{ projectRetention }"
-        >
-          <b-form-radio-group
-            v-model="projectRetentionTypeSelected"
-            :options="projectRetentionTypes"
-            :aria-describedby="projectRetention"
-            name="radios-btn-default"
-            button-variant="outline-primary"
-            class="cvss-calc cvss-calc-3-btn"
-            buttons
-          />
-        </b-form-group>
-        <b-form-group :label="$t('message.age')">
-          <b-input-group :append="$t('admin.days')">
-            <b-form-input
-              type="number"
-              v-model="projectRetentionDays"
-            ></b-form-input>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group :label="$t('admin.versions')">
-          <b-input-group :append="$t('message.inactive_versions')">
-            <b-form-input
-              type="number"
-              v-model="projectRetentionVersions"
-            ></b-form-input>
-          </b-input-group>
-        </b-form-group>
+        <div v-if="enableProjectRetention">
+          <b-form-group :label="$t('message.project_retention_type')">
+            <b-form-text class="mb-2">
+              {{ $t('admin.project_retention_type_help') }}
+            </b-form-text>
+            <b-form-select
+              v-model="projectRetentionTypeSelected"
+              :options="projectRetentionTypeOptions"
+              :state="projectRetentionTypeState"
+            />
+          </b-form-group>
+          <b-form-group v-if="projectRetentionTypeSelected === 'AGE'">
+            <b-form-text class="mb-2">
+              {{ $t('admin.project_retention_days_help') }}
+            </b-form-text>
+            <div class="d-flex align-items-center">
+              <b-form-input
+                type="range"
+                v-model="projectRetentionDays"
+                min="1"
+                max="365"
+                step="1"
+                class="flex-grow-1"
+              />
+              <span
+                class="ml-2 font-weight-bold"
+                style="min-width: 6em; text-align: right; white-space: nowrap"
+                >{{ projectRetentionDays }} {{ $t('admin.days') }}</span
+              >
+            </div>
+          </b-form-group>
+          <b-form-group v-if="projectRetentionTypeSelected === 'VERSIONS'">
+            <b-form-text class="mb-2">
+              {{ $t('admin.project_retention_versions_help') }}
+            </b-form-text>
+            <div class="d-flex align-items-center">
+              <b-form-input
+                type="range"
+                v-model="projectRetentionVersions"
+                min="1"
+                max="100"
+                step="1"
+                class="flex-grow-1"
+              />
+              <span
+                class="ml-2 font-weight-bold"
+                style="min-width: 6em; text-align: right; white-space: nowrap"
+                >{{ projectRetentionVersions }}</span
+              >
+            </div>
+          </b-form-group>
+        </div>
       </b-form-group>
       <b-form-group
         :label="$t('admin.tags')"
         label-size="lg"
         label-class="font-weight-bold pt-0 mb-0"
       >
-        <c-switch
-          color="primary"
-          v-model="tagsDeleteUnused"
-          label
-          v-bind="switchLabelIcon"
-        />{{ $t('admin.tags_delete_unused') }}
-      </b-form-group>
-      <b-form-group
-        :label="$t('admin.vulnerability_scans')"
-        label-size="lg"
-        label-class="font-weight-bold pt-0 mb-0"
-      >
-        <b-form-group :label="$t('admin.retention')">
-          <b-input-group :append="$t('admin.hours')">
-            <b-form-input
-              type="number"
-              v-model="vulnScanRetentionHours"
-            ></b-form-input>
-          </b-input-group>
-        </b-form-group>
-      </b-form-group>
-      <b-form-group
-        :label="$t('admin.workflows')"
-        label-size="lg"
-        label-class="font-weight-bold pt-0 mb-0"
-      >
-        <b-form-group :label="$t('admin.retention')">
-          <b-input-group :append="$t('admin.hours')">
-            <b-form-input
-              type="number"
-              v-model="workflowRetentionHours"
-            ></b-form-input>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group :label="$t('admin.workflow_step_timeout')">
-          <b-input-group :append="$t('admin.minutes')">
-            <b-form-input
-              type="number"
-              v-model="workflowStepTimeoutMinutes"
-            ></b-form-input>
-          </b-input-group>
-        </b-form-group>
+        <label class="d-flex align-items-center mb-0">
+          <c-switch
+            color="primary"
+            v-model="tagsDeleteUnused"
+            label
+            v-bind="switchLabelIcon"
+          />
+          <span class="ml-1">{{ $t('admin.tags_delete_unused') }}</span>
+        </label>
+        <b-form-text>
+          {{ $t('admin.tags_delete_unused_help') }}
+        </b-form-text>
       </b-form-group>
     </b-card-body>
     <b-card-footer>
-      <b-button variant="outline-primary" class="px-4" @click="saveChanges">{{
-        $t('message.update')
-      }}</b-button>
+      <b-button
+        variant="outline-primary"
+        class="px-4"
+        :disabled="!hasUnsavedChanges || !isValid"
+        @click="saveChanges"
+        ><i class="fa fa-floppy-o" /> {{ $t('message.update') }}</b-button
+      >
+      <b-button
+        variant="outline-danger"
+        class="ml-2"
+        :disabled="!hasUnsavedChanges"
+        @click="resetChanges"
+      >
+        <i class="fa fa-undo" />
+        {{ $t('message.reset') }}
+      </b-button>
     </b-card-footer>
   </b-card>
 </template>
@@ -132,24 +160,108 @@ export default {
   },
   data() {
     return {
-      metricsRetentionDays: null,
+      metricsRetentionDays: 90,
       enableProjectRetention: null,
-      projectRetentionTypes: ['AGE', 'VERSIONS'],
       projectRetentionTypeSelected: '',
-      projectRetentionDays: null,
-      projectRetentionVersions: null,
+      projectRetentionDays: 30,
+      projectRetentionVersions: 5,
       tagsDeleteUnused: null,
-      vulnScanRetentionHours: null,
-      workflowRetentionHours: null,
-      workflowStepTimeoutMinutes: null,
+      initialSnapshot: '',
       switchLabelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
       },
     };
   },
+  computed: {
+    projectRetentionTypeOptions() {
+      return [
+        { value: '', text: this.$t('message.select'), disabled: true },
+        { value: 'AGE', text: this.$t('message.age') },
+        { value: 'VERSIONS', text: this.$t('admin.versions') },
+      ];
+    },
+    formData() {
+      return {
+        metricsRetentionDays: this.metricsRetentionDays,
+        enableProjectRetention: this.enableProjectRetention,
+        projectRetentionTypeSelected: this.projectRetentionTypeSelected,
+        projectRetentionDays: this.projectRetentionDays,
+        projectRetentionVersions: this.projectRetentionVersions,
+        tagsDeleteUnused: this.tagsDeleteUnused,
+      };
+    },
+    hasUnsavedChanges() {
+      if (!this.initialSnapshot) return false;
+      return JSON.stringify(this.formData) !== this.initialSnapshot;
+    },
+    isValid() {
+      if (!this.enableProjectRetention) return true;
+      return !!this.projectRetentionTypeSelected;
+    },
+    projectRetentionTypeState() {
+      if (!this.enableProjectRetention) return null;
+      return this.projectRetentionTypeSelected ? null : false;
+    },
+  },
   methods: {
-    saveChanges: function () {
+    resetChanges() {
+      if (!this.initialSnapshot) return;
+      const snapshot = JSON.parse(this.initialSnapshot);
+      this.metricsRetentionDays = snapshot.metricsRetentionDays;
+      this.enableProjectRetention = snapshot.enableProjectRetention;
+      this.projectRetentionTypeSelected = snapshot.projectRetentionTypeSelected;
+      this.projectRetentionDays = snapshot.projectRetentionDays;
+      this.projectRetentionVersions = snapshot.projectRetentionVersions;
+      this.tagsDeleteUnused = snapshot.tagsDeleteUnused;
+    },
+    saveChanges: async function () {
+      const prev = JSON.parse(this.initialSnapshot || '{}');
+
+      const projectRetentionEnabled =
+        this.enableProjectRetention && !prev.enableProjectRetention;
+      const tagDeletionEnabled =
+        this.tagsDeleteUnused && !prev.tagsDeleteUnused;
+      const metricsRetentionReduced =
+        parseInt(this.metricsRetentionDays) <
+        parseInt(prev.metricsRetentionDays);
+
+      const retentionStrategyChanged =
+        this.enableProjectRetention &&
+        prev.enableProjectRetention &&
+        this.projectRetentionTypeSelected !== prev.projectRetentionTypeSelected;
+      const retentionThresholdReduced =
+        this.enableProjectRetention &&
+        prev.enableProjectRetention &&
+        ((this.projectRetentionTypeSelected === 'AGE' &&
+          parseInt(this.projectRetentionDays) <
+            parseInt(prev.projectRetentionDays)) ||
+          (this.projectRetentionTypeSelected === 'VERSIONS' &&
+            parseInt(this.projectRetentionVersions) <
+              parseInt(prev.projectRetentionVersions)));
+
+      const needsConfirmation =
+        projectRetentionEnabled ||
+        tagDeletionEnabled ||
+        metricsRetentionReduced ||
+        retentionStrategyChanged ||
+        retentionThresholdReduced;
+
+      if (needsConfirmation) {
+        const confirmed = await this.$bvModal.msgBoxConfirm(
+          this.$t('admin.maintenance_destructive_confirm_message'),
+          {
+            title: this.$t('admin.maintenance_destructive_confirm_title'),
+            size: 'md',
+            okVariant: 'danger',
+            okTitle: this.$t('message.update'),
+            cancelTitle: this.$t('message.cancel'),
+            centered: true,
+          },
+        );
+        if (!confirmed) return;
+      }
+
       this.updateConfigProperties([
         {
           groupName: 'maintenance',
@@ -166,34 +278,29 @@ export default {
         {
           groupName: 'maintenance',
           propertyName: 'projects.retention.days',
-          propertyValue: this.projectRetentionDays,
+          propertyValue:
+            this.projectRetentionTypeSelected === 'AGE'
+              ? this.projectRetentionDays
+              : null,
         },
         {
           groupName: 'maintenance',
           propertyName: 'projects.retention.versions',
-          propertyValue: this.projectRetentionVersions,
+          propertyValue:
+            this.projectRetentionTypeSelected === 'VERSIONS'
+              ? this.projectRetentionVersions
+              : null,
         },
         {
           groupName: 'maintenance',
           propertyName: 'tags.delete.unused',
           propertyValue: this.tagsDeleteUnused,
         },
-        {
-          groupName: 'maintenance',
-          propertyName: 'vuln.scan.retention.hours',
-          propertyValue: this.vulnScanRetentionHours,
-        },
-        {
-          groupName: 'maintenance',
-          propertyName: 'workflow.retention.hours',
-          propertyValue: this.workflowRetentionHours,
-        },
-        {
-          groupName: 'maintenance',
-          propertyName: 'workflow.step.timeout.minutes',
-          propertyValue: this.workflowStepTimeoutMinutes,
-        },
-      ]);
+      ]).then((success) => {
+        if (success) {
+          this.initialSnapshot = JSON.stringify(this.formData);
+        }
+      });
     },
   },
   created() {
@@ -221,17 +328,11 @@ export default {
           case 'tags.delete.unused':
             this.tagsDeleteUnused = common.toBoolean(item.propertyValue);
             break;
-          case 'vuln.scan.retention.hours':
-            this.vulnScanRetentionHours = item.propertyValue;
-            break;
-          case 'workflow.retention.hours':
-            this.workflowRetentionHours = item.propertyValue;
-            break;
-          case 'workflow.step.timeout.minutes':
-            this.workflowStepTimeoutMinutes = item.propertyValue;
-            break;
         }
       }
+      this.$nextTick(() => {
+        this.initialSnapshot = JSON.stringify(this.formData);
+      });
     });
   },
 };
