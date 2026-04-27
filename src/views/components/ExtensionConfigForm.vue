@@ -53,6 +53,7 @@
           {{ $t('admin.save') }}
         </b-button>
         <b-button
+          v-if="testable"
           variant="outline-secondary"
           :disabled="isOperationInProgress || !schema"
           class="ml-2"
@@ -152,6 +153,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    testable: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     header: {
       type: String,

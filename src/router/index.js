@@ -851,6 +851,23 @@ function configRoutes() {
               },
             },
             {
+              path: 'notifications/publishers/:extensionName',
+              component: Publishers,
+              meta: {
+                title: i18n.t('message.administration'),
+                i18n: 'message.administration',
+                sectionPath: '/admin',
+                sectionName: 'Admin',
+                permissions: [
+                  'SYSTEM_CONFIGURATION',
+                  'SYSTEM_CONFIGURATION_CREATE',
+                  'SYSTEM_CONFIGURATION_READ',
+                  'SYSTEM_CONFIGURATION_UPDATE',
+                  'SYSTEM_CONFIGURATION_DELETE',
+                ],
+              },
+            },
+            {
               path: 'integrations/fortifySSC',
               alias: ['integrations'],
               component: FortifySsc,
