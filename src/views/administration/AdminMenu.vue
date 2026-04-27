@@ -23,17 +23,36 @@
         role="tabpanel"
       >
         <div class="list-group" id="list-tab" role="tablist">
-          <router-link
-            :ref="item.id"
-            :key="item.id"
-            v-for="item in section.children"
-            class="list-group-item list-group-item-action"
-            data-toggle="list"
-            role="tab"
-            :to="'/admin/' + item.route"
-            @click="emitEvent(item)"
-            >{{ item.name }}</router-link
-          >
+          <template v-for="item in section.children">
+            <div
+              v-if="item.header"
+              :key="item.id || item.route || item.name"
+              class="list-group-item admin-menu-subheader"
+            >
+              {{ item.name }}
+            </div>
+            <router-link
+              v-else
+              :ref="item.id || item.route"
+              :key="item.id || item.route"
+              class="list-group-item list-group-item-action"
+              :class="{
+                'admin-menu-item-readonly': item.configurable === false,
+              }"
+              data-toggle="list"
+              role="tab"
+              :to="'/admin/' + item.route"
+              @click="emitEvent(item)"
+            >
+              {{ item.name }}
+              <i
+                v-if="item.configurable === false"
+                class="fa fa-info-circle float-right"
+                :title="$t('admin.extension_no_config')"
+                aria-hidden="true"
+              ></i>
+            </router-link>
+          </template>
         </div>
       </b-collapse>
     </b-card>
@@ -76,7 +95,7 @@ export default {
       let tab = pattern.exec(this.$route.fullPath.toLowerCase());
       return tab && tab[1] ? tab[1].toLowerCase() : 'configuration';
     },
-    fetchExtensions: function (menuId, extensionPoint, routePrefix) {
+    fetchExtensions: function (menuId, extensionPoint, routePrefix, header) {
       const section = this.menu.find((s) => s.id === menuId);
       if (!section) return;
       this.axios
@@ -87,15 +106,29 @@ export default {
           const extensions = Array.isArray(response.data)
             ? response.data
             : response.data.items || [];
-          section.children = extensions.map((ext) => {
+          const fetched = extensions.map((ext) => {
             const encodedName = encodeURIComponent(ext.name);
             const route = routePrefix + '/' + encodedName;
             return {
               id: route,
               name: common.titleCase(ext.name),
               route: route,
+              configurable: ext.configurable !== false,
             };
           });
+          const existingIds = new Set(section.children.map((c) => c.id));
+          const newItems = fetched.filter((c) => !existingIds.has(c.id));
+          if (newItems.length === 0) return;
+          const headerItem = header
+            ? [
+                {
+                  id: `${menuId}-header-${routePrefix}`,
+                  name: header,
+                  header: true,
+                },
+              ]
+            : [];
+          section.children = [...section.children, ...headerItem, ...newItems];
         })
         .catch((error) => {
           console.error(
@@ -112,6 +145,12 @@ export default {
       'vulnerabilitysources',
       'vuln-data-source',
       'vulnerabilitySources',
+    );
+    this.fetchExtensions(
+      'notifications',
+      'notification-publisher',
+      'notifications/publishers',
+      this.$t('admin.publishers'),
     );
   },
   mounted() {
@@ -315,11 +354,6 @@ export default {
               name: this.$t('admin.templates'),
               route: 'notifications/templates',
             },
-            {
-              component: 'Publishers',
-              name: this.$t('admin.publishers'),
-              route: 'notifications/publishers',
-            },
           ],
         },
         {
@@ -432,5 +466,25 @@ export default {
 .list-group-item {
   border-left: 0;
   border-right: 0;
+}
+.admin-menu-item-readonly {
+  font-style: italic;
+  opacity: 0.85;
+}
+.admin-menu-item-readonly .fa-info-circle {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  opacity: 0.6;
+}
+.admin-menu-subheader {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  cursor: default;
 }
 </style>
