@@ -269,7 +269,7 @@ export default {
         {
           title: this.$t('message.scope'),
           field: 'scope',
-          sortable: true,
+          sortable: false,
           visible: false,
           formatter(value, row, index) {
             return xssFilters.inHTMLData(common.valueWithDefault(value, ''));
