@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "Mostrar apenas dependências que tenham versões estáveis mais recentes disponíveis",
     "operational_risk": "Risco operacional",
     "operator": "Operador",
+    "operator_help": null,
     "osi_approved": "Aprovado pelo OSI",
     "outdated_only": "Apenas desatualizado",
     "overview": "Visão geral",
@@ -912,6 +913,7 @@
     "required_component_identifier": "Um identificador de componente é obrigatório",
     "required_component_name": "O nome do componente é obrigatório",
     "required_component_version": "A versão do componente é obrigatória",
+    "required_field": null,
     "required_license_id": "O ID da licença é obrigatório",
     "required_license_name": "O nome da licença é obrigatório",
     "required_project_name": "O nome do projeto é obrigatório",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX carregado",
     "view_details": "Ver detalhes",
     "violation_state": "Estado de violação",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "Violações auditadas",
     "violations_unaudited": "Violações não auditadas",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "Limite de confiança cruzada"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "contém tudo",
     "contains_any": "contém qualquer",
     "is": "é",

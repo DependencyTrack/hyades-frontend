@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "केवल उन निर्भरताओं को दिखाएं जिनके नए स्थिर संस्करण उपलब्ध हैं",
     "operational_risk": "परिचालनात्मक जोखिम",
     "operator": "ऑपरेटर",
+    "operator_help": null,
     "osi_approved": "ओएसआई स्वीकृत",
     "outdated_only": "केवल पुराना",
     "overview": "अवलोकन",
@@ -912,6 +913,7 @@
     "required_component_identifier": "घटक पहचानकर्ता आवश्यक है",
     "required_component_name": "घटक का नाम आवश्यक है",
     "required_component_version": "घटक संस्करण आवश्यक है",
+    "required_field": null,
     "required_license_id": "लाइसेंस आईडी आवश्यक है",
     "required_license_name": "लाइसेंस का नाम आवश्यक है",
     "required_project_name": "प्रोजेक्ट का नाम आवश्यक है",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX अपलोड किया गया",
     "view_details": "विवरण देखें",
     "violation_state": "उल्लंघन राज्य",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "उल्लंघनों का लेखापरीक्षण किया गया",
     "violations_unaudited": "उल्लंघन असंपरीक्षित",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "क्रॉस ट्रस्ट सीमा"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "इसमें सभी शामिल हैं",
     "contains_any": "इसमें कोई भी शामिल है",
     "is": "है",
