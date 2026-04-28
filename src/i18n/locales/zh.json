@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "仅显示具有较新的稳定版本的依赖项",
     "operational_risk": "操作风险",
     "operator": "操作员",
+    "operator_help": null,
     "osi_approved": "OSI 批准",
     "outdated_only": "仅限过时",
     "overview": "概述",
@@ -912,6 +913,7 @@
     "required_component_identifier": "需要组件标识符",
     "required_component_name": "组件名称为必填项",
     "required_component_version": "组件版本为必填项",
+    "required_field": null,
     "required_license_id": "需要许可证 ID",
     "required_license_name": "许可证名称为必填项",
     "required_project_name": "项目名称为必填项",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX 已上传",
     "view_details": "查看详情",
     "violation_state": "违规状态",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "违规行为已审计",
     "violations_unaudited": "违规行为未经审计",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "跨越信任边界"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "包含全部",
     "contains_any": "包含任何",
     "is": "是",

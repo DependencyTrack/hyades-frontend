@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "Nur Abhängigkeiten anzeigen, für die neuere stabile Versionen verfügbar sind",
     "operational_risk": "Betriebsrisiko",
     "operator": "Operator",
+    "operator_help": null,
     "osi_approved": "OSI-Zulassung",
     "outdated_only": "Nur veraltet",
     "overview": "Überblick",
@@ -912,6 +913,7 @@
     "required_component_identifier": "Eine Komponentenkennung ist erforderlich",
     "required_component_name": "Der Komponentenname ist erforderlich",
     "required_component_version": "Die Komponentenversion ist erforderlich",
+    "required_field": null,
     "required_license_id": "Die Lizenz-ID ist erforderlich",
     "required_license_name": "Der Lizenzname ist erforderlich",
     "required_project_name": "Der Projektname ist erforderlich",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX hochgeladen",
     "view_details": "Details anzeigen",
     "violation_state": "Bewertung bei Verstoß",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "Überprüfte Verstöße",
     "violations_unaudited": "Verstöße ungeprüft",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "Vertrauensgrenze überschreiten"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "enthält alle",
     "contains_any": "enthält irgendeinen",
     "is": "ist",

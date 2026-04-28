@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "Показывать только зависимости, для которых доступны более новые стабильные версии.",
     "operational_risk": "Операционный риск",
     "operator": "Оператор",
+    "operator_help": null,
     "osi_approved": "Одобрено OSI",
     "outdated_only": "Только устаревшие",
     "overview": "Обзор",
@@ -912,6 +913,7 @@
     "required_component_identifier": "Необходим идентификатор компонента",
     "required_component_name": "Необходимо указать название компонента",
     "required_component_version": "Необходима версия компонента",
+    "required_field": null,
     "required_license_id": "Необходим ID лицензии",
     "required_license_name": "Необходимо указать название лицензии",
     "required_project_name": "Необходимо указать название проекта",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX загружен",
     "view_details": "Посмотреть детали",
     "violation_state": "Состояние нарушения",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "Нарушения прошли аудит",
     "violations_unaudited": "Нарушения не прошли аудит",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "Пересечение границы доверия"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "содержит все",
     "contains_any": "содержит любой",
     "is": "является",

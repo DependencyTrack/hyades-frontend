@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "新しい安定バージョンが利用可能な依存関係のみを表示する",
     "operational_risk": "運用リスク",
     "operator": "オペレーター",
+    "operator_help": null,
     "osi_approved": "OSI承認",
     "outdated_only": "古いもののみ",
     "overview": "概要",
@@ -912,6 +913,7 @@
     "required_component_identifier": "コンポーネント識別子が必要です",
     "required_component_name": "コンポーネント名は必須です",
     "required_component_version": "コンポーネントのバージョンが必要です",
+    "required_field": null,
     "required_license_id": "ライセンスIDが必要です",
     "required_license_name": "ライセンス名は必須です",
     "required_project_name": "プロジェクト名は必須です",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEXをアップロードしました",
     "view_details": "詳細を見る",
     "violation_state": "違反状態",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "監査された違反",
     "violations_unaudited": "監査されていない違反",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "信頼境界を越える"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "すべてを含む",
     "contains_any": "含む",
     "is": "は",

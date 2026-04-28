@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "Показувати лише залежності, для яких доступні новіші стабільні версії",
     "operational_risk": "Операційний ризик",
     "operator": "Оператор",
+    "operator_help": null,
     "osi_approved": "Схвалено OSI",
     "outdated_only": "Тільки застарілі",
     "overview": "Огляд",
@@ -912,6 +913,7 @@
     "required_component_identifier": "Потрібен ідентифікатор компонента",
     "required_component_name": "Потрібно вказати назву компонента",
     "required_component_version": "Потрібна версія компонента",
+    "required_field": null,
     "required_license_id": "Потрібен ідентифікатор ліцензії",
     "required_license_name": "Потрібна назва ліцензії",
     "required_project_name": "Потрібно вказати назву проекту",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX завантажено",
     "view_details": "Докладніше",
     "violation_state": "Стан порушення",
+    "violation_state_help": null,
     "violation_type": null,
     "violations_audited": "Перевірені порушення",
     "violations_unaudited": "Порушення не перевірені",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "Перетнути кордон довіри"
   },
   "operator": {
+    "all": null,
+    "any": null,
     "contains_all": "містить усе",
     "contains_any": "містить будь-які",
     "is": "є",

@@ -667,6 +667,7 @@
     "only_outdated_tooltip": "Only show dependencies that have newer stable versions available",
     "operational_risk": "Operational Risk",
     "operator": "Operator",
+    "operator_help": "ANY = any condition matches; ALL = every condition must match",
     "osi_approved": "OSI Approved",
     "outdated_only": "Outdated only",
     "overview": "Overview",
@@ -912,6 +913,7 @@
     "required_component_identifier": "A component identifier is required",
     "required_component_name": "The component name is required",
     "required_component_version": "The component version is required",
+    "required_field": "This field is required",
     "required_license_id": "The license ID is required",
     "required_license_name": "The license name is required",
     "required_project_name": "The project name is required",
@@ -1028,6 +1030,7 @@
     "vex_uploaded": "VEX uploaded",
     "view_details": "View Details",
     "violation_state": "Violation State",
+    "violation_state_help": "Severity assigned when this policy is violated",
     "violation_type": "Violation Type",
     "violations_audited": "Violations Audited",
     "violations_unaudited": "Violations Unaudited",
@@ -1058,6 +1061,8 @@
     "x_trust_boundary": "Cross Trust Boundary"
   },
   "operator": {
+    "all": "All",
+    "any": "Any",
     "contains_all": "contains all",
     "contains_any": "contains any",
     "is": "is",

@@ -1,67 +1,141 @@
 <template>
   <b-modal
     id="createPolicyModal"
-    @hide="resetValues()"
     size="md"
     hide-header-close
     no-stacking
     :title="$t('message.create_policy')"
+    :ok-title="$t('message.create')"
+    :cancel-title="$t('message.close')"
+    :ok-disabled="submitting"
+    :no-close-on-esc="submitting"
+    :no-close-on-backdrop="submitting"
+    @ok="onOk"
+    @show="resetValues"
+    @hidden="resetValues"
   >
-    <b-validated-input-group-form-input
-      id="identifier"
-      :label="this.$t('message.name')"
-      input-group-size="mb-3"
-      rules="required"
-      v-model="name"
-    />
+    <b-form ref="form" @submit.stop.prevent="onSubmit">
+      <b-form-group
+        :label="$t('message.name')"
+        label-class="required"
+        label-for="name-input"
+        :invalid-feedback="nameInvalidFeedback"
+        :state="nameInvalidFeedback ? false : null"
+      >
+        <b-form-input
+          id="name-input"
+          v-model="name"
+          type="text"
+          maxlength="255"
+          trim
+          autofocus
+          aria-required="true"
+          @input="nameInvalidFeedback = null"
+        />
+      </b-form-group>
 
-    <template v-slot:modal-footer="{ cancel }">
-      <b-button size="md" variant="secondary" @click="cancel()">{{
-        $t('message.close')
-      }}</b-button>
-      <b-button size="md" variant="primary" @click="createPolicy()">{{
-        $t('message.create')
-      }}</b-button>
-    </template>
+      <b-form-group
+        :label="$t('message.operator')"
+        label-class="required"
+        label-for="operator-input"
+        :description="$t('message.operator_help')"
+      >
+        <b-form-select
+          id="operator-input"
+          v-model="operator"
+          :options="operatorOptions"
+          aria-required="true"
+        />
+      </b-form-group>
+
+      <b-form-group
+        :label="$t('message.violation_state')"
+        label-class="required"
+        label-for="violation-state-input"
+        :description="$t('message.violation_state_help')"
+      >
+        <b-form-select
+          id="violation-state-input"
+          v-model="violationState"
+          :options="violationStateOptions"
+          aria-required="true"
+        />
+      </b-form-group>
+
+      <button type="submit" style="display: none" />
+    </b-form>
   </b-modal>
 </template>
 
 <script>
 import permissionsMixin from '../../mixins/permissionsMixin';
-import BValidatedInputGroupFormInput from '../../forms/BValidatedInputGroupFormInput';
 
 export default {
   name: 'createPolicyModal',
   mixins: [permissionsMixin],
-  components: {
-    BValidatedInputGroupFormInput,
-  },
   data() {
     return {
-      name: null,
+      name: '',
+      nameInvalidFeedback: null,
+      operator: 'ANY',
+      violationState: 'INFO',
+      submitting: false,
     };
   },
+  computed: {
+    operatorOptions() {
+      return [
+        { value: 'ANY', text: this.$t('operator.any') },
+        { value: 'ALL', text: this.$t('operator.all') },
+      ];
+    },
+    violationStateOptions() {
+      return [
+        { value: 'INFO', text: this.$t('violation.info') },
+        { value: 'WARN', text: this.$t('violation.warn') },
+        { value: 'FAIL', text: this.$t('violation.fail') },
+      ];
+    },
+  },
   methods: {
-    createPolicy: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_POLICY}`;
+    onOk(event) {
+      event.preventDefault();
+      this.onSubmit();
+    },
+    onSubmit() {
+      if (this.submitting) return;
+      this.resetValidationFeedback();
+
+      if (!this.name || !this.name.trim()) {
+        this.nameInvalidFeedback = this.$t('message.required_field');
+        return;
+      }
+
+      this.submitting = true;
       this.axios
-        .put(url, {
+        .put(`${this.$api.BASE_URL}/${this.$api.URL_POLICY}`, {
           name: this.name,
+          operator: this.operator,
+          violationState: this.violationState,
         })
-        .then((response) => {
-          this.$root.$emit('bv::hide::modal', 'createPolicyModal');
+        .then(() => {
           this.$emit('refreshTable');
           this.$toastr.s(this.$t('message.policy_created'));
-        })
-        .catch((error) => {
-          this.$toastr.w(this.$t('condition.unsuccessful_action'));
+          this.$root.$emit('bv::hide::modal', 'createPolicyModal');
         })
         .finally(() => {
-          this.resetValues();
+          this.submitting = false;
         });
     },
-    resetValues: function () {
-      this.name = null;
+    resetValidationFeedback() {
+      this.nameInvalidFeedback = null;
+    },
+    resetValues() {
+      this.name = '';
+      this.operator = 'ANY';
+      this.violationState = 'INFO';
+      this.submitting = false;
+      this.resetValidationFeedback();
     },
   },
 };
