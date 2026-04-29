@@ -1,13 +1,25 @@
-[![Build Status](https://github.com/DependencyTrack/hyades-frontend/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/DependencyTrack/hyades-frontend/actions?workflow=Build+CI)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/a6ce34f1aa7440b580d5ed33d8397bc8)](https://app.codacy.com/gh/DependencyTrack/hyades-frontend/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)]
-[![Latest (including pre-releases)](https://img.shields.io/github/v/release/dependencytrack/hyades-frontend?include_prereleases)](https://github.com/DependencyTrack/hyades-frontend/releases)
+# Hyades Frontend
 
-# Dependency-Track Front-End
+Frontend module of Hyades, the next major version of [OWASP Dependency-Track](https://github.com/DependencyTrack/dependency-track).
 
-Hyades Frontend is a fork of the [Dependency-Track Frontend](https://github.com/DependencyTrack/frontend).
-It includes various changes necessary to work with [Hyades](https://github.com/DependencyTrack/hyades).
+[![Build Status](https://github.com/DependencyTrack/hyades-frontend/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/DependencyTrack/hyades-frontend/actions/workflows/ci-build.yaml)
+[![Documentation](https://img.shields.io/badge/docs-next-blue.svg)](https://dependencytrack.github.io/docs/next/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-If you're looking for a production ready version of Dependency-Track, please refer to its main repository: https://github.com/DependencyTrack/
+> [!NOTE]
+> Hyades has not yet reached GA. For a production-ready release, refer to the
+> [main Dependency-Track repository](https://github.com/DependencyTrack/dependency-track).
 
-If you're interested in what Hyades is all about, please refer to the Hyades repository: https://github.com/DependencyTrack/hyades
+## Documentation
+
+User-facing documentation is rendered at [dependencytrack.github.io/docs/next](https://dependencytrack.github.io/docs/next/) and maintained in the [docs](https://github.com/DependencyTrack/docs) repository.
+
+## Contributing
+
+1. [Code of conduct](CODE_OF_CONDUCT.md)
+2. [Developer guide](DEVELOPING.md)
+
+## See also
+
+- [hyades-apiserver](https://github.com/DependencyTrack/hyades-apiserver): API server repository
+- [docs](https://github.com/DependencyTrack/docs): Documentation repository
