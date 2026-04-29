@@ -36,4 +36,4 @@
 -->
 
 - [ ] I have read and understand the [contributing guidelines](https://github.com/DependencyTrack/hyades/blob/main/CONTRIBUTING.md#pull-requests)
-- [ ] This PR introduces new or alters existing behavior, and I have updated the [documentation](https://dependencytrack.github.io/hyades/latest/development/documentation/) accordingly
+- [ ] This PR introduces new or alters existing behavior, and I have updated the [documentation](https://github.com/DependencyTrack/docs) accordingly

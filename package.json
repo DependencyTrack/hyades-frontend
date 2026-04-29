@@ -21,7 +21,7 @@
     "prettier": "prettier --check --cache '**/*.{js,vue,json,md,yaml}'",
     "prettier-fix": "prettier --write --cache '**/*.{js,vue,json,md,yaml}'",
     "vue-i18n-extract": "vue-i18n-extract report --ci",
-    "add-missing-i18n": "vue-i18n-extract --add"
+    "remove-unused-i18n": "vue-i18n-extract --remove"
   },
   "dependencies": {
     "@codemirror/autocomplete": "6.20.1",
