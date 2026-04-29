@@ -163,7 +163,7 @@ export default {
       return this.types[this.tabIndex];
     },
     tableDataBaseUrl() {
-      return `${this.$api.BASE_URL}/api/v2/task-queues/${this.selectedType}`;
+      return `${this.$api.BASE_URL}/api/v2/internal/task-queues/${this.selectedType}`;
     },
   },
   methods: {
@@ -174,7 +174,7 @@ export default {
     async toggleStatus(row) {
       const newStatus = row.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
       await this.axios.patch(
-        `${this.$api.BASE_URL}/api/v2/task-queues/${this.selectedType}/${encodeURIComponent(row.name)}`,
+        `${this.$api.BASE_URL}/api/v2/internal/task-queues/${this.selectedType}/${encodeURIComponent(row.name)}`,
         { status: newStatus },
       );
       this.$toastr.s(this.$t('message.updated'));
@@ -203,7 +203,7 @@ export default {
       }
       try {
         await this.axios.patch(
-          `${this.$api.BASE_URL}/api/v2/task-queues/${this.selectedType}/${encodeURIComponent(row.name)}`,
+          `${this.$api.BASE_URL}/api/v2/internal/task-queues/${this.selectedType}/${encodeURIComponent(row.name)}`,
           { capacity: this.editCapacityValue },
         );
         this.$toastr.s(this.$t('message.updated'));

@@ -385,7 +385,7 @@ export default {
   },
   computed: {
     runUrl() {
-      return `${this.$api.BASE_URL}/api/v2/workflow-runs/${encodeURIComponent(this.id)}`;
+      return `${this.$api.BASE_URL}/api/v2/internal/workflow-runs/${encodeURIComponent(this.id)}`;
     },
     normalizedStatus() {
       if (!this.run) {
