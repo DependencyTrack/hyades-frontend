@@ -233,7 +233,7 @@ export default {
       ];
     },
     tableDataBaseUrl() {
-      const url = `${this.$api.BASE_URL}/api/v2/workflow-runs`;
+      const url = `${this.$api.BASE_URL}/api/v2/internal/workflow-runs`;
       const queryParams = {};
       if (
         this.workflowNameFilter &&
