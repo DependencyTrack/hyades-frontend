@@ -683,7 +683,7 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;
-  cursor: help;
+  cursor: pointer;
 }
 </style>
 
